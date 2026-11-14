@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>吊桥维修 · 双人协作</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; background: #0b1020; color: #dfe7ff;
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    height: 100%; overflow: hidden;
+  }
+  #wrap { display: flex; flex-direction: column; height: 100%; }
+  #hud {
+    display: flex; gap: 24px; align-items: center; justify-content: center;
+    padding: 8px 16px; background: #111a33; font-size: 14px; flex-wrap: wrap;
+  }
+  #hud .tag { padding: 2px 10px; border-radius: 10px; background: #1c2a52; }
+  #hud .p1 { color: #7fd0ff; }
+  #hud .p2 { color: #ffc37f; }
+  #stage { position: relative; flex: 1; }
+  canvas { display: block; width: 100%; height: 100%; }
+  #overlay {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    background: rgba(5, 8, 18, 0.78); transition: opacity .3s;
+  }
+  #overlay.hidden { opacity: 0; pointer-events: none; }
+  #overlay h1 { margin: 0 0 12px; font-size: 34px; }
+  #overlay p { margin: 4px 0; max-width: 640px; line-height: 1.7; }
+  #overlay .keys { color: #9db4ff; }
+  #overlay button {
+    margin-top: 18px; padding: 10px 34px; font-size: 18px; cursor: pointer;
+    background: #2f6bff; color: #fff; border: none; border-radius: 8px;
+  }
+  #overlay button:hover { background: #4a80ff; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="hud">
+    <span class="tag p1">维修员A（左）：W/S 控制桥板升降</span>
+    <span class="tag" id="hud-plate">桥板 1 / 3</span>
+    <span class="tag" id="hud-stress">应力 0%</span>
+    <span class="tag" id="hud-dock">对接 0%</span>
+    <span class="tag p2">维修员B（右）：↑/↓ 控制拉索张力</span>
+  </div>
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div id="overlay">
+      <h1>吊桥维修 · 双人协作</h1>
+      <p>桥面会随重量弯曲，两人不同步时桥体会扭动并累积应力，应力超限吊桥将强制关闭。</p>
+      <p>任务：合作更换 <b>3</b> 块桥板。每次对接需要<b>位置</b>与<b>张力</b>同时进入绿色区间并保持。</p>
+      <p class="keys">维修员A：W 升起 / S 下降 &nbsp;|&nbsp; 维修员B：↑ 增张力 / ↓ 减张力 &nbsp;|&nbsp; R 复位</p>
+      <button id="btn-start">开始作业</button>
+    </div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
