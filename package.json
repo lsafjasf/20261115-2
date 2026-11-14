@@ -1,0 +1,11 @@
+{
+  "name": "av-sync-tool",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}

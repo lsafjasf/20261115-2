@@ -1,0 +1,159 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif;
+  background: #ffffff;
+  color: #1a1a1a;
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 36px 24px 60px;
+}
+
+h1 {
+  font-size: 34px;
+  font-weight: 800;
+  margin: 0 0 14px;
+}
+
+.hint {
+  color: #555;
+  font-size: 15px;
+  margin: 0 0 18px;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #111;
+}
+
+#screen {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #0d0d0d;
+}
+
+.time-readout {
+  position: absolute;
+  left: 22px;
+  bottom: 14px;
+  color: #f2f2f2;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 20px;
+  letter-spacing: 1px;
+}
+
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 18px 0 16px;
+}
+
+#playBtn {
+  padding: 4px 12px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.transport-time {
+  font-family: Consolas, monospace;
+  font-size: 15px;
+  min-width: 140px;
+}
+
+#scrubber {
+  flex: 1;
+  cursor: pointer;
+}
+
+.offset-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.offset-label {
+  font-size: 16px;
+}
+
+#offsetSlider {
+  width: 190px;
+  cursor: pointer;
+}
+
+.offset-value {
+  font-family: Consolas, monospace;
+  font-size: 16px;
+  min-width: 80px;
+}
+
+.tolerance-label {
+  margin-left: 28px;
+  font-size: 16px;
+}
+
+#toleranceInput {
+  width: 78px;
+  padding: 4px 6px;
+  font-size: 15px;
+}
+
+#saveBtn {
+  padding: 6px 14px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.save-status {
+  color: #1a7f37;
+  font-size: 15px;
+}
+
+.align-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+
+.align-table th,
+.align-table td {
+  border: 1px solid #9a9a9a;
+  padding: 7px 10px;
+  text-align: center;
+}
+
+.align-table th {
+  font-weight: 700;
+  background: #fafafa;
+}
+
+.align-table tr.over-tolerance td {
+  color: #d1242f;
+  background: #fff1f0;
+}
+
+.avg-label {
+  font-weight: 700;
+  text-align: center !important;
+}
+
+#avgDiff {
+  font-weight: 800;
+  font-family: Consolas, monospace;
+}
+
+#avgDiff.over-tolerance {
+  color: #d1242f;
+}

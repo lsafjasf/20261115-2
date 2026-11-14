@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>声画对齐校正工具</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>声画对齐校正工具</h1>
+    <p class="hint">
+      18 秒画面含 12 次闪烁，音频含 12 次节拍。拖动“音频偏移”滑块使节拍与闪光对齐，超容差行会标红。
+    </p>
+
+    <section class="stage" id="stage">
+      <canvas id="screen" width="860" height="380"></canvas>
+      <div class="time-readout" id="timeReadout">t = 0.000 s</div>
+    </section>
+
+    <section class="transport">
+      <button id="playBtn" type="button">播放</button>
+      <span class="transport-time" id="transportTime">0.000 / 18.000 s</span>
+      <input type="range" id="scrubber" min="0" max="18" step="0.001" value="0" />
+    </section>
+
+    <section class="offset-row">
+      <label class="offset-label" for="offsetSlider">音频偏移</label>
+      <input type="range" id="offsetSlider" min="-1000" max="1000" step="1" value="0" />
+      <span class="offset-value" id="offsetValue">0 ms</span>
+      <label class="tolerance-label" for="toleranceInput">容差 (ms)</label>
+      <input type="number" id="toleranceInput" min="1" max="1000" step="1" value="80" />
+      <button id="saveBtn" type="button">保存偏移</button>
+      <span class="save-status" id="saveStatus"></span>
+    </section>
+
+    <table class="align-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>闪光时刻 (s)</th>
+          <th>节拍时刻(校正后) (s)</th>
+          <th>差值 (ms)</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" class="avg-label">平均差值</td>
+          <td id="avgDiff">0.0 ms</td>
+        </tr>
+      </tfoot>
+    </table>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
