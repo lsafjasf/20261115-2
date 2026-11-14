@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>双人机械臂 · 装配挑战</title>
+<style>
+  body{margin:0;background:#14181f;color:#dfe6ef;font-family:"Microsoft YaHei",system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;user-select:none}
+  h1{font-size:20px;margin:10px 0 4px}
+  #hud{display:flex;gap:22px;font-size:14px;margin:6px 0}
+  #hud b{color:#ffd166}
+  #msg{height:22px;font-size:16px;color:#8be9a0}
+  canvas{background:#1c2230;border:1px solid #39415a;border-radius:8px}
+  #help{display:flex;gap:36px;margin:8px 0;font-size:13px;color:#9fb0c8}
+  kbd{background:#2a3348;border:1px solid #4a5678;border-radius:4px;padding:1px 6px;color:#fff}
+</style>
+</head>
+<body>
+<h1>双人协作机械臂 · 装配挑战</h1>
+<div id="hud">
+  <span>已放置 <b id="placed">0</b>/3</span>
+  <span>碰撞 <b id="col">0</b>/1</span>
+  <span>夹空 <b id="miss">0</b></span>
+  <span>肩角 <b id="a1">0</b>°</span>
+  <span>肘角 <b id="a2">0</b>°</span>
+</div>
+<div id="msg">抓住传送带上的工件，放进左侧槽位，完成 3 次且碰撞 ≤1 即通过</div>
+<canvas id="cv" width="900" height="600"></canvas>
+<div id="help">
+  <span>玩家1（臂）：<kbd>A</kbd>/<kbd>D</kbd> 肩关节，<kbd>W</kbd>/<kbd>S</kbd> 肘关节</span>
+  <span>玩家2（夹爪）：按住 <kbd>Space</kbd> 闭合，松开张开</span>
+  <span><kbd>R</kbd> 重置</span>
+</div>
+<script>
+'use strict';
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const BASE = {x:150, y:480}, L1 = 140, L2 = 120;
+const BELT = {x0:250, x1:880, y:540};
+const SLOT = {x0:44, x1:108, top:498, bottom:562};
+const GRAB_R = 30;
+const W1 = 1.7, W2 = 2.1, GRATE = 1/0.22;
+
+const S = {};
+function reset(){
+  S.a1 = 0.9; S.a2 = -1.9; S.g = 0;
+  S.carry = null; S.wp = null; S.spawnT = 0.6;
+  S.placed = 0; S.col = 0; S.miss = 0;
+  S.status = 'run'; S.msg = ''; S.msgT = 0;
+  S.flashT = 0; S.colCd = 0; S.t = 0;
+  S.w1 = 0; S.w2 = 0; S.gRate = 0;
+  S.placedList = []; S.closedLatch = false;
+}
+reset();
+
+const keys = {};
+addEventListener('keydown', e => {
+  const k = e.key === ' ' ? ' ' : e.key.toLowerCase();
+  if ([' ','a','d','w','s','r'].includes(k)) e.preventDefault();
+  keys[k] = true;
+  AudioSys.ensure();
+  if (k === 'r') reset();
+});
+addEventListener('keyup', e => {
+  keys[e.key === ' ' ? ' ' : e.key.toLowerCase()] = false;
+});
+
+function joints(){
+  const j1 = {x: BASE.x + L1*Math.cos(S.a1), y: BASE.y - L1*Math.sin(S.a1)};
+  const tip = {x: j1.x + L2*Math.cos(S.a1+S.a2), y: j1.y - L2*Math.sin(S.a1+S.a2)};
+  return {j1, tip};
+}
+function say(m, t=1.6){ S.msg = m; S.msgT = t; }
+
+function spawnWp(){
+  S.wp = {x: BELT.x1 - 24, y: BELT.y - 11, vx: -(55 + S.placed*12), vy: 0, state:'belt', size:18};
+}
+
+function update(dt){
+  if (S.status !== 'run') { S.t += dt; return; }
+  S.t += dt;
+  S.w1 = ((keys['d']?1:0) - (keys['a']?1:0)) * W1;
+  S.w2 = ((keys['s']?1:0) - (keys['w']?1:0)) * W2;
+  S.a1 = Math.min(3.4, Math.max(-0.5, S.a1 + S.w1*dt));
+  S.a2 = Math.min(2.7, Math.max(-2.7, S.a2 + S.w2*dt));
+
+  const gTarget = keys[' '] ? 1 : 0;
+  const gPrev = S.g;
+  S.g += Math.sign(gTarget - S.g) * GRATE * dt;
+  if ((gTarget - gPrev) * (gTarget - S.g) < 0) S.g = gTarget;
+  S.gRate = (S.g - gPrev) / dt;
+
+  const {tip} = joints();
+
+  if (S.g >= 0.98 && !S.closedLatch){
+    S.closedLatch = true;
+    if (!S.carry){
+      if (S.wp && S.wp.state === 'belt' && Math.hypot(tip.x-S.wp.x, tip.y-S.wp.y) < GRAB_R){
+        S.carry = S.wp; S.wp.state = 'held';
+        say('抓取成功！送往槽位'); AudioSys.blip(520, 0.08);
+      } else {
+        S.miss++; say('夹空了！', 1.0); AudioSys.blip(180, 0.12, 'square', 0.05);
+      }
+    }
+  }
+  if (S.g <= 0.05) S.closedLatch = false;
+
+  if (S.carry && S.g <= 0.05){
+    const wp = S.carry; S.carry = null;
+    wp.state = 'falling'; wp.vy = 0; wp.x = tip.x; wp.y = tip.y + 6;
+  }
+
+  if (S.wp){
+    const wp = S.wp;
+    if (wp.state === 'belt'){
+      wp.x += wp.vx * dt;
+      if (wp.x < BELT.x0 + 8){ S.wp = null; S.spawnT = 1.2; say('错过窗口，工件流走了', 1.2); }
+    } else if (wp.state === 'held'){
+      wp.x = tip.x; wp.y = tip.y + 4;
+    } else if (wp.state === 'falling'){
+      wp.vy += 900*dt; wp.y += wp.vy*dt;
+      if (wp.y >= SLOT.top + 8){
+        if (wp.x > SLOT.x0 + 6 && wp.x < SLOT.x1 - 6){
+          S.placed++;
+          S.placedList.push({x: (SLOT.x0+SLOT.x1)/2, y: SLOT.bottom - 10 - (S.placed-1)*20});
+          S.wp = null; S.spawnT = 1.0;
+          say(`装配 ${S.placed}/3 完成！`); AudioSys.chime();
+          if (S.placed >= 3){
+            S.status = S.col <= 1 ? 'win' : 'fail';
+            say(S.status === 'win' ? '✔ 通过！三次装配完成' : '✘ 碰撞超限，未通过', 999);
+          }
+        } else {
+          S.col++; S.flashT = 0.4; S.wp = null; S.spawnT = 1.2;
+          say('工件掉落！碰撞 +1'); AudioSys.buzz();
+          if (S.col >= 2){ S.status = 'fail'; say('✘ 碰撞超限，未通过（按 R 重来）', 999); }
+        }
+      }
+    }
+  } else if (S.status === 'run'){
+    S.spawnT -= dt;
+    if (S.spawnT <= 0) spawnWp();
+  }
+
+  S.colCd = Math.max(0, S.colCd - dt);
+  if (tip.y > BELT.y - 3 && tip.x > BELT.x0 && tip.x < BELT.x1 && S.colCd <= 0){
+    S.col++; S.flashT = 0.4; S.colCd = 0.8;
+    say('夹爪撞到传送带！碰撞 +1'); AudioSys.buzz();
+    if (S.col >= 2){ S.status = 'fail'; say('✘ 碰撞超限，未通过（按 R 重来）', 999); }
+  }
+
+  S.msgT = Math.max(0, S.msgT - dt);
+  S.flashT = Math.max(0, S.flashT - dt);
+  const spd = Math.min(1, Math.abs(S.w1)/W1*0.55 + Math.abs(S.w2)/W2*0.35 + Math.min(1,Math.abs(S.gRate))*0.25);
+  AudioSys.setMotor(spd);
+}
+
+function drawWp(x, y, size){
+  ctx.fillStyle = '#ffb84d';
+  ctx.fillRect(x-size/2, y-size/2, size, size);
+  ctx.fillStyle = '#ffe0a8';
+  ctx.fillRect(x-size/2+3, y-size/2+3, size-6, 5);
+  ctx.strokeStyle = '#8a5a1a'; ctx.lineWidth = 2;
+  ctx.strokeRect(x-size/2, y-size/2, size, size);
+}
+
+function render(){
+  ctx.clearRect(0, 0, 900, 600);
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 1;
+  for (let x = 0; x <= 900; x += 50){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,600); ctx.stroke(); }
+  for (let y = 0; y <= 600; y += 50){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(900,y); ctx.stroke(); }
+
+  ctx.fillStyle = 'rgba(110,231,140,0.18)';
+  let zx = -1, zx0 = 0;
+  for (let x = BELT.x0; x <= BELT.x1; x += 4){
+    const d = Math.hypot(x-BASE.x, (BELT.y-11)-BASE.y);
+    const ok = d < L1+L2-8 && d > Math.abs(L1-L2)+6;
+    if (ok && zx < 0){ zx = 1; zx0 = x; }
+    if (!ok && zx > 0){ ctx.fillRect(zx0, BELT.y-26, x-zx0, 26); zx = -1; }
+  }
+  if (zx > 0) ctx.fillRect(zx0, BELT.y-26, BELT.x1-zx0, 26);
+
+  ctx.fillStyle = '#2b3350';
+  ctx.fillRect(BELT.x0, BELT.y, BELT.x1-BELT.x0, 14);
+  ctx.fillStyle = '#3d4a75';
+  const off = (S.t*55) % 24;
+  for (let x = BELT.x0 - off; x < BELT.x1; x += 24) ctx.fillRect(x, BELT.y+2, 10, 10);
+  ctx.fillStyle = '#9fb0c8'; ctx.font = '12px sans-serif';
+  ctx.fillText('传送带（绿区为可抓取窗口）', BELT.x0+8, BELT.y+32);
+
+  ctx.fillStyle = '#37503f';
+  ctx.fillRect(SLOT.x0-8, SLOT.top, 8, SLOT.bottom-SLOT.top);
+  ctx.fillRect(SLOT.x1, SLOT.top, 8, SLOT.bottom-SLOT.top);
+  ctx.fillRect(SLOT.x0-8, SLOT.bottom, SLOT.x1-SLOT.x0+16, 10);
+  ctx.fillStyle = '#9fb0c8';
+  ctx.fillText('槽位', SLOT.x0+12, SLOT.bottom+28);
+  for (const p of S.placedList) drawWp(p.x, p.y, 18);
+
+  if (S.wp) drawWp(S.wp.x, S.wp.y, S.wp.size);
+
+  const {j1, tip} = joints();
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#6ea8ff'; ctx.lineWidth = 14;
+  ctx.beginPath(); ctx.moveTo(BASE.x, BASE.y); ctx.lineTo(j1.x, j1.y); ctx.stroke();
+  ctx.strokeStyle = '#4fd1c5'; ctx.lineWidth = 10;
+  ctx.beginPath(); ctx.moveTo(j1.x, j1.y); ctx.lineTo(tip.x, tip.y); ctx.stroke();
+  ctx.fillStyle = '#8b98b8';
+  ctx.beginPath(); ctx.arc(BASE.x, BASE.y, 12, 0, 7); ctx.fill();
+  ctx.beginPath(); ctx.arc(j1.x, j1.y, 9, 0, 7); ctx.fill();
+
+  ctx.strokeStyle = '#ffd166'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(BASE.x, BASE.y, 26, -S.a1, 0); ctx.stroke();
+  ctx.beginPath(); ctx.arc(j1.x, j1.y, 18, -(S.a1+S.a2), -S.a1); ctx.stroke();
+
+  const ga = S.a1 + S.a2, spread = (1-S.g)*9 + 2;
+  const fx = Math.cos(ga), fy = -Math.sin(ga);
+  const px = -fy, py = fx;
+  ctx.strokeStyle = S.carry ? '#8be9a0' : '#e2e8f0'; ctx.lineWidth = 4;
+  for (const s of [1,-1]){
+    ctx.beginPath();
+    ctx.moveTo(tip.x + px*spread*s, tip.y + py*spread*s);
+    ctx.lineTo(tip.x + px*spread*s + fx*16, tip.y + py*spread*s + fy*16);
+    ctx.stroke();
+  }
+
+  if (S.flashT > 0){ ctx.fillStyle = `rgba(255,60,60,${S.flashT*0.8})`; ctx.fillRect(0,0,900,600); }
+  if (S.status !== 'run'){
+    ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(0,0,900,600);
+    ctx.fillStyle = S.status === 'win' ? '#8be9a0' : '#ff7b7b';
+    ctx.font = 'bold 42px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(S.status === 'win' ? '✔ 装配通过！' : '✘ 未通过', 450, 280);
+    ctx.font = '18px sans-serif'; ctx.fillStyle = '#dfe6ef';
+    ctx.fillText(`放置 ${S.placed}/3 · 碰撞 ${S.col} · 夹空 ${S.miss}　（按 R 重新开始）`, 450, 320);
+    ctx.textAlign = 'left';
+  }
+
+  document.getElementById('placed').textContent = S.placed;
+  document.getElementById('col').textContent = S.col;
+  document.getElementById('miss').textContent = S.miss;
+  document.getElementById('a1').textContent = (S.a1*180/Math.PI).toFixed(0);
+  document.getElementById('a2').textContent = (S.a2*180/Math.PI).toFixed(0);
+  document.getElementById('msg').textContent = S.msgT > 0 || S.status !== 'run' ? S.msg :
+    (S.carry ? '搬运中：送往左侧槽位后松开 Space' : '等待抓取：将夹爪移到绿区内工件上方');
+}
+
+const AudioSys = {
+  ctx: null, osc: null, gain: null,
+  ensure(){
+    if (!this.ctx){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AC();
+      this.osc = this.ctx.createOscillator();
+      this.osc.type = 'sawtooth';
+      const filt = this.ctx.createBiquadFilter();
+      filt.type = 'lowpass'; filt.frequency.value = 500;
+      this.gain = this.ctx.createGain();
+      this.gain.gain.value = 0;
+      this.osc.connect(filt); filt.connect(this.gain); this.gain.connect(this.ctx.destination);
+      this.osc.start();
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  setMotor(spd){
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    this.osc.frequency.setTargetAtTime(55 + spd*160, t, 0.05);
+    this.gain.gain.setTargetAtTime(spd > 0.02 ? 0.025 + spd*0.05 : 0, t, 0.06);
+  },
+  blip(freq, dur, type='sine', vol=0.1){
+    if (!this.ctx) return;
+    const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, this.ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + dur);
+    o.connect(g); g.connect(this.ctx.destination);
+    o.start(); o.stop(this.ctx.currentTime + dur);
+  },
+  chime(){ this.blip(660, 0.15); setTimeout(() => this.blip(880, 0.25), 120); },
+  buzz(){ this.blip(85, 0.35, 'sawtooth', 0.16); }
+};
+
+
+let last = performance.now();
+function frame(now){
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+  update(dt);
+  render();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+window.__state = function(){
+  const {j1, tip} = joints();
+  return {
+    a1: S.a1, a2: S.a2, g: S.g, tip, j1,
+    wp: S.wp ? {x: S.wp.x, y: S.wp.y, vx: S.wp.vx, state: S.wp.state} : null,
+    carried: !!S.carry, placed: S.placed, col: S.col, miss: S.miss,
+    status: S.status, base: BASE, L1, L2, slot: SLOT, belt: BELT
+  };
+};
+</script>
+</body>
+</html>
