@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>城市颗粒物浓度三维剖面</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>颗粒物（PM2.5）三维浓度剖面</h1>
+  <div class="hint">拖动切片移动 · 空白处拖动旋转视角 · 滚轮缩放</div>
+</header>
+<main>
+  <div class="stage">
+    <canvas id="scene"></canvas>
+    <div id="sliceBadge" class="badge"></div>
+  </div>
+  <aside class="panel">
+    <section class="card">
+      <h2>时间</h2>
+      <div class="row">
+        <button id="playBtn">暂停</button>
+        <span id="timeLabel" class="mono">08:00</span>
+      </div>
+      <input type="range" id="timeSlider" min="0" max="23" value="8">
+    </section>
+
+    <section class="card">
+      <h2>切片位置</h2>
+      <label class="slider-label">水平切片高度
+        <input type="range" id="hSlider" min="0" max="7" value="1">
+        <span id="hLabel" class="mono">25 m（第2层）</span>
+      </label>
+      <label class="slider-label">垂直切片行（Y 轴）
+        <input type="range" id="vSlider" min="0" max="15" value="8">
+        <span id="vLabel" class="mono">Y = 8</span>
+      </label>
+    </section>
+
+    <section class="card legend-card">
+      <h2>浓度图例 <span class="unit">μg/m³</span></h2>
+      <div class="legend-wrap">
+        <canvas id="legend" width="40" height="260"></canvas>
+        <div class="legend-ticks" id="legendTicks"></div>
+      </div>
+      <div class="legend-domain mono" id="legendDomain"></div>
+    </section>
+
+    <section class="card">
+      <h2>统计数据</h2>
+      <div id="stats"></div>
+    </section>
+
+    <section class="card">
+      <h2>热点 TOP 5</h2>
+      <ol id="hotspots" class="hotspots"></ol>
+    </section>
+
+    <section class="card">
+      <h2>一致性自检</h2>
+      <button id="selfTestBtn">重新自检（25m / 100m）</button>
+      <div id="selfTest" class="selftest"></div>
+    </section>
+  </aside>
+</main>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
