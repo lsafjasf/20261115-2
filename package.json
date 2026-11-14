@@ -1,0 +1,13 @@
+{
+  "name": "subtitle-studio",
+  "version": "1.0.0",
+  "description": "三模板字幕工作台：新闻 / 剧情 / 提示卡，时间轴同步动画，支持帧与模板 JSON 导出",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/core.test.js test/render.test.js && node test/smoke-app.test.js",
+    "demo": "node test/demo.mjs && node test/smoke-app.test.js",
+    "e2e": "node scripts/e2e-browser.mjs",
+    "start": "node server.mjs"
+  },
+  "license": "MIT"
+}
