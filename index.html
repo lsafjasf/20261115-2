@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMA 显影室 · Color Room</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='none' stroke='%23d8a866' stroke-width='2'/%3E%3Cpath d='M5 18V11M10 18V6M15 18v-7M20 18V9' stroke='%23d8a866' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+        <path d="M4 20V10M9 20V5M14 20v-8M19 20V8" stroke="currentColor" stroke-width="2.4"
+              stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <h1>LUMA</h1>
+      <p>显影室 / COLOR ROOM</p>
+    </div>
+  </div>
+  <div class="status-pills">
+    <span class="pill"><i class="dot"></i>CANVAS 就绪</span>
+    <span class="pill">960 × 640</span>
+    <span class="pill">sRGB · 逐像素</span>
+  </div>
+  <div class="top-actions">
+    <button id="redo-btn" class="btn ghost" title="重做 (Ctrl+Y)">重做 ↻</button>
+    <button id="undo-btn" class="btn ghost" title="撤销 (Ctrl+Z)">↶ 撤销 <kbd>⌘Z</kbd></button>
+    <button id="export-btn" class="btn primary">⤓ 导出 PNG</button>
+  </div>
+</header>
+
+<main class="layout">
+  <!-- 左：预设库 -->
+  <aside class="panel preset-panel">
+    <div class="panel-head">
+      <span class="eyebrow">PRESET LIBRARY</span>
+      <span class="count-badge" id="preset-count">03</span>
+    </div>
+    <h2 class="panel-title">预设库</h2>
+    <p class="panel-note">为同一张底图快速切换不同情绪。选择预设会记录一次可撤销操作。</p>
+    <div id="preset-list" class="preset-list"></div>
+    <div class="save-box">
+      <input id="preset-name" type="text" maxlength="16" placeholder="输入预设名称…">
+      <button id="save-preset" class="btn dashed">＋ 保存当前设置</button>
+    </div>
+    <p class="save-hint">自定义预设保存在本机浏览器</p>
+  </aside>
+
+  <!-- 中：画布 -->
+  <section class="stage-panel">
+    <div class="base-tabs">
+      <button class="base-tab on" data-base="coastline"><b>01</b> 海岸公路 <small>COASTLINE</small></button>
+      <button class="base-tab" data-base="duneGarden"><b>02</b> 沙丘花园 <small>DUNE GARDEN</small></button>
+    </div>
+    <div class="stage-frame">
+      <canvas id="stage" width="960" height="640"></canvas>
+      <span class="frame-badge" id="frame-badge">01 / 02</span>
+      <span class="frame-tag">GOLDEN HOUR · COLOR ROOM</span>
+    </div>
+    <div class="stage-meta">
+      <div>
+        <span class="eyebrow">当前预设</span>
+        <strong id="current-preset-name">原图参数</strong>
+        <em id="current-preset-sub">未套用预设</em>
+      </div>
+      <div class="stage-tools">
+        <span class="live-dot"><i></i>实时逐像素处理</span>
+        <button id="hold-original" class="btn ghost small">◈ 按住看原图 <kbd>B</kbd></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 右：直方图与参数 -->
+  <aside class="panel control-panel">
+    <div class="panel-head">
+      <span class="eyebrow">LIVE ANALYSIS</span>
+      <span class="live-tag"><i></i>LIVE</span>
+    </div>
+    <h2 class="panel-title">影调控制</h2>
+
+    <div class="histo-block">
+      <div class="histo-head">
+        <span>RGB 直方图</span>
+        <span class="mono">0 — 255</span>
+      </div>
+      <canvas id="histo" width="320" height="118"></canvas>
+      <div class="histo-foot"><span>SHADOW</span><span>HIGHLIGHT</span></div>
+    </div>
+
+    <div class="readout-grid">
+      <div><span>EXPOSURE</span><b id="readout-exposure">+0.00 EV</b></div>
+      <div><span>WHITE BALANCE</span><b id="readout-temp">5600 K</b></div>
+      <div><span>CONTRAST</span><b id="readout-contrast">0</b></div>
+      <div><span>SPLIT TONE</span><b id="readout-split">—</b></div>
+    </div>
+    <p class="ms-line">本次逐像素处理耗时 <b id="readout-ms">0.0 ms</b></p>
+
+    <div class="sliders">
+      <div class="slider-row" data-group="exposure">
+        <label><b>01</b> 曝光</label><output id="val-exposure">+0.00 EV</output>
+        <input id="ctl-exposure" type="range" min="-2" max="2" step="0.01" value="0">
+        <div class="scale"><span>-2 EV</span><span>0</span><span>+2 EV</span></div>
+      </div>
+      <div class="slider-row" data-group="temperature">
+        <label><b>02</b> 色温</label><output id="val-temperature">5600 K</output>
+        <input id="ctl-temperature" type="range" min="3200" max="8000" step="20" value="5600">
+        <div class="scale"><span>3200 K 冷</span><span>5600 K</span><span>暖 8000 K</span></div>
+      </div>
+      <div class="slider-row" data-group="contrast">
+        <label><b>03</b> 对比度</label><output id="val-contrast">0</output>
+        <input id="ctl-contrast" type="range" min="-100" max="100" step="1" value="0">
+        <div class="scale"><span>柔和</span><span>0</span><span>强烈</span></div>
+      </div>
+      <div class="slider-row split">
+        <label><b>04</b> 分离色调</label>
+        <output class="split-output">阴 <span id="val-shadowHue">220°</span>/<span id="val-shadowSat">0</span>
+          · 高 <span id="val-highHue">40°</span>/<span id="val-highSat">0</span></output>
+        <div class="split-lines">
+          <div class="split-line">
+            <i class="chip blue"></i><span>阴影</span>
+            <input id="ctl-shadowHue" type="range" min="0" max="360" step="1" value="220">
+            <output id="val-shadowHue">220°</output>
+          </div>
+          <div class="split-line">
+            <i class="chip"></i><span></span>
+            <input id="ctl-shadowSat" type="range" min="0" max="100" step="1" value="0">
+            <output id="val-shadowSat">0</output>
+          </div>
+          <div class="split-line">
+            <i class="chip amber"></i><span>高光</span>
+            <input id="ctl-highHue" type="range" min="0" max="360" step="1" value="40">
+            <output id="val-highHue">40°</output>
+          </div>
+          <div class="split-line">
+            <i class="chip"></i><span></span>
+            <input id="ctl-highSat" type="range" min="0" max="100" step="1" value="0">
+            <output id="val-highSat">0</output>
+          </div>
+        </div>
+        <div class="scale split-scale"><span>阴影 / 高光</span><span>色相 · 饱和度</span></div>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<footer class="compare-strip">
+  <div class="compare-intro">
+    <span class="eyebrow">TWO NEGATIVES · THREE LOOKS</span>
+    <h3>双底图对照</h3>
+    <p>三套预设分别套用于两张程序生成底图。点击任一缩略图可载入编辑台。</p>
+    <div class="legend">
+      <span><i class="dot a"></i>A 海岸公路</span>
+      <span><i class="dot b"></i>B 沙丘花园</span>
+    </div>
+  </div>
+  <div id="compare-grid" class="compare-grid"></div>
+</footer>
+
+<script src="js/engine.cjs"></script>
+<script src="js/baseimages.cjs"></script>
+<script src="js/histogram.cjs"></script>
+<script src="js/app.js"></script>
+<script src="js/compare.js"></script>
+</body>
+</html>

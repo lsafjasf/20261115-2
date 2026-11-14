@@ -1,0 +1,15 @@
+{
+  "name": "luma-color-room",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LUMA 显影室：纯 Canvas 逐像素调色台（曝光/色温/对比度/分离色调 + 预设 + 撤销 + PNG 导出）",
+  "type": "module",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "test:engine": "node --test tools/test-engine.mjs",
+    "test:browser": "node tools/verify-browser-pw.mjs",
+    "test:interactions": "node tools/verify-interactions.mjs",
+    "contact-sheet": "node tools/make-contact-sheet.mjs",
+    "test": "npm run test:engine && npm run test:browser && npm run test:interactions"
+  }
+}
