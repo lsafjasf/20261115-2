@@ -1,0 +1,14 @@
+{
+  "name": "gravity-field-poster-grid",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Canvas activity-poster grid editor with responsive snapping and export.",
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "test": "node --test tests/grid-core.test.js",
+    "test:e2e": "node tests/e2e-check.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.55.0"
+  }
+}

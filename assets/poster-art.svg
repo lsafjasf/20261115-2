@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" width="900" height="900">
+  <defs>
+    <radialGradient id="sun" cx="42%" cy="36%" r="68%">
+      <stop offset="0" stop-color="#ff9c75"/>
+      <stop offset="0.6" stop-color="#eb5939"/>
+      <stop offset="1" stop-color="#c73820"/>
+    </radialGradient>
+    <radialGradient id="orb" cx="34%" cy="27%" r="72%">
+      <stop offset="0" stop-color="#f7ffc9"/>
+      <stop offset="0.18" stop-color="#dff57d"/>
+      <stop offset="0.66" stop-color="#82994b"/>
+      <stop offset="1" stop-color="#2c3a28"/>
+    </radialGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e95435" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#e95435" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.25" fill="#f4eedf" opacity=".25"/>
+    </pattern>
+    <pattern id="lines" width="45" height="45" patternUnits="userSpaceOnUse">
+      <path d="M0 45 45 0" stroke="#f4eedf" stroke-width="1" opacity=".09"/>
+    </pattern>
+    <filter id="blur">
+      <feGaussianBlur stdDeviation="34"/>
+    </filter>
+    <clipPath id="frame">
+      <rect width="900" height="900" rx="4"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <rect width="900" height="900" fill="#20241a"/>
+    <rect width="900" height="900" fill="url(#lines)"/>
+
+    <circle cx="662" cy="182" r="180" fill="url(#glow)" filter="url(#blur)" opacity=".7"/>
+    <circle cx="421" cy="424" r="322" fill="url(#sun)"/>
+    <circle cx="392" cy="391" r="252" fill="#20241a" opacity=".13"/>
+
+    <g fill="none" stroke="#f1ead8" opacity=".6">
+      <circle cx="424" cy="423" r="347" stroke-width="1.2"/>
+      <circle cx="424" cy="423" r="368" stroke-width=".8" stroke-dasharray="2 11"/>
+      <ellipse cx="424" cy="423" rx="432" ry="208" stroke-width="1.2" transform="rotate(-27 424 423)"/>
+      <ellipse cx="424" cy="423" rx="438" ry="284" stroke-width=".7" transform="rotate(32 424 423)"/>
+    </g>
+
+    <path d="M628 88h202l-128 128H500z" fill="#d9ef7a"/>
+    <path d="M768 88h62v159L665 412z" fill="#f3efe3" opacity=".92"/>
+    <path d="M88 747h323l-68 104H88z" fill="#d9ef7a" opacity=".96"/>
+    <circle cx="742" cy="710" r="92" fill="#f3efe3"/>
+    <circle cx="742" cy="710" r="58" fill="#20241a"/>
+    <circle cx="742" cy="710" r="25" fill="#e95435"/>
+
+    <g transform="translate(588 514)">
+      <circle cx="0" cy="0" r="155" fill="#10150e" opacity=".26"/>
+      <circle cx="0" cy="0" r="137" fill="url(#orb)"/>
+      <path d="M-37-106C22-117 73-67 82-10" fill="none" stroke="#fbffe7" stroke-width="7" stroke-linecap="round" opacity=".45"/>
+      <circle cx="-53" cy="-47" r="13" fill="#fbffe7" opacity=".48"/>
+    </g>
+
+    <g fill="#f3efe3">
+      <circle cx="143" cy="168" r="4"/>
+      <circle cx="168" cy="168" r="4" opacity=".7"/>
+      <circle cx="193" cy="168" r="4" opacity=".4"/>
+      <circle cx="303" cy="130" r="3" opacity=".8"/>
+    </g>
+
+    <g fill="none" stroke="#20241a" stroke-width="2">
+      <path d="M83 628h96M83 644h63M83 660h34"/>
+      <path d="M757 462v96M773 462v63M789 462v34"/>
+    </g>
+
+    <g fill="#f3efe3" font-family="Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="4">
+      <text x="84" y="100">GRAVITY FIELD / VOL.06</text>
+      <text x="628" y="836">SIGNAL 06°</text>
+    </g>
+    <g fill="#f3efe3" font-family="Arial, sans-serif" font-size="10" letter-spacing="2" opacity=".62">
+      <text x="84" y="832">EAST COAST WAREHOUSE</text>
+      <text x="628" y="854">N31°14′ E121°29′</text>
+    </g>
+
+    <rect width="900" height="900" fill="url(#dots)"/>
+    <g stroke="#f3efe3" opacity=".28">
+      <path d="M40 40h35M40 40v35M860 40h-35M860 40v35"/>
+      <path d="M40 860h35M40 860v-35M860 860h-35M860 860v-35"/>
+    </g>
+    <rect x="1" y="1" width="898" height="898" fill="none" stroke="#f3efe3" stroke-opacity=".22"/>
+  </g>
+</svg>

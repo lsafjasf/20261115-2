@@ -1,0 +1,8 @@
+WenQuanYi Micro Hei (subset)
+Copyright 2008-2009, The WenQuanYi Project Board of Trustees.
+Based on the Google Droid font family and contributions from the
+WenQuanYi Project. Licensed under the Apache License, Version 2.0.
+
+The bundled WOFF2 file is a glyph subset generated from
+wqy-microhei.ttc 0.2.0-beta for this interface and poster.
+See WQY-COPYRIGHT.txt and LICENSE-Apache-2.0.txt.
