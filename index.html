@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>双人协作大画幅相机</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #14100c;
+    color: #e8dcc8;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh; padding: 16px; user-select: none;
+  }
+  h1 { font-size: 20px; letter-spacing: 4px; margin-bottom: 10px; color: #d8b96a; }
+  #stage { position: relative; }
+  canvas { display: block; border: 6px solid #3a2f22; border-radius: 6px; background: #000; }
+  #hud {
+    display: flex; justify-content: space-between; width: 960px;
+    margin-top: 10px; font-size: 14px; gap: 12px;
+  }
+  .panel {
+    background: #1f1a14; border: 1px solid #4a3d2a; border-radius: 6px;
+    padding: 8px 12px; flex: 1; line-height: 1.7;
+  }
+  .panel b { color: #d8b96a; }
+  .key {
+    display: inline-block; background: #33291c; border: 1px solid #6b573a;
+    border-radius: 4px; padding: 0 6px; font-family: monospace; color: #f0e2c0;
+  }
+  #message {
+    width: 960px; margin-top: 8px; text-align: center; font-size: 16px;
+    min-height: 24px; color: #9fd48a;
+  }
+  #gallery { display: flex; gap: 6px; margin-top: 8px; width: 960px; min-height: 64px; }
+  .frame {
+    width: 110px; height: 62px; border: 2px solid #4a3d2a; border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; text-align: center; overflow: hidden; background: #0c0a08;
+  }
+  .frame.keeper { border-color: #7fae5c; }
+  .frame.dud { border-color: #8a4a3a; color: #b08070; }
+  #overlay {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 12px;
+    background: rgba(10, 8, 6, 0.85); border-radius: 6px; font-size: 18px;
+  }
+  #overlay.hidden { display: none; }
+  #overlay button {
+    background: #d8b96a; color: #241c10; border: none; border-radius: 6px;
+    padding: 10px 28px; font-size: 16px; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <h1>双 人 大 画 幅 协 作</h1>
+  <div id="stage">
+    <canvas id="view" width="960" height="540"></canvas>
+    <div id="overlay" class="hidden">
+      <div id="overlayText"></div>
+      <button id="restart">重新开始</button>
+    </div>
+  </div>
+  <div id="message"></div>
+  <div id="hud">
+    <div class="panel" id="leftPanel">
+      <b>左玩家 · 对焦手</b><br>
+      <span class="key">W</span> 对焦变远 &nbsp; <span class="key">S</span> 对焦变近<br>
+      对焦距离: <span id="focusReadout">--</span> m
+    </div>
+    <div class="panel" id="midPanel">
+      <b>胶片</b>: <span id="filmReadout">8</span> 张 &nbsp;
+      <b>目标</b>: 近/中/远 各 1 张<br>
+      已收录: <span id="keeperReadout">无</span>
+    </div>
+    <div class="panel" id="rightPanel">
+      <b>右玩家 · 曝光手</b><br>
+      <span class="key">↑</span><span class="key">↓</span> 光圈 f/<span id="apReadout">8</span>
+      &nbsp; <span class="key">←</span><span class="key">→</span> 快门 <span id="shReadout">1/60</span>s<br>
+      <span class="key">空格</span> 释放快门
+    </div>
+  </div>
+  <div id="gallery"></div>
+  <script src="logic.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
