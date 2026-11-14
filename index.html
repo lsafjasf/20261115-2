@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>雾海双桨 · Fogbound Duo</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <canvas id="sea" width="1280" height="800"></canvas>
+    <div id="hud">
+      <div class="panel" id="hud-p1">
+        <h3>玩家一 · 舵手（罗盘）</h3>
+        <p><kbd>←</kbd><kbd>→</kbd> 修正航向（罗盘会受扰动漂移）</p>
+        <p>航向 <span id="p1-heading">--</span>° · 目标方位 <span id="p1-bearing">--</span>°</p>
+      </div>
+      <div class="panel" id="hud-status">
+        <p>船体 <span id="hull">100</span>%</p>
+        <p>剩余 <span id="timer">--</span>s</p>
+        <p>浮标 <span id="gates">0</span>/3</p>
+        <p id="message">按任意键起航（首次按键启用声音）</p>
+      </div>
+      <div class="panel" id="hud-p2">
+        <h3>玩家二 · 桨帆手</h3>
+        <p><kbd>W</kbd>/<kbd>S</kbd> 桨力 · <kbd>A</kbd>/<kbd>D</kbd> 帆角</p>
+        <p>速度 <span id="p2-speed">--</span>（安全航速 30–70）</p>
+        <p>帆角 <span id="p2-sail">--</span>° · 风舷角 <span id="p2-wind">--</span>°</p>
+      </div>
+    </div>
+  </div>
+  <script src="js/audio.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

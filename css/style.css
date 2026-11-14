@@ -1,0 +1,70 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #06090d;
+  color: #cfd8dc;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  overflow: hidden;
+}
+
+#app {
+  position: relative;
+  width: 1280px;
+  height: 800px;
+  margin: 0 auto;
+}
+
+#sea {
+  display: block;
+  background: #0a1118;
+}
+
+#hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.panel {
+  background: rgba(8, 14, 20, 0.72);
+  border: 1px solid rgba(120, 160, 180, 0.25);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  min-width: 240px;
+}
+
+.panel h3 {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: #8fd3e8;
+}
+
+.panel p {
+  margin: 2px 0;
+}
+
+#hud-status {
+  text-align: center;
+  min-width: 180px;
+}
+
+#message {
+  color: #ffd54f;
+}
+
+kbd {
+  background: #1c2833;
+  border: 1px solid #4a5a66;
+  border-radius: 4px;
+  padding: 0 5px;
+  font-size: 12px;
+}
