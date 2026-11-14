@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>程序纹理工作室 · 石材 / 木材 / 布纹</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="panel">
+    <h1>程序纹理工作室</h1>
+
+    <section>
+      <h2>材质</h2>
+      <div class="seg" id="typeSeg">
+        <button data-value="stone" class="on">石材</button>
+        <button data-value="wood">木材</button>
+        <button data-value="fabric">布纹</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>参数</h2>
+      <label class="ctl">尺度 <span id="scaleVal"></span>
+        <input type="range" id="scale" min="1" max="12" step="0.5" value="5" />
+      </label>
+      <label class="ctl">方向 <span id="angleVal"></span>
+        <input type="range" id="angle" min="0" max="180" step="1" value="30" />
+      </label>
+      <label class="ctl">对比度 <span id="contrastVal"></span>
+        <input type="range" id="contrast" min="0.4" max="2.5" step="0.05" value="1.15" />
+      </label>
+      <label class="ctl">随机种子 <span id="seedVal"></span>
+        <input type="range" id="seed" min="1" max="99999" step="1" value="20261115" />
+      </label>
+      <button id="regen" class="full">重新生成</button>
+    </section>
+
+    <section>
+      <h2>预览</h2>
+      <div class="seg" id="viewSeg">
+        <button data-value="plane" class="on">平面</button>
+        <button data-value="sphere">球体</button>
+      </div>
+      <label class="ctl">平铺次数
+        <input type="range" id="repeat" min="1" max="4" step="1" value="1" />
+      </label>
+      <label class="check"><input type="checkbox" id="showGrid" /> 显示平铺接缝网格</label>
+      <p class="hint" id="viewHint">平面模式：直接在纹理上拖动即可修补。</p>
+    </section>
+
+    <section>
+      <h2>局部修补（对边同步）</h2>
+      <div class="seg" id="toolSeg">
+        <button data-value="heal" class="on">修复</button>
+        <button data-value="smooth">平滑</button>
+        <button data-value="lighten">提亮</button>
+        <button data-value="darken">压暗</button>
+      </div>
+      <label class="ctl">笔刷大小 <span id="brushVal"></span>
+        <input type="range" id="brush" min="4" max="80" step="1" value="28" />
+      </label>
+      <label class="ctl">强度 <span id="strengthVal"></span>
+        <input type="range" id="strength" min="5" max="100" step="1" value="60" />
+      </label>
+      <label class="check"><input type="checkbox" id="wrapOn" checked /> 对边环绕同步</label>
+      <button id="undo" class="full">撤销 (Ctrl+Z)</button>
+      <button id="resetEdits" class="full secondary">清除修补</button>
+    </section>
+
+    <section>
+      <h2>导出 512×512 PNG</h2>
+      <button id="exportPng" class="full primary">导出当前材质 PNG</button>
+      <button id="exportAll" class="full">导出全部三套 + 接缝报告</button>
+      <div id="seamBox" class="seam"></div>
+    </section>
+  </aside>
+
+  <main class="stage">
+    <canvas id="canvas" width="640" height="640"></canvas>
+    <div id="status" class="status"></div>
+  </main>
+</div>
+<script src="src/engine.js"></script>
+<script src="src/png.js"></script>
+<script src="src/seam.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

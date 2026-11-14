@@ -1,0 +1,46 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #14161b;
+  color: #e7e9ee;
+}
+.app { display: flex; min-height: 100vh; }
+.panel {
+  width: 320px; flex: 0 0 320px; padding: 18px;
+  background: #1b1e25; border-right: 1px solid #2a2f3a;
+  overflow-y: auto; max-height: 100vh;
+}
+h1 { font-size: 18px; margin: 0 0 14px; }
+h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em;
+  color: #8b93a3; margin: 18px 0 8px; }
+section { margin-bottom: 6px; }
+.seg { display: flex; gap: 6px; flex-wrap: wrap; }
+.seg button {
+  flex: 1 1 auto; min-width: 56px; padding: 8px 6px; border-radius: 8px;
+  border: 1px solid #333a48; background: #232733; color: #c7cdd9; cursor: pointer;
+}
+.seg button.on { background: #3d6cff; border-color: #3d6cff; color: #fff; }
+.ctl { display: block; margin: 10px 0; font-size: 13px; color: #c7cdd9; }
+.ctl span { float: right; color: #8fb0ff; font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; margin-top: 6px; accent-color: #3d6cff; }
+.check { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 8px 0; }
+button.full {
+  width: 100%; margin-top: 8px; padding: 10px; border-radius: 8px;
+  border: 1px solid #333a48; background: #232733; color: #e7e9ee; cursor: pointer;
+}
+button.primary { background: #3d6cff; border-color: #3d6cff; }
+button.secondary { background: transparent; }
+.hint { font-size: 12px; color: #8b93a3; line-height: 1.5; }
+.seam { margin-top: 10px; font-size: 12px; line-height: 1.6;
+  font-variant-numeric: tabular-nums; color: #9fe0b0; white-space: pre-wrap; }
+.stage {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 12px; padding: 24px;
+}
+#canvas {
+  max-width: 80vh; max-height: 80vh; width: 640px; height: 640px;
+  border-radius: 12px; background: #000; cursor: crosshair; touch-action: none;
+  box-shadow: 0 12px 40px rgba(0,0,0,.5);
+}
+.status { font-size: 13px; color: #8b93a3; min-height: 20px; }
