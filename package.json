@@ -1,0 +1,11 @@
+{
+  "name": "framediff-tidal-bloom",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Parametric Canvas animation comparison studio with live pixel-diff analysis.",
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs"
+  }
+}
