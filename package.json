@@ -1,0 +1,11 @@
+{
+  "name": "dive-chamber-control",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "双人潜水舱氧气与压力协同控制仿真（Canvas + Web Audio）",
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "serve": "node serve.js"
+  }
+}

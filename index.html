@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>潜水舱协同控制 · 氧气与压力</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>潜水舱协同控制</h1>
+      <div class="controls">
+        <label>模式
+          <select id="mode">
+            <option value="duo">双人手动（各看一块仪表）</option>
+            <option value="solo">单人手动（一人看两块仪表）</option>
+            <option value="auto-duo">自动演示：双人协作</option>
+            <option value="auto-solo">自动演示：单人连续操作</option>
+          </select>
+        </label>
+        <button id="reset" type="button">重置舱室</button>
+        <button id="mute" type="button">声音：开</button>
+      </div>
+    </header>
+
+    <main>
+      <canvas id="stage" width="960" height="440"></canvas>
+
+      <section class="panels">
+        <div class="panel" id="left-panel">
+          <h2>左玩家 · 供氧阀</h2>
+          <p class="hint">只能看到氧浓度仪表，看不到压力</p>
+          <ul>
+            <li><kbd>A</kbd> 关小供氧阀</li>
+            <li><kbd>D</kbd> 开大供氧阀</li>
+          </ul>
+        </div>
+        <div class="panel center-panel">
+          <h2>任务条件</h2>
+          <ul>
+            <li>压力安全区：98 – 112 kPa</li>
+            <li>氧浓度安全区：19.5% – 23.5%</li>
+            <li>两项同时在安全区内保持 <strong>30 秒</strong></li>
+            <li>压力 85/125、氧 14%/26% 为硬边界，越界即封闭 20 秒</li>
+          </ul>
+          <p id="status" class="status">准备就绪</p>
+        </div>
+        <div class="panel" id="right-panel">
+          <h2>右玩家 · 泄压阀</h2>
+          <p class="hint">只能看到压力仪表，看不到氧浓度</p>
+          <ul>
+            <li><kbd>←</kbd> 关小泄压阀</li>
+            <li><kbd>→</kbd> 开大泄压阀</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="panels solo-only" hidden>
+        <div class="panel">
+          <h2>单人连续操作</h2>
+          <p class="hint">一人同时看两块仪表，左右手分别控制两个阀</p>
+          <ul>
+            <li><kbd>A</kbd>/<kbd>D</kbd> 供氧阀　<kbd>←</kbd>/<kbd>→</kbd> 泄压阀</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

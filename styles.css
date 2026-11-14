@@ -1,0 +1,139 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  background: radial-gradient(circle at 50% 0%, #16233d 0%, #0b1220 60%);
+  color: #e6eefc;
+  min-height: 100vh;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+}
+
+h1 {
+  font-size: 20px;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+select,
+button {
+  background: #1b2a45;
+  color: #e6eefc;
+  border: 1px solid #33507e;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button:hover,
+select:hover {
+  border-color: #58b7ff;
+}
+
+label {
+  font-size: 13px;
+  color: #9fb3cc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+main {
+  max-width: 1020px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: linear-gradient(180deg, #0e1a30 0%, #0a1322 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.solo-only {
+  grid-template-columns: 1fr;
+}
+
+.panel {
+  background: rgba(27, 42, 69, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.panel h2 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: #9fd6ff;
+}
+
+.panel ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.9;
+  color: #cdd9ea;
+}
+
+.hint {
+  margin: 0;
+  font-size: 12px;
+  color: #7f90ab;
+}
+
+kbd {
+  background: #0b1220;
+  border: 1px solid #33507e;
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 1px 7px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.status {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #0b1220;
+  font-size: 13px;
+  color: #ffd479;
+  font-family: monospace;
+}
+
+.status.ok {
+  color: #35d07f;
+}
+
+.status.danger {
+  color: #ff6b6b;
+}
