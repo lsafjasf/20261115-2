@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>地震波回放台网</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>模拟地震波回放 · 三台站</h1>
+  <div id="transport">
+    <button id="btn-play">▶ 播放</button>
+    <div class="speed-group" id="speed-group">
+      <button data-speed="0.5">0.5×</button>
+      <button data-speed="1" class="active">1×</button>
+      <button data-speed="2">2×</button>
+      <button data-speed="4">4×</button>
+    </div>
+    <button id="btn-sound" class="active">🔊 低频提示</button>
+    <span id="clock">t = 0.00 s</span>
+  </div>
+</header>
+
+<main>
+  <section id="left">
+    <div id="map-wrap">
+      <canvas id="map" width="520" height="420"></canvas>
+    </div>
+    <div id="station-filter">
+      <span>台站筛选:</span>
+      <label><input type="checkbox" data-sta="ALP" checked> ALP (30 km)</label>
+      <label><input type="checkbox" data-sta="BRC" checked> BRC (80 km)</label>
+      <label><input type="checkbox" data-sta="CHI" checked> CHI (150 km)</label>
+    </div>
+    <div id="marker-panel">
+      <h2>到时标记</h2>
+      <ul id="marker-list"></ul>
+      <p class="hint">在波形上单击标记到时；拖动框选放大；双击复位缩放。</p>
+    </div>
+  </section>
+
+  <section id="right">
+    <canvas id="wave" width="860" height="560"></canvas>
+    <input type="range" id="timeline" min="0" max="120" step="0.02" value="0">
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
