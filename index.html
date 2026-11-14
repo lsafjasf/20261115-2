@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>动态字幕卡 · Canvas Subtitle Card</title>
+<style>
+  :root {
+    --panel-bg: #16181f;
+    --panel-fg: #e8eaf0;
+    --muted: #9aa1b0;
+    --accent: #6ea8fe;
+    --field: #20232c;
+    --border: #2d313d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    min-height: 100vh;
+    background: #0d0f14;
+    color: var(--panel-fg);
+    font: 13px/1.5 -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  aside {
+    background: var(--panel-bg);
+    border-right: 1px solid var(--border);
+    padding: 16px;
+    overflow-y: auto;
+    max-height: 100vh;
+  }
+  h1 { font-size: 15px; margin: 0 0 12px; }
+  h2 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--muted); margin: 18px 0 8px;
+  }
+  label { display: block; margin-bottom: 10px; }
+  label > span { display: block; margin-bottom: 4px; color: var(--muted); }
+  textarea, input[type="text"], select {
+    width: 100%;
+    background: var(--field);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--panel-fg);
+    padding: 8px 10px;
+    font: inherit;
+    outline: none;
+  }
+  textarea { min-height: 84px; resize: vertical; }
+  textarea:focus, input:focus, select:focus { border-color: var(--accent); }
+  input[type="color"] {
+    width: 46px; height: 32px; padding: 2px; border-radius: 8px;
+    background: var(--field); border: 1px solid var(--border); cursor: pointer;
+  }
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  .row { display: flex; gap: 10px; align-items: center; }
+  .row > * { flex: 1; }
+  button {
+    background: var(--accent); color: #0b1020; border: 0; border-radius: 8px;
+    padding: 9px 12px; font-weight: 600; cursor: pointer; font: inherit;
+  }
+  button.secondary { background: var(--field); color: var(--panel-fg); border: 1px solid var(--border); }
+  button:disabled { opacity: .5; cursor: progress; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chips button { flex: 0 0 auto; padding: 5px 10px; font-size: 12px; }
+  .inline { display: flex; gap: 8px; align-items: center; }
+  .inline input[type="color"] { flex: 0 0 auto; }
+  main {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 24px; gap: 14px; min-width: 0;
+  }
+  .stage-wrap { width: min(100%, 1040px); }
+  canvas {
+    width: 100%; height: auto; display: block;
+    border-radius: 12px; background: #000;
+    box-shadow: 0 18px 60px rgba(0,0,0,.55);
+  }
+  .transport { display: flex; gap: 10px; align-items: center; width: min(100%, 1040px); }
+  .transport input[type="range"] { flex: 1; }
+  .time { font-variant-numeric: tabular-nums; color: var(--muted); min-width: 86px; text-align: right; }
+  .hint { color: var(--muted); font-size: 12px; }
+  .status { font-size: 12px; color: var(--accent); min-height: 18px; }
+  .toggle { display: flex; align-items: center; gap: 8px; }
+  .toggle input { width: auto; }
+  .preset-meta { color: var(--muted); font-size: 12px; margin: 2px 0 6px; }
+</style>
+</head>
+<body>
+<aside>
+  <h1>动态字幕卡</h1>
+
+  <h2>文案预设</h2>
+  <div class="chips" id="presetChips"></div>
+  <div class="preset-meta" id="presetMeta"></div>
+
+  <h2>句子（可编辑）</h2>
+  <label>
+    <span>主文案，逗号 / 句号处也会参与断行</span>
+    <textarea id="textInput"></textarea>
+  </label>
+  <label>
+    <span>关键词（逗号分隔，命中后高亮变色）</span>
+    <input type="text" id="keywordInput" />
+  </label>
+
+  <h2>主题色</h2>
+  <div class="row">
+    <label class="inline">
+      <input type="color" id="primaryColor" value="#6ea8fe" />
+      <span style="margin:0">主色 / 关键词</span>
+    </label>
+    <label class="inline">
+      <input type="color" id="bgColor" value="#0b1020" />
+      <span style="margin:0">背景基调</span>
+    </label>
+  </div>
+
+  <h2>动画</h2>
+  <label>
+    <span>入场方式</span>
+    <select id="animSelect">
+      <option value="rise">上浮淡入</option>
+      <option value="pop">弹缩放</option>
+      <option value="slide">横向滑入</option>
+      <option value="blur">模糊聚焦</option>
+    </select>
+  </label>
+  <label>
+    <span>动画幅度 <b id="ampValue">1.0×</b></span>
+    <input type="range" id="ampRange" min="0" max="2" step="0.05" value="1" />
+  </label>
+  <label class="toggle">
+    <input type="checkbox" id="beatToggle" />
+    <span>Web Audio 轻量节拍（导出 WebM 时一并录制）</span>
+  </label>
+
+  <h2>导出</h2>
+  <div class="row">
+    <button id="exportPng" class="secondary">当前帧 PNG</button>
+    <button id="exportWebm">导出 12s WebM</button>
+  </div>
+  <div class="status" id="status"></div>
+  <p class="hint">虚线框为安全框（5%），所有文字均限制在安全框内。</p>
+</aside>
+
+<main>
+  <div class="stage-wrap"><canvas id="stage" width="1920" height="1080"></canvas></div>
+  <div class="transport">
+    <button id="playBtn" class="secondary">播放</button>
+    <input type="range" id="scrub" min="0" max="12000" step="16" value="0" />
+    <span class="time" id="timeLabel">0.00 / 12.00s</span>
+  </div>
+</main>
+
+<script>
+"use strict";
+
+const W = 1920, H = 1080, DURATION = 12000;
+const SAFE = 0.05;                       // 安全框 5%
+const SAFE_X = W * SAFE, SAFE_Y = H * SAFE;
+const SAFE_W = W * (1 - SAFE * 2), SAFE_H = H * (1 - SAFE * 2);
+
+const PRESETS = [
+  {
+    name: "短文案",
+    text: "热爱可抵岁月漫长。",
+    keywords: "热爱,岁月"
+  },
+  {
+    name: "中文案",
+    text: "每一个不曾起舞的日子，都是对生命的辜负；保持热爱，奔赴山海。",
+    keywords: "起舞,热爱,山海"
+  },
+  {
+    name: "长文案",
+    text: "创意不是等待灵感突然降临，而是把每天观察到的微小细节耐心收集起来，再用合适的节奏重新组合，最终变成能打动人的画面、声音与文字；工具会不断进化，真正稀缺的始终是感受力、判断力与持续表达的勇气。",
+    keywords: "创意,灵感,节奏,勇气"
+  }
+];
+
+const state = {
+  text: PRESETS[0].text,
+  keywords: PRESETS[0].keywords,
+  primary: "#6ea8fe",
+  bg: "#0b1020",
+  anim: "rise",
+  amplitude: 1,
+  beat: false,
+  playing: false,
+  t: 0
+};
+
+/* ---------- 文本分词：把一行文字切成 普通段 / 关键词段 ---------- */
+function segmentLine(line, keywordList) {
+  if (!keywordList.length) return [{ text: line, hit: false }];
+  const hits = keywordList
+    .filter(k => k.length > 0)
+    .sort((a, b) => b.length - a.length);
+  const segs = [];
+  let cursor = 0;
+  while (cursor < line.length) {
+    let matched = null;
+    for (const kw of hits) {
+      if (line.startsWith(kw, cursor)) { matched = kw; break; }
+    }
+    if (matched) {
+      segs.push({ text: matched, hit: true });
+      cursor += matched.length;
+    } else {
+      const tail = segs.length && !segs[segs.length - 1].hit ? segs.pop() : null;
+      const piece = (tail ? tail.text : "") + line[cursor];
+      segs.push({ text: piece, hit: false });
+      cursor += 1;
+    }
+  }
+  return segs;
+}
+
+/* ---------- 自动换行：贪心 + 二分缩放字号，保证全部落入安全框 ---------- */
+function measureWidth(ctx, segs, font) {
+  ctx.font = font;
+  let width = 0;
+  for (const s of segs) width += ctx.measureText(s.text).width;
+  return width;
+}
+
+function wrapText(ctx, text, keywordList, maxWidth) {
+  const chars = Array.from(text);
+  const noLineStart = new Set(["，", "。", "；", "！", "？", "、", "：", "”", "’", "）", "】", "》", ",", ".", ";", "!", "?", ":", "]", ")"]);
+  const lines = [];
+  let line = "";
+  for (const ch of chars) {
+    const candidate = line + ch;
+    const width = ctx.measureText(candidate).width;
+    if (width <= maxWidth || line === "") {
+      line = candidate;
+    } else {
+      let pushed = line;
+      let next = ch;
+      // 避头尾：标点不允许出现在行首，把上一行末字挪下来
+      if (noLineStart.has(ch) && Array.from(line).length > 1) {
+        const arr = Array.from(line);
+        pushed = arr.slice(0, -1).join("");
+        next = arr[arr.length - 1] + ch;
+      }
+      lines.push(pushed);
+      line = next === " " ? "" : next;
+    }
+  }
+  if (line) lines.push(line);
+  return lines.map(l => ({
+    raw: l,
+    segments: segmentLine(l, keywordList)
+  }));
+}
+
+function computeLayout(ctx) {
+  const keywordList = state.keywords.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+  const maxTextWidth = SAFE_W;
+  const maxBlockHeight = SAFE_H * 0.72;
+
+  let layout = null;
+  // 二分向下寻找最大可用字号
+  let lo = 28, hi = 104;
+  while (lo <= hi) {
+    const mid = Math.round((lo + hi) / 2);
+    const font = `700 ${mid}px "PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif`;
+    ctx.font = font;
+    const trial = wrapText(ctx, state.text, keywordList, maxTextWidth);
+    const lineHeight = mid * 1.34;
+    const blockHeight = trial.length * lineHeight;
+    const widest = Math.max(...trial.map(l => measureWidth(ctx, l.segments, font)));
+    if (blockHeight <= maxBlockHeight && widest <= maxTextWidth) {
+      layout = { lines: trial, fontSize: mid, lineHeight, font, widest, blockHeight };
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  if (!layout) {
+    const font = `700 ${lo}px "PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif`;
+    ctx.font = font;
+    const trial = wrapText(ctx, state.text, keywordList, maxTextWidth);
+    layout = {
+      lines: trial, fontSize: lo, lineHeight: lo * 1.34, font,
+      widest: Math.max(...trial.map(l => measureWidth(ctx, l.segments, font))),
+      blockHeight: trial.length * lo * 1.34
+    };
+  }
+  layout.keywordList = keywordList;
+  layout.startY = (H - layout.blockHeight) / 2;
+  return layout;
+}
+
+/* 供自动化测试读取 */
+/* ---------- 颜色工具 ---------- */
+function hexToRgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+function rgba(c, a) { return `rgba(${c.r},${c.g},${c.b},${a})`; }
+function mix(a, b, t) {
+  return { r: a.r + (b.r - a.r) * t, g: a.g + (b.g - a.g) * t, b: a.b + (b.b - a.b) * t };
+}
+const easeOutCubic = x => 1 - Math.pow(1 - x, 3);
+const easeOutBack = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+
+/* ---------- 动态背景：渐变 + 流动光斑 + 细网格 ---------- */
+function drawBackground(ctx, t) {
+  const bg = hexToRgb(state.bg);
+  const accent = hexToRgb(state.primary);
+  const glow = mix(bg, accent, 0.35);
+
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, state.bg);
+  grad.addColorStop(1, rgba(mix(bg, { r: 0, g: 0, b: 0 }, 0.45), 1));
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  const blobs = [
+    { x: W * (0.22 + 0.06 * Math.sin(t * 0.0007)), y: H * (0.28 + 0.05 * Math.cos(t * 0.0005)), r: 520, p: 0.20 },
+    { x: W * (0.82 + 0.05 * Math.cos(t * 0.0006)), y: H * (0.72 + 0.06 * Math.sin(t * 0.0008)), r: 620, p: 0.16 },
+    { x: W * (0.55 + 0.04 * Math.sin(t * 0.0009 + 2)), y: H * (0.18 + 0.04 * Math.cos(t * 0.0006 + 1)), r: 380, p: 0.12 }
+  ];
+  for (const b of blobs) {
+    const rg = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+    rg.addColorStop(0, rgba(glow, b.p));
+    rg.addColorStop(1, rgba(glow, 0));
+    ctx.fillStyle = rg;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  ctx.strokeStyle = rgba(accent, 0.05);
+  ctx.lineWidth = 1;
+  const gap = 64;
+  const drift = (t * 0.012) % gap;
+  ctx.beginPath();
+  for (let x = -gap + drift; x < W + gap; x += gap) {
+    ctx.moveTo(x, 0); ctx.lineTo(x, H);
+  }
+  for (let y = -gap + drift; y < H + gap; y += gap) {
+    ctx.moveTo(0, y); ctx.lineTo(W, y);
+  }
+  ctx.stroke();
+}
+
+/* ---------- 单行入场动画参数 ---------- */
+function lineEntrance(t, index, lineCount) {
+  const stagger = 520;                       // 每行错峰 ms
+  const start = 350 + index * stagger;
+  const duration = 750;
+  const raw = Math.min(1, Math.max(0, (t - start) / duration));
+  const e = easeOutCubic(raw);
+  const amp = state.amplitude;
+  const params = { progress: raw, alpha: e, dx: 0, dy: 0, scale: 1, blur: 0, margin: 0 };
+  if (state.anim === "rise") {
+    params.dy = (1 - e) * 72 * amp;
+    params.margin = Math.abs(params.dy);
+  } else if (state.anim === "slide") {
+    params.dx = (1 - e) * 110 * amp * (index % 2 === 0 ? -1 : 1);
+    params.margin = Math.abs(params.dx);
+  } else if (state.anim === "pop") {
+    const eb = easeOutBack(raw);
+    params.scale = 1 + (1 - Math.min(1, eb)) * 0.22 * amp;
+    params.alpha = Math.min(1, raw * 2.2);
+    params.margin = (params.scale - 1);
+  } else if (state.anim === "blur") {
+    params.blur = (1 - e) * 24 * amp;
+    params.scale = 1 + (1 - e) * 0.05 * amp;
+    params.margin = (params.scale - 1);
+  }
+  // 整体收尾轻微淡出，给 12 秒一个完整节奏
+  if (t > DURATION - 900) {
+    params.alpha *= Math.max(0, (DURATION - t) / 900);
+  }
+  return params;
+}
+
+/* ---------- 主渲染 ---------- */
+const canvas = document.getElementById("stage");
+const ctx = canvas.getContext("2d");
+
+function render(t) {
+  drawBackground(ctx, t);
+  const layout = computeLayout(ctx);
+  const accent = hexToRgb(state.primary);
+
+  for (let i = 0; i < layout.lines.length; i++) {
+    const line = layout.lines[i];
+    const p = lineEntrance(t, i, layout.lines.length);
+    if (p.alpha <= 0.01) continue;
+
+    const lineWidth = measureWidth(ctx, line.segments, layout.font);
+    const roomX = SAFE_W - lineWidth;        // 该行水平可用余量
+    const maxShiftX = Math.max(0, roomX / 2 - 8);
+    const shiftX = Math.max(-maxShiftX, Math.min(maxShiftX, p.dx));
+    const topY = layout.startY + i * layout.lineHeight;
+    const maxShiftUp = Math.max(0, topY - SAFE_Y - 8);
+    const maxShiftDown = Math.max(0, (SAFE_Y + SAFE_H) - (topY + layout.lineHeight) - 8);
+    const shiftY = Math.max(-maxShiftUp, Math.min(maxShiftDown, p.dy));
+    // 缩放同样不能超出安全框：按行宽与行高余量反推最大比例
+    const maxScaleW = (SAFE_W - 16) / lineWidth;
+    const maxScaleH = (SAFE_H - 16) / layout.lineHeight;
+    const scale = Math.min(p.scale, maxScaleW, maxScaleH);
+    const baseX = (W - lineWidth) / 2;
+    const baseY = topY + layout.lineHeight * 0.72;
+
+    ctx.save();
+    ctx.globalAlpha = p.alpha;
+    if (p.blur > 0) ctx.filter = `blur(${p.blur.toFixed(1)}px)`;
+    ctx.translate(baseX + shiftX + lineWidth / 2, baseY + shiftY);
+    ctx.scale(scale, scale);
+    ctx.font = layout.font;
+    ctx.textBaseline = "alphabetic";
+
+    let x = -lineWidth / 2;
+    for (const seg of line.segments) {
+      const w = ctx.measureText(seg.text).width;
+      if (seg.hit) {
+        // 关键词：主题色 + 柔光底
+        const pulse = 0.12 + 0.08 * Math.sin(t * 0.004 + i);
+        ctx.fillStyle = rgba(accent, pulse + 0.10);
+        const pad = layout.fontSize * 0.12;
+        roundRect(ctx, x - pad, -layout.fontSize * 0.86, w + pad * 2, layout.fontSize * 1.06, pad);
+        ctx.fill();
+        ctx.fillStyle = state.primary;
+        ctx.shadowColor = rgba(accent, 0.85);
+        ctx.shadowBlur = 26 * state.amplitude;
+      } else {
+        ctx.fillStyle = "#f2f4fa";
+        ctx.shadowBlur = 0;
+      }
+      ctx.fillText(seg.text, x, 0);
+      ctx.shadowBlur = 0;
+      x += w;
+    }
+    ctx.restore();
+  }
+
+  drawSafeFrame(ctx, layout);
+  return layout;
+}
+
+function roundRect(c, x, y, w, h, r) {
+  c.beginPath();
+  c.moveTo(x + r, y);
+  c.arcTo(x + w, y, x + w, y + h, r);
+  c.arcTo(x + w, y + h, x, y + h, r);
+  c.arcTo(x, y + h, x, y, r);
+  c.arcTo(x, y, x + w, y, r);
+  c.closePath();
+}
+
+function drawSafeFrame(ctx, layout) {
+  ctx.save();
+  ctx.strokeStyle = "rgba(255,255,255,0.28)";
+  ctx.setLineDash([14, 12]);
+  ctx.lineWidth = 2;
+  ctx.strokeRect(SAFE_X, SAFE_Y, SAFE_W, SAFE_H);
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+/* ---------- Web Audio 轻量节拍 ---------- */
+let audioCtx = null, beatTimer = null;
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  return audioCtx;
+}
+function kick(ac) {
+  const now = ac.currentTime;
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.frequency.setValueAtTime(150, now);
+  osc.frequency.exponentialRampToValueAtTime(48, now + 0.14);
+  gain.gain.setValueAtTime(0.22, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+  osc.connect(gain).connect(ac.destination);
+  osc.start(now); osc.stop(now + 0.2);
+}
+function startBeat() {
+  if (beatTimer) return;
+  const ac = ensureAudio();
+  beatTimer = setInterval(() => { if (state.beat && state.playing) kick(ac); }, 500); // 120 BPM
+}
+function stopBeat() {
+  clearInterval(beatTimer);
+  beatTimer = null;
+}
+
+/* ---------- 播放循环 ---------- */
+let rafId = null, lastTs = null;
+function frame(ts) {
+  if (lastTs === null) lastTs = ts;
+  const dt = ts - lastTs;
+  lastTs = ts;
+  if (state.playing) {
+    state.t += dt;
+    if (state.t >= DURATION) { state.t = DURATION; state.playing = false; }
+  }
+  render(state.t);
+  syncTransport();
+  if (state.playing) rafId = requestAnimationFrame(frame);
+  else { rafId = null; lastTs = null; }
+}
+function kickRender() {
+  if (!rafId) rafId = requestAnimationFrame(frame);
+}
+
+/* 供自动化测试读取 */
+
+/* ---------- UI 绑定 ---------- */
+const $ = id => document.getElementById(id);
+const statusEl = $("status");
+
+function setStatus(msg) { statusEl.textContent = msg || ""; }
+
+function bindUI() {
+  const chips = $("presetChips");
+  PRESETS.forEach((p, idx) => {
+    const b = document.createElement("button");
+    b.className = "secondary";
+    b.textContent = p.name;
+    b.addEventListener("click", () => loadPreset(idx));
+    chips.appendChild(b);
+  });
+
+  $("textInput").addEventListener("input", e => { state.text = e.target.value; kickRender(); });
+  $("keywordInput").addEventListener("input", e => { state.keywords = e.target.value; kickRender(); });
+  $("primaryColor").addEventListener("input", e => { state.primary = e.target.value; kickRender(); });
+  $("bgColor").addEventListener("input", e => { state.bg = e.target.value; kickRender(); });
+  $("animSelect").addEventListener("change", e => { state.anim = e.target.value; kickRender(); });
+  $("ampRange").addEventListener("input", e => {
+    state.amplitude = parseFloat(e.target.value);
+    $("ampValue").textContent = state.amplitude.toFixed(2) + "×";
+    kickRender();
+  });
+  $("beatToggle").addEventListener("change", e => {
+    state.beat = e.target.checked;
+    if (state.beat) { ensureAudio(); startBeat(); } else { stopBeat(); }
+  });
+
+  $("playBtn").addEventListener("click", togglePlay);
+  $("scrub").addEventListener("input", e => {
+    state.t = parseInt(e.target.value, 10);
+    state.playing = false;
+    kickRender();
+  });
+  $("exportPng").addEventListener("click", () => downloadPNG(state.t));
+  $("exportWebm").addEventListener("click", () => exportWebM());
+}
+
+function loadPreset(idx) {
+  const p = PRESETS[idx];
+  state.text = p.text;
+  state.keywords = p.keywords;
+  $("textInput").value = p.text;
+  $("keywordInput").value = p.keywords;
+  $("presetMeta").textContent = `${p.name}：${Array.from(p.text).length} 字`;
+  kickRender();
+}
+
+function togglePlay() {
+  if (state.playing) {
+    state.playing = false;
+  } else {
+    if (state.t >= DURATION) state.t = 0;
+    state.playing = true;
+    if (state.beat) { ensureAudio(); startBeat(); }
+    lastTs = null;
+    kickRender();
+  }
+  $("playBtn").textContent = state.playing ? "暂停" : "播放";
+}
+
+function syncTransport() {
+  $("scrub").value = state.t;
+  $("timeLabel").textContent = `${(state.t / 1000).toFixed(2)} / 12.00s`;
+  $("playBtn").textContent = state.playing ? "暂停" : "播放";
+}
+
+/* ---------- 安全框几何校验（供自动化测试） ---------- */
+function textBounds(ctx, t) {
+  const layout = computeLayout(ctx);
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (let i = 0; i < layout.lines.length; i++) {
+    const line = layout.lines[i];
+    const p = lineEntrance(t, i, layout.lines.length);
+    if (p.alpha <= 0.01) continue;
+    const lineWidth = measureWidth(ctx, line.segments, layout.font);
+    const maxShiftX = Math.max(0, (SAFE_W - lineWidth) / 2 - 8);
+    const shiftX = Math.max(-maxShiftX, Math.min(maxShiftX, p.dx));
+    const topY = layout.startY + i * layout.lineHeight;
+    const maxShiftUp = Math.max(0, topY - SAFE_Y - 8);
+    const maxShiftDown = Math.max(0, (SAFE_Y + SAFE_H) - (topY + layout.lineHeight) - 8);
+    const shiftY = Math.max(-maxShiftUp, Math.min(maxShiftDown, p.dy));
+    const maxScaleW = (SAFE_W - 16) / lineWidth;
+    const maxScaleH = (SAFE_H - 16) / layout.lineHeight;
+    const scale = Math.min(p.scale, maxScaleW, maxScaleH);
+    const baseX = (W - lineWidth) / 2 + shiftX;
+    const top = topY + shiftY;
+    const halfW = (lineWidth / 2) * scale;
+    minX = Math.min(minX, baseX + lineWidth / 2 - halfW);
+    maxX = Math.max(maxX, baseX + lineWidth / 2 + halfW);
+    minY = Math.min(minY, top - layout.fontSize * 0.3 * scale);
+    maxY = Math.max(maxY, top + layout.lineHeight * 0.28 * scale);
+  }
+  return {
+    minX, maxX, minY, maxY,
+    insideSafe: minX >= SAFE_X && maxX <= W - SAFE_X && minY >= SAFE_Y && maxY <= H - SAFE_Y,
+    lineCount: layout.lines.length,
+    fontSize: layout.fontSize
+  };
+}
+
+/* ---------- 导出：当前帧 PNG ---------- */
+function renderFrameTo(t) {
+  render(t);
+}
+function downloadPNG(t, filename) {
+  renderFrameTo(t);
+  const url = canvas.toDataURL("image/png");
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename || `subtitle-frame-${Math.round(t)}.png`;
+  a.click();
+  return url;
+}
+
+/* ---------- 导出：12s WebM（确定性逐帧渲染 + MediaRecorder） ---------- */
+async function exportWebM(opts = {}) {
+  const fps = opts.fps || 30;
+  const withAudio = opts.audio !== undefined ? opts.audio : state.beat;
+  const btn = $("exportWebm");
+  btn.disabled = true;
+  setStatus("开始导出 WebM…");
+
+  const canvasStream = canvas.captureStream(fps);
+  const track = canvasStream.getVideoTracks()[0];
+  let dest = null, ac = null;
+  if (withAudio) {
+    ac = ensureAudio();
+    dest = ac.createMediaStreamDestination();
+    scheduleBeatTrack(ac, dest);
+    dest.stream.getAudioTracks().forEach(tr => canvasStream.addTrack(tr));
+  }
+
+  const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
+    ? "video/webm;codecs=vp9,opus"
+    : "video/webm;codecs=vp8,opus";
+  const recorder = new MediaRecorder(canvasStream, { mimeType: mime, videoBitsPerSecond: 8_000_000 });
+  const chunks = [];
+  recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+  const done = new Promise(resolve => recorder.onstop = resolve);
+
+  recorder.start(100);
+  const frameMs = 1000 / fps;
+  const total = Math.round(DURATION / frameMs);
+  const wasPlaying = state.playing;
+  state.playing = false;
+  const startWall = performance.now();
+
+  for (let f = 0; f < total; f++) {
+    const t = Math.min(DURATION - 1, f * frameMs);
+    renderFrameTo(t);
+    if (track.requestFrame) track.requestFrame();
+    if (opts.onProgress) opts.onProgress(f + 1, total);
+    if (f % 6 === 0) setStatus(`导出中 ${Math.round((f / total) * 100)}%`);
+    // 跟随真实 30fps 时钟，避免事件循环繁忙时调度器吞掉帧
+    const target = startWall + (f + 1) * frameMs;
+    const wait = Math.max(0, target - performance.now());
+    await new Promise(r => setTimeout(r, wait));
+  }
+  renderFrameTo(DURATION - 1);
+  if (track.requestFrame) track.requestFrame();
+
+  await new Promise(r => setTimeout(r, 200));
+  recorder.stop();
+  await done;
+  state.playing = wasPlaying;
+
+  const blob = new Blob(chunks, { type: "video/webm" });
+  if (!opts.auto) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "subtitle-card-12s.webm";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+  btn.disabled = false;
+  setStatus(`导出完成：${(blob.size / 1024).toFixed(1)} KB`);
+  return blob;
+}
+
+/* 离线节拍轨：每 500ms 一个底鼓，覆盖完整 12 秒 */
+function scheduleBeatTrack(ac, destNode) {
+  for (let t = 0; t < DURATION; t += 500) {
+    const start = ac.currentTime + t / 1000 + 0.05;
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.frequency.setValueAtTime(150, start);
+    osc.frequency.exponentialRampToValueAtTime(48, start + 0.14);
+    gain.gain.setValueAtTime(0.22, start);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + 0.18);
+    osc.connect(gain).connect(destNode);
+    osc.start(start);
+    osc.stop(start + 0.2);
+  }
+}
+
+bindUI();
+loadPreset(0);
+state.t = 0;
+kickRender();
+
+/* 供自动化测试读取 */
+window.__subtitle = {
+  PRESETS, state, computeLayout, wrapText, segmentLine, render,
+  W, H, SAFE_X, SAFE_Y, SAFE_W, SAFE_H, DURATION,
+  ensureAudio, startBeat, stopBeat,
+  textBounds, downloadPNG, exportWebM, renderFrameTo, lineEntrance
+};
+</script>
+</body>
+</html>
