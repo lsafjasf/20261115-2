@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>手绘小人定格动画 · 挥手</title>
+<style>
+  :root {
+    --paper: #f7f3e8;
+    --ink: #2b2b2b;
+    --accent: #d0553a;
+    --panel: #fffdf6;
+    --line: #d8d2c0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    background: #ece7d8;
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+  main { width: 1000px; max-width: 100%; }
+  h1 { font-size: 20px; margin: 0 0 12px; }
+  h1 small { font-weight: normal; color: #777; font-size: 13px; margin-left: 8px; }
+  .stage-row { display: flex; gap: 16px; align-items: flex-start; }
+  .stage {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px;
+  }
+  canvas#main { display: block; border-radius: 6px; cursor: crosshair; touch-action: none; }
+  .panel {
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 260px;
+  }
+  .group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .group .label { font-size: 12px; color: #888; width: 100%; }
+  button {
+    font: inherit;
+    font-size: 13px;
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.primary:hover { opacity: 0.9; }
+  button:disabled { opacity: 0.45; cursor: default; }
+  .fps-group label {
+    font-size: 13px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 5px 10px;
+    cursor: pointer;
+    background: #fff;
+  }
+  .fps-group input { display: none; }
+  .fps-group input:checked + span { color: var(--accent); font-weight: bold; }
+  .fps-group label:has(input:checked) { border-color: var(--accent); }
+  #status { font-size: 12px; color: #888; min-height: 16px; }
+  .strip-wrap {
+    margin-top: 16px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .strip-title { font-size: 12px; color: #888; margin-bottom: 8px; }
+  #strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+  .thumb { position: relative; flex: 0 0 auto; cursor: pointer; }
+  .thumb canvas { display: block; border: 2px solid var(--line); border-radius: 6px; background: var(--paper); }
+  .thumb.selected canvas { border-color: var(--accent); }
+  .thumb .num {
+    position: absolute; top: 2px; left: 4px;
+    font-size: 10px; color: #999; pointer-events: none;
+  }
+  .thumb.selected .num { color: var(--accent); font-weight: bold; }
+  kbd {
+    background: #eee; border: 1px solid #ccc; border-radius: 4px;
+    padding: 0 4px; font-size: 11px;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>手绘小人定格动画<small>拖拽关节逐帧调整 · 已内置一段 12 帧挥手动画</small></h1>
+  <div class="stage-row">
+    <div class="stage"><canvas id="main" width="480" height="480"></canvas></div>
+    <div class="panel">
+      <div class="group">
+        <span class="label">播放（空格键 播放/暂停，← → 切换帧）</span>
+        <button id="btn-play" class="primary">▶ 播放</button>
+        <div class="fps-group" id="fps-group">
+          <label><input type="radio" name="fps" value="8"><span>8 fps</span></label>
+          <label><input type="radio" name="fps" value="12" checked><span>12 fps</span></label>
+          <label><input type="radio" name="fps" value="24"><span>24 fps</span></label>
+        </div>
+      </div>
+      <div class="group">
+        <span class="label">帧编辑（作用于当前选中帧）</span>
+        <button id="btn-copy-prev">⧉ 复制上一帧</button>
+        <button id="btn-add">＋ 在后面插入帧</button>
+        <button id="btn-delete">🗑 删除当前帧</button>
+        <button id="btn-reset">↺ 重置为挥手动画</button>
+      </div>
+      <div class="group">
+        <span class="label">导出（按当前帧率）</span>
+        <button id="btn-gif">导出 GIF</button>
+        <button id="btn-webm">导出 WebM</button>
+      </div>
+      <div id="status"></div>
+    </div>
+  </div>
+  <div class="strip-wrap">
+    <div class="strip-title">帧条（点击切换当前帧，灰色为上一帧洋葱皮参考）</div>
+    <div id="strip"></div>
+  </div>
+</main>
+<script src="pose.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
