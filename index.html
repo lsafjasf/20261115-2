@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>相机路线编辑器</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>相机路线编辑器</h1>
+    <div id="warning" class="warning hidden">⚠ 路线穿过不可见障碍区域，请调整关键点</div>
+  </header>
+  <main>
+    <div class="canvas-wrap">
+      <canvas id="stage" width="1280" height="720"></canvas>
+    </div>
+    <aside class="panel">
+      <section>
+        <h2>选中关键点</h2>
+        <div id="kf-info">未选中</div>
+        <label>旋转 <span id="angle-val"></span>
+          <input type="range" id="angle" min="-180" max="180" step="1">
+        </label>
+        <label>焦距 <span id="focal-val"></span>
+          <input type="range" id="focal" min="20" max="120" step="1">
+        </label>
+      </section>
+      <section>
+        <h2>预览</h2>
+        <button id="play">▶ 播放预览</button>
+        <label>时间 <span id="time-val">0.0s</span>
+          <input type="range" id="scrub" min="0" max="8" step="0.01" value="0">
+        </label>
+      </section>
+      <section>
+        <h2>工程</h2>
+        <button id="save">保存工程 (JSON)</button>
+        <button id="download">下载 JSON</button>
+        <button id="export">导出 8 秒视频</button>
+        <div id="export-status"></div>
+      </section>
+      <section>
+        <h2>说明</h2>
+        <ul class="help">
+          <li>拖动相机图标移动关键点</li>
+          <li>拖动旋转手柄改变朝向</li>
+          <li>滑杆或滚轮调整焦距</li>
+          <li>取景框始终被限制在舞台内</li>
+        </ul>
+      </section>
+    </aside>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

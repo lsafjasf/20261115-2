@@ -1,0 +1,71 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "PingFang SC", sans-serif;
+  background: #1b1e24;
+  color: #e6e8eb;
+}
+header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 18px;
+  background: #23272f;
+  border-bottom: 1px solid #333a45;
+}
+header h1 { font-size: 18px; margin: 0; }
+.warning {
+  background: #5a2b16;
+  color: #ffb37a;
+  border: 1px solid #c96a2b;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+}
+.hidden { display: none; }
+main {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  align-items: flex-start;
+}
+.canvas-wrap {
+  flex: 1;
+  background: #101318;
+  border: 1px solid #333a45;
+  border-radius: 8px;
+  overflow: hidden;
+}
+canvas { display: block; width: 100%; height: auto; cursor: default; }
+.panel {
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.panel section {
+  background: #23272f;
+  border: 1px solid #333a45;
+  border-radius: 8px;
+  padding: 12px;
+}
+.panel h2 { font-size: 14px; margin: 0 0 8px; color: #9fb4d0; }
+label { display: block; font-size: 13px; margin-top: 8px; }
+input[type="range"] { width: 100%; }
+button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  background: #3b6ea5;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+button:hover { background: #4a80bd; }
+button:disabled { background: #3a3f47; cursor: not-allowed; }
+#kf-info { font-size: 13px; color: #b8c0ca; min-height: 18px; }
+#export-status { font-size: 12px; color: #8fd18f; margin-top: 6px; min-height: 16px; }
+.help { margin: 0; padding-left: 18px; font-size: 12px; color: #9aa3ad; }
+.help li { margin: 3px 0; }
