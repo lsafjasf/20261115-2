@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#03111a">
+  <title>盲航 · 夜间小船</title>
+  <link rel="stylesheet" href="assets/fonts/fonts.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <i></i><i></i><i></i>
+        </span>
+        <div>
+          <p class="eyebrow">NIGHT PASSAGE / CO-OP</p>
+          <h1>盲航 <span>· 双人夜航</span></h1>
+        </div>
+      </div>
+      <div class="top-meta">
+        <div class="meta-cell">
+          <span class="meta-label">航段种子</span>
+          <strong id="seedLabel">NIGHT-407</strong>
+        </div>
+        <div class="meta-cell status-cell">
+          <span class="meta-label">主航道</span>
+          <strong id="channelLabel" class="ok">正在校验</strong>
+        </div>
+        <button id="audioButton" class="audio-button" type="button" aria-pressed="false">
+          <span class="audio-led"></span>
+          <span id="audioText">声呐待机</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="stage-shell">
+      <section class="stage" id="stage" aria-label="夜间航行游戏">
+        <canvas id="game" aria-label="双人分栏仪表与夜航图"></canvas>
+
+        <div class="start-screen overlay-panel" id="startScreen">
+          <div class="panel-kicker"><span></span> 两人一船 · 盲区互补</div>
+          <h2>别让一个人看见整片海。</h2>
+          <p class="lede">雾夜里只剩下半块仪表可信。左席读航向与浪向，右席读水深与油温；把各自看到的念出来，才能穿过四组暗礁。</p>
+          <div class="role-cards">
+            <div class="role-card nav">
+              <span class="role-index">01 / 领航席</span>
+              <strong>航向 + 浪向</strong>
+              <p><kbd>A</kbd><kbd>D</kbd> 转舵，修正横向漂流</p>
+            </div>
+            <div class="role-card engine">
+              <span class="role-index">02 / 轮机席</span>
+              <strong>水深 + 油温</strong>
+              <p><kbd>W</kbd><kbd>S</kbd> 推收油门，防止过热</p>
+            </div>
+          </div>
+          <div class="briefing">
+            <span>共同操作</span>
+            <p>只看自己的半屏，把读数念给对方。<kbd>Space</kbd> 主动声呐，听见回波的方向与远近。</p>
+          </div>
+          <div class="start-actions">
+            <label class="seed-field">
+              <span>输入种子</span>
+              <input id="seedInput" value="NIGHT-407" maxlength="24" autocomplete="off" spellcheck="false">
+            </label>
+            <button id="startButton" class="primary-button" type="button">
+              <span>开始夜航</span>
+              <i aria-hidden="true">→</i>
+            </button>
+          </div>
+          <p class="fine-print">建议音量为 60% · 声呐需要浏览器音频权限 · 每次生成的航道都会验证可通行</p>
+        </div>
+
+        <div class="result-screen overlay-panel hidden" id="resultScreen">
+          <div class="panel-kicker" id="resultKicker"><span></span> 航海日志</div>
+          <h2 id="resultTitle">灯塔已抵达。</h2>
+          <p class="lede" id="resultText">两人都活着，而且船还浮着。</p>
+          <div class="result-grid">
+            <div><span>用时</span><strong id="resultTime">00:00</strong></div>
+            <div><span>碰撞</span><strong id="resultHits">0</strong></div>
+            <div><span>声呐</span><strong id="resultPings">0</strong></div>
+            <div><span>种子</span><strong id="resultSeed">NIGHT-407</strong></div>
+          </div>
+          <button id="restartButton" class="primary-button" type="button">
+            <span>再来一次</span><i aria-hidden="true">→</i>
+          </button>
+        </div>
+
+        <div class="flash-message" id="flashMessage" aria-live="polite"></div>
+        <div class="pause-hint hidden-hint" id="pauseHint">SPACE · 声呐扫描</div>
+      </section>
+      <footer class="underbar">
+        <p><span class="pulse-dot"></span> 实时双席 / 共用一条船</p>
+        <p class="tip" id="tipText">左席报告航向，右席报告水深。任何一席沉默，船都会更接近暗礁。</p>
+        <p class="legend"><i class="legend-nav"></i> 领航席 <i class="legend-engine"></i> 轮机席</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="js/core.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

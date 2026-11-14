@@ -1,0 +1,14 @@
+{
+  "name": "blind-passage",
+  "version": "1.0.0",
+  "private": true,
+  "description": "双人分屏仪表夜航游戏",
+  "scripts": {
+    "start": "python3 -m http.server 8123",
+    "verify": "node scripts/verify-passage.cjs",
+    "build:fonts": "node scripts/build-fonts.cjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.0"
+  }
+}
