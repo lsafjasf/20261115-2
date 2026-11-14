@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>风向玫瑰图 · 季节分析</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>风向玫瑰图</h1>
+    <p class="sub">内置一年逐日风向风速数据（代码生成），按季节过滤查看</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="season-btns" id="seasonBtns">
+      <button data-season="all" class="active">全年</button>
+      <button data-season="spring">春季</button>
+      <button data-season="summer">夏季</button>
+      <button data-season="autumn">秋季</button>
+      <button data-season="winter">冬季</button>
+    </div>
+    <button id="exportBtn" class="export">导出 PNG</button>
+  </div>
+
+  <main>
+    <section class="chart-panel">
+      <canvas id="roseCanvas" width="560" height="560"></canvas>
+      <div class="stats" id="statsPanel"></div>
+    </section>
+    <section class="list-panel">
+      <h2 id="listTitle">原始记录</h2>
+      <div class="list-scroll">
+        <table>
+          <thead>
+            <tr><th>日期</th><th>风向</th><th>角度</th><th>风速 (m/s)</th></tr>
+          </thead>
+          <tbody id="recordBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
