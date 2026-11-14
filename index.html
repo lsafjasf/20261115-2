@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>公交线路间隔时空图</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 16px;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f4f6f8; color: #222;
+  }
+  h1 { font-size: 18px; margin: 0 0 12px; }
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    background: #fff; padding: 10px 14px; border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 12px;
+  }
+  .toolbar label { font-size: 13px; color: #555; }
+  .toolbar select, .toolbar input {
+    font-size: 13px; padding: 4px 6px; margin-left: 4px;
+    border: 1px solid #ccc; border-radius: 4px;
+  }
+  .toolbar button {
+    font-size: 13px; padding: 5px 14px; border: none; border-radius: 4px;
+    background: #1976d2; color: #fff; cursor: pointer;
+  }
+  .toolbar button:hover { background: #1565c0; }
+  .main { display: flex; gap: 12px; align-items: flex-start; }
+  .canvas-wrap {
+    background: #fff; border-radius: 8px; padding: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  canvas { display: block; cursor: crosshair; }
+  .side { width: 260px; display: flex; flex-direction: column; gap: 12px; }
+  .panel {
+    background: #fff; border-radius: 8px; padding: 12px 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08); font-size: 13px;
+  }
+  .panel h2 { font-size: 14px; margin: 0 0 8px; }
+  .stats-grid { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; }
+  .stats-grid .k { color: #777; }
+  .stats-grid .v { font-weight: 600; text-align: right; }
+  #legend-canvas { display: block; }
+  #detail { white-space: pre-wrap; line-height: 1.6; color: #333; }
+  #detail .empty { color: #999; }
+</style>
+</head>
+<body>
+  <h1>公交线路间隔时空图</h1>
+  <div class="toolbar">
+    <label>线路
+      <select id="route-select"></select>
+    </label>
+    <label>时间窗口
+      <input id="win-start" type="time" value="07:00">
+      至
+      <input id="win-end" type="time" value="09:30">
+    </label>
+    <button id="export-btn">导出 PNG</button>
+  </div>
+  <div class="main">
+    <div class="canvas-wrap"><canvas id="chart" width="860" height="460"></canvas></div>
+    <div class="side">
+      <div class="panel">
+        <h2>图例（等待时长）</h2>
+        <canvas id="legend-canvas" width="220" height="46"></canvas>
+        <div id="legend-labels"></div>
+      </div>
+      <div class="panel">
+        <h2>统计</h2>
+        <div class="stats-grid" id="stats"></div>
+      </div>
+      <div class="panel">
+        <h2>间隔详情</h2>
+        <div id="detail"><span class="empty">点击图中的间隔色块查看原始记录</span></div>
+      </div>
+    </div>
+  </div>
+  <script src="bus-data.js"></script>
+  <script src="bus-core.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
