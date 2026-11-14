@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" content="#07171c">
+  <title>风暴眼 · 浮标投放任务</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><circle cx=%2216%22 cy=%2216%22 r=%2213%22 fill=%22%2307171c%22 stroke=%22%2367f5d2%22/><path d=%22M8 16h16M16 8v16%22 stroke=%22%2367f5d2%22/></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app">
+    <canvas id="game" aria-label="气象无人机穿越台风投放浮标的游戏画面"></canvas>
+
+    <header class="topbar hud">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div>
+          <p>WEATHER RECON / 07</p>
+          <h1>风暴眼</h1>
+        </div>
+      </div>
+      <div class="mission-meta">
+        <span class="live"><i></i> 实时链路</span>
+        <span id="clock">T+ 00:00</span>
+        <span class="storm-rating">台风外围 · 8级</span>
+      </div>
+    </header>
+
+    <section class="telemetry hud" aria-label="无人机遥测">
+      <div class="section-label">FLIGHT TELEMETRY</div>
+      <div class="battery-row">
+        <span>电量</span>
+        <strong id="battery-value">100%</strong>
+      </div>
+      <div class="meter"><i id="battery-bar"></i><b id="power-flow"></b></div>
+      <div class="readout-grid">
+        <div><span>空速</span><strong id="speed-value">0</strong><small>km/h</small></div>
+        <div><span>高度</span><strong id="altitude-value">420</strong><small>m</small></div>
+        <div><span>风速</span><strong id="wind-value">0</strong><small>m/s</small></div>
+      </div>
+      <div class="power-note" id="power-note">逆风功率储备正常</div>
+    </section>
+
+    <section class="objectives hud" aria-label="任务目标">
+      <div class="section-label">DEPLOYMENT / <span id="deploy-count">0</span> OF 3</div>
+      <ol id="objective-list">
+        <li data-target="alpha"><i></i><span><b>ALPHA</b> 北侧浮标</span><em>等待</em></li>
+        <li data-target="bravo"><i></i><span><b>BRAVO</b> 风眼下沿</span><em>等待</em></li>
+        <li data-target="charlie"><i></i><span><b>CHARLIE</b> 东侧浮标</span><em>等待</em></li>
+      </ol>
+      <div class="return-chip" id="return-chip">返航平台 · 未解锁</div>
+    </section>
+
+    <aside class="sensor hud" aria-label="传感器与风场">
+      <div class="sensor-head">
+        <span class="section-label">SENSOR ARRAY</span>
+        <span id="sensor-state">良好</span>
+      </div>
+      <div class="radar-mini"><canvas id="sensor-radar" width="176" height="176"></canvas></div>
+      <div class="sensor-stats">
+        <div><span>能见度</span><b id="visibility-value">72%</b></div>
+        <div><span>投放误差</span><b id="error-value">±4 m</b></div>
+      </div>
+    </aside>
+
+    <div class="altitude-tape hud" aria-label="高度控制">
+      <span class="tape-label">ALT</span>
+      <div class="tape-line"><i id="altitude-marker"></i></div>
+      <span class="tape-high">600</span>
+      <span class="tape-low">80</span>
+    </div>
+
+    <div class="compass hud" aria-label="罗盘">
+      <canvas id="compass" width="190" height="190"></canvas>
+      <span id="heading-value">000°</span>
+    </div>
+
+    <div class="message" id="message" role="status"></div>
+
+    <footer class="controls hud">
+      <div><kbd>A</kbd><kbd>D</kbd><span>控制航向</span></div>
+      <div><kbd>W</kbd><kbd>S</kbd><span>升降高度</span></div>
+      <div><kbd>SPACE</kbd><span>投放浮标</span></div>
+      <div><kbd>M</kbd><span>静音</span></div>
+      <div><kbd>P</kbd><span>暂停</span></div>
+    </footer>
+
+    <div class="overlay visible" id="start-overlay">
+      <div class="overlay-panel">
+        <p class="eyebrow">MISSION 07 / TYPHOON OUTER BAND</p>
+        <h2>穿过风墙，<br><em>把答案留在海上。</em></h2>
+        <p class="brief">驾驶气象无人机进入台风外围，在三个目标海域投放探测浮标，然后返回平台。低空投放更准，但会承受更强侧风；高空更稳，却会让雨幕干扰传感器。</p>
+        <div class="brief-grid">
+          <div><b>3</b><span>目标海域</span></div>
+          <div><b>100%</b><span>初始电量</span></div>
+          <div><b>1</b><span>次返航</span></div>
+        </div>
+        <button id="start-button" type="button">启动任务 <span>→</span></button>
+        <p class="audio-note">建议开启声音 · 风噪会随实时风速变化</p>
+      </div>
+    </div>
+
+    <div class="overlay result-overlay" id="result-overlay">
+      <div class="overlay-panel result-panel">
+        <p class="eyebrow" id="result-eyebrow">MISSION COMPLETE</p>
+        <h2 id="result-title">任务成功</h2>
+        <p id="result-copy">三枚浮标已进入目标海域，无人机安全返航。</p>
+        <div class="result-stats">
+          <div><span>任务用时</span><b id="result-time">00:00</b></div>
+          <div><span>剩余电量</span><b id="result-battery">0%</b></div>
+          <div><span>投放精度</span><b id="result-accuracy">0%</b></div>
+        </div>
+        <button id="restart-button" type="button">再次出航 <span>↻</span></button>
+      </div>
+    </div>
+
+    <div class="pause-card" id="pause-card">任务暂停 <small>按 P 继续</small></div>
+  </main>
+
+  <script src="js/world.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
