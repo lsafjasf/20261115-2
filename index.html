@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1015" />
+    <title>NEXUS · 供应网络协同台</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="NEXUS 供应网络协同台">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none">
+              <path d="M16 3.5 27 9.8v12.4L16 28.5 5 22.2V9.8L16 3.5Z" stroke="currentColor" stroke-width="1.4"/>
+              <path d="m10 12 6-3.4 6 3.4v7.8L16 23l-6-3.2V12Z" fill="currentColor" opacity=".18"/>
+              <path d="M10 12.2 16 16l6-3.8M16 16v7" stroke="currentColor" stroke-width="1.4"/>
+            </svg>
+          </span>
+          <span class="brand-word">NEXUS<span>/</span></span>
+          <span class="brand-copy">供应网络协同台</span>
+        </a>
+
+        <div class="topbar-center">
+          <span class="live-dot"></span>
+          <span>网络在线</span>
+          <span class="top-divider"></span>
+          <span class="muted">华东区域 · 2026 / 11 / 14</span>
+        </div>
+
+        <div class="top-actions">
+          <button class="icon-button" id="resetButton" type="button" title="恢复平衡方案">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 4v6h6M20 20v-6h-6M5.2 15A8 8 0 0 0 19 17.5M18.8 9A8 8 0 0 0 5 6.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>复位</span>
+          </button>
+          <button class="icon-button export-trigger" id="topExportButton" type="button" disabled title="完成十步模拟后可导出">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3h16v-3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>导出</span>
+          </button>
+          <div class="user-chip" aria-label="当前用户：林可">
+            <span class="avatar">LK</span>
+            <span class="user-copy"><strong>林可</strong><small>运营调度</small></span>
+          </div>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="network-panel" aria-labelledby="networkTitle">
+          <div class="panel-toolbar">
+            <div class="title-block">
+              <div class="eyebrow"><span class="eyebrow-line"></span>LIVE TOPOLOGY</div>
+              <h1 id="networkTitle">区域供应网络</h1>
+              <p>拖动线路流量调整计划，单击节点查看库存与缺口</p>
+            </div>
+            <div class="toolbar-actions">
+              <div class="scenario-switch" role="group" aria-label="场景切换">
+                <button class="scenario-button active" data-scenario="balanced" type="button">
+                  <span class="button-dot"></span>平衡方案
+                </button>
+                <button class="scenario-button danger" data-scenario="overload" type="button">
+                  <span class="button-dot"></span>超载测试
+                </button>
+              </div>
+              <button class="primary-button" id="runButton" type="button">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="m9 7 8 5-8 5V7Z" fill="currentColor"/>
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" opacity=".55"/>
+                </svg>
+                <span>运行十步模拟</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="canvas-frame" id="canvasFrame">
+            <canvas id="networkCanvas" aria-label="供应网络图"></canvas>
+            <div class="canvas-status" id="canvasStatus">
+              <span class="status-orb"></span>
+              <span id="canvasStatusText">供需平衡</span>
+            </div>
+            <div class="simulation-flag" id="simulationFlag" hidden>
+              <span class="flag-pulse"></span>
+              <span>模拟进行中</span>
+              <b id="simulationFlagStep">01 / 10</b>
+            </div>
+            <div class="canvas-hint">
+              <span class="hint-icon">↕</span>
+              拖动容量数值调节流量
+            </div>
+          </div>
+
+          <div class="panel-footer">
+            <div class="legend">
+              <span class="legend-item"><i class="legend-line normal"></i>正常流向</span>
+              <span class="legend-item"><i class="legend-line warning"></i>接近容量</span>
+              <span class="legend-item"><i class="legend-line danger"></i>容量超载</span>
+            </div>
+            <div class="network-meta">
+              <span><b>2</b> 工厂</span>
+              <span><b>3</b> 仓库</span>
+              <span><b>4</b> 商店</span>
+              <span><b>18</b> 线路</span>
+            </div>
+          </div>
+        </section>
+
+        <aside class="control-panel" aria-label="运行控制面板">
+          <section class="balance-card panel-section">
+            <div class="section-heading">
+              <span>供需总览</span>
+              <span class="section-tag">LIVE</span>
+            </div>
+            <div class="balance-main">
+              <div>
+                <div class="metric-label">网络总流出</div>
+                <div class="metric-value"><span id="totalSupply">210</span><small>件</small></div>
+              </div>
+              <div class="balance-equals" aria-hidden="true">
+                <span></span><b>=</b><span></span>
+              </div>
+              <div class="metric-right">
+                <div class="metric-label">终端总流入</div>
+                <div class="metric-value"><span id="totalDemand">210</span><small>件</small></div>
+              </div>
+            </div>
+            <div class="balance-track"><span id="balanceTrackFill"></span></div>
+            <div class="balance-meta">
+              <span id="balanceCaption">供应与需求已精确匹配</span>
+              <strong id="balanceDelta">Δ 0</strong>
+            </div>
+          </section>
+
+          <section class="validation-card panel-section">
+            <div class="section-heading">
+              <span>实时校验</span>
+              <span class="validation-pill" id="validationPill">通过</span>
+            </div>
+            <div class="check-rows">
+              <div class="check-row">
+                <span class="check-mark" id="capacityMark">✓</span>
+                <span>线路容量</span>
+                <strong id="capacitySummary">18 / 18 合规</strong>
+              </div>
+              <div class="check-row">
+                <span class="check-mark" id="conservationMark">✓</span>
+                <span>节点守恒</span>
+                <strong id="conservationSummary">9 / 9 守恒</strong>
+              </div>
+              <div class="check-row">
+                <span class="check-mark" id="demandMark">✓</span>
+                <span>终端履约</span>
+                <strong id="demandSummary">4 / 4 满足</strong>
+              </div>
+            </div>
+            <div class="warning-banner" id="warningBanner" hidden>
+              <span class="warning-icon">!</span>
+              <span id="warningText">检测到 1 条线路超出容量</span>
+              <button id="fixButton" type="button">一键配平</button>
+            </div>
+          </section>
+
+          <section class="node-card panel-section">
+            <div class="section-heading">
+              <span>节点详情</span>
+              <span class="section-tag" id="nodeCode">W-02</span>
+            </div>
+            <div class="node-identity">
+              <span class="node-type-icon" id="nodeTypeIcon">仓</span>
+              <div>
+                <h2 id="nodeName">中轴仓</h2>
+                <p id="nodeTypeLabel">区域仓库 · 中轴枢纽</p>
+              </div>
+              <span class="node-health" id="nodeHealth">守恒</span>
+            </div>
+            <div class="node-metrics">
+              <div class="stock-metric">
+                <span>当前库存</span>
+                <strong><b id="nodeStock">12</b><small>件</small></strong>
+              </div>
+              <div class="gap-metric">
+                <span>当前缺口</span>
+                <strong><b id="nodeGap">0</b><small>件</small></strong>
+              </div>
+            </div>
+            <div class="flow-balance">
+              <div class="flow-balance-head">
+                <span>流入 <b id="nodeInflow">85</b></span>
+                <span>流出 <b id="nodeOutflow">85</b></span>
+              </div>
+              <div class="flow-bars">
+                <span class="flow-bar-in" id="flowBarIn"></span>
+                <span class="flow-bar-out" id="flowBarOut"></span>
+              </div>
+            </div>
+            <div class="node-note" id="nodeNote">流入与流出一致，仓内周转处于稳定状态。</div>
+          </section>
+
+          <section class="simulation-card panel-section">
+            <div class="section-heading">
+              <span>十步模拟</span>
+              <span class="section-tag" id="simulationTag">待运行</span>
+            </div>
+            <div class="step-track" id="stepTrack" aria-label="模拟步骤进度"></div>
+            <div class="simulation-meta">
+              <span id="simulationStatus">调整流量后运行十步压力测试</span>
+              <strong id="simulationPercent">0%</strong>
+            </div>
+            <div class="simulation-actions">
+              <button class="secondary-button" id="exportButton" type="button" disabled>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3h16v-3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>导出 PNG</span>
+              </button>
+              <button class="primary-button compact" id="runButtonSide" type="button">
+                <span>运行模拟</span>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="m9 7 8 5-8 5V7Z" fill="currentColor"/>
+                </svg>
+              </button>
+            </div>
+            <div class="event-feed" id="eventFeed" aria-live="polite">
+              <div class="feed-row"><span>09:42</span><p>平衡方案已载入，全部线路校验通过</p></div>
+            </div>
+          </section>
+        </aside>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
