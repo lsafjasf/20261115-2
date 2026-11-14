@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f1eee6">
+  <title>Paperfold — a three-surface motion study</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Paperfold home">
+        <span class="brand-mark" aria-hidden="true">
+          <i></i><i></i><i></i>
+        </span>
+        <span class="brand-copy">
+          <strong>Paperfold</strong>
+          <small>Motion study / 01</small>
+        </span>
+      </a>
+
+      <div class="topbar-meta" aria-label="Project details">
+        <span>Canvas / Web Audio</span>
+        <span class="meta-dot"></span>
+        <span>10.00 sec</span>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="sound-chip" id="soundToggle" type="button" aria-pressed="true" aria-label="Toggle paper sound">
+          <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <span id="soundLabel">Paper sound <b>on</b></span>
+        </button>
+        <button class="export-button" id="exportButton" type="button">
+          <span class="record-dot" aria-hidden="true"></span>
+          <span id="exportLabel">Export 10s WebM</span>
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M5 2.5v8.8M2.1 8.4l2.9 3 2.9-3M1.5 14h13" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="workbench">
+      <aside class="settings" aria-label="Fold controls">
+        <div class="settings-intro">
+          <p class="eyebrow">Compose / <span>3 surfaces</span></p>
+          <h1>Set the paper<br>in motion.</h1>
+          <p class="intro-copy">Every surface has its own cue. Offset the starts, choose its fold side, then drag the playhead to inspect the angle.</p>
+        </div>
+
+        <div class="preset-row" aria-label="Timing presets">
+          <button type="button" class="preset is-active" data-preset="sequence">Sequence</button>
+          <button type="button" class="preset" data-preset="overlap">Overlap</button>
+          <button type="button" class="preset" data-preset="together">Together</button>
+        </div>
+
+        <section class="fold-stack" aria-label="Fold timing">
+          <div class="section-label">
+            <span>Fold timing</span>
+            <span>Start / length</span>
+          </div>
+          <div id="foldCards"></div>
+        </section>
+
+        <section class="check-card" aria-label="Sequence validation">
+          <div class="check-copy">
+            <span class="status-light" id="checkLight"></span>
+            <div>
+              <strong id="checkTitle">Sequence verified</strong>
+              <small id="checkSub">Open order 01 · 02 · 03</small>
+            </div>
+          </div>
+          <button class="check-button" id="foldCheckButton" type="button">Run fold check</button>
+        </section>
+      </aside>
+
+      <section class="studio" aria-label="Animation studio">
+        <div class="stage-toolbar">
+          <div class="stage-title">
+            <span class="live-dot" aria-hidden="true"></span>
+            <span>Live canvas</span>
+            <small id="stageHint">Drag the playhead to freeze any angle</small>
+          </div>
+          <div class="angle-readout" aria-live="polite">
+            <span>COVER <b id="coverAngle">0.0°</b></span>
+            <span>INNER <b id="innerAngle">100%</b></span>
+            <span>PLATE <b id="plateAngle">0.0°</b></span>
+          </div>
+        </div>
+
+        <div class="canvas-frame" id="canvasFrame">
+          <canvas id="stage" aria-label="Animated three-panel paper fold"></canvas>
+          <div class="canvas-tag top-left">FIELD STUDY<br><b>NO. 01</b></div>
+          <div class="canvas-tag top-right">PERSPECTIVE<br><b>PROJECTION ON</b></div>
+          <div class="canvas-note bottom-left">FOLD / FOLD / FOLD</div>
+          <div class="scrub-indicator" id="scrubIndicator" aria-hidden="true">SCRUB</div>
+        </div>
+
+        <div class="transport" aria-label="Playback controls">
+          <div class="transport-main">
+            <button class="round-button" id="playButton" type="button" aria-label="Play animation">
+              <svg class="icon-play" viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 4.1 15 10l-8.5 5.9Z"/></svg>
+              <svg class="icon-pause" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 3.8h2.7v12.4H6zM11.3 3.8H14v12.4h-2.7z"/></svg>
+            </button>
+            <button class="small-button" id="rewindButton" type="button" aria-label="Return to start">
+              <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 3v12M14.5 4 6 9l8.5 5Z"/></svg>
+            </button>
+            <div class="time-display">
+              <b id="currentTime">06.40</b><span>/ 10.00 s</span>
+            </div>
+          </div>
+
+          <div class="timeline" id="timeline">
+            <div class="timeline-tracks" id="timelineTracks" aria-hidden="true"></div>
+            <input id="scrubber" type="range" min="0" max="10" step="0.001" value="6.4" aria-label="Animation playhead">
+            <div class="playhead-line" id="playheadLine"></div>
+            <div class="tick-labels" aria-hidden="true">
+              <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span>
+            </div>
+          </div>
+
+          <div class="transport-side">
+            <div class="frame-count"><span id="frameLabel">30</span><small>FPS</small></div>
+            <button class="text-button" id="settingsReset" type="button">Reset</button>
+          </div>
+        </div>
+
+        <footer class="sequence-footer">
+          <div class="fold-order">
+            <span class="footer-label">Open order</span>
+            <div class="order-chips">
+              <span class="order-chip cover"><i>01</i> Cover</span>
+              <svg viewBox="0 0 28 10" aria-hidden="true"><path d="M1 5h24m-4-4 4 4-4 4"/></svg>
+              <span class="order-chip inner"><i>02</i> Inner</span>
+              <svg viewBox="0 0 28 10" aria-hidden="true"><path d="M1 5h24m-4-4 4 4-4 4"/></svg>
+              <span class="order-chip plate"><i>03</i> Plate</span>
+            </div>
+          </div>
+          <div class="footer-status"><span class="status-dot"></span><span id="footerStatus">All three surfaces aligned</span></div>
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span id="toastIcon">✓</span>
+    <div><strong id="toastTitle">Ready</strong><small id="toastMessage"></small></div>
+  </div>
+
+  <script src="js/audio.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
