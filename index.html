@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>双人协作 · 重型布景换景</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>重型布景换景 <span>双人协作</span></h1>
+          <p id="auto-badge">自动驾驶（双人协作演示）</p>
+        </div>
+        <div class="controls">
+          <button id="reset" type="button">重新开始 (R)</button>
+          <button id="auto-toggle" type="button">切到手动 (A)</button>
+          <button id="mute-toggle" type="button">静音 (M)</button>
+        </div>
+      </header>
+
+      <section class="board">
+        <div class="canvas-wrap">
+          <canvas id="stage"></canvas>
+          <div id="overlay" class="overlay">
+            <div class="overlay-card">
+              <h2 id="overlay-title"></h2>
+              <p id="overlay-detail"></p>
+              <button type="button" onclick="document.getElementById('reset').click()">
+                再来一次
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="sidebar">
+          <h2>任务状态</h2>
+          <dl class="hud">
+            <dt>当前场景</dt><dd id="hud-scene">—</dd>
+            <dt>换景进度</dt><dd id="hud-progress">0/3 次换景</dd>
+            <dt>提示段数</dt><dd id="hud-cue">1/5 段提示</dd>
+            <dt>本段剩余</dt><dd id="hud-timer">20.0s</dd>
+            <dt>布景角度</dt><dd id="hud-angle">0°</dd>
+            <dt>目标偏差</dt><dd id="hud-err">0°</dd>
+            <dt>转动速度</dt><dd id="hud-speed">0 rad/s</dd>
+            <dt>配重位置</dt><dd id="hud-cw">0 m</dd>
+            <dt>倾斜指标</dt><dd id="hud-tilt">0%</dd>
+          </dl>
+
+          <div class="players">
+            <div class="player">
+              <h3>左玩家 · 底座旋转</h3>
+              <div class="btn-row">
+                <button data-hold="torque-" type="button">逆时针<br /><b>A / ←</b></button>
+                <button data-hold="torque+" type="button">顺时针<br /><b>D / →</b></button>
+              </div>
+            </div>
+            <div class="player">
+              <h3>右玩家 · 配重滑动</h3>
+              <div class="btn-row">
+                <button data-hold="cw-" type="button">收回<br /><b>S / ↓</b></button>
+                <button data-hold="cw+" type="button">外推<br /><b>W / ↑</b></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="legend">
+            <h3>图例与规则</h3>
+            <ul>
+              <li><i class="dot target"></i> 绿色虚线为目标角度，停稳 0.8s 算到位</li>
+              <li><i class="dot danger"></i> 红色扇形是演员/台柱碰撞禁入区</li>
+              <li><i class="dot com"></i> 十字标记为布景+配重合成质心</li>
+              <li>质心越出底座支撑面即倾斜失败，碰撞立即失败</li>
+              <li>五段提示内完成三次换景即成功；超时消耗一段提示</li>
+            </ul>
+          </div>
+        </aside>
+      </section>
+    </main>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "stage-shift-duo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "双人协作的重型布景换景游戏：Canvas 渲染 + Web Audio + 确定性物理引擎",
+  "scripts": {
+    "serve": "node demo/serve.mjs",
+    "run-demo": "node demo/run.mjs",
+    "verify": "node demo/verify.mjs"
+  }
+}
