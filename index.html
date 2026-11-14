@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抽象地铁换乘规划</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 18px;
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      background: #f4f6f9; color: #1f2933;
+    }
+    h1 { font-size: 20px; margin: 0 0 12px; }
+    .layout { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+    .panel {
+      background: #fff; border-radius: 10px; padding: 14px 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    #map { background: #fbfcfe; border: 1px solid #e2e8f0; border-radius: 8px; }
+    .side { width: 320px; display: flex; flex-direction: column; gap: 12px; }
+    .row { font-size: 13px; line-height: 1.7; }
+    .line-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin: 2px 8px 2px 0; cursor: pointer; user-select: none;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    button {
+      border: 1px solid #cbd5e1; background: #fff; border-radius: 6px;
+      padding: 6px 10px; font-size: 13px; cursor: pointer; margin: 3px 4px 3px 0;
+    }
+    button:hover { background: #eef4ff; }
+    .legend { font-size: 12px; color: #52606d; }
+    .legend span { display: inline-flex; align-items: center; margin-right: 14px; }
+    .swatch { width: 22px; height: 0; border-top-width: 4px;
+      border-top-style: solid; margin-right: 5px; border-radius: 2px; }
+    #result { font-size: 13px; min-height: 120px; }
+    .plan { border-left: 4px solid #ccc; padding: 8px 10px; margin: 8px 0;
+      background: #f8fafc; border-radius: 0 6px 6px 0; }
+    .plan.time { border-left-color: #f59e0b; }
+    .plan.transfer { border-left-color: #7c3aed; }
+    .plan h3 { margin: 0 0 4px; font-size: 14px; }
+    .muted { color: #7b8794; }
+    .danger { color: #c0392b; font-weight: 600; }
+    .tag { padding: 1px 7px; border-radius: 10px; font-size: 12px; color: #fff; }
+  </style>
+</head>
+<body>
+  <h1>抽象地铁换乘规划（点击站点选择起点 / 终点）</h1>
+  <div class="layout">
+    <canvas id="map" width="960" height="620"></canvas>
+    <div class="side">
+      <div class="panel">
+        <div class="row" id="selection"></div>
+        <div class="row">
+          <strong>临时停运线路：</strong><br>
+          <span id="lineControls"></span>
+        </div>
+        <div class="row">
+          <strong>样例起终点：</strong><br>
+          <button data-q="C0,A4">机场 → 东站</button>
+          <button data-q="B0,C0">南站 → 机场</button>
+          <button data-q="A0,A4">西站 → 东站</button><br>
+          <button id="reset">清除选择</button>
+        </div>
+        <div class="legend">
+          <span><i class="swatch" style="border-top-color:#f59e0b"></i>最短时间</span>
+          <span><i class="swatch" style="border-top-color:#7c3aed"></i>最少换乘</span>
+          <span><i class="swatch" style="border-top-color:#9aa5b1;
+            border-top-style:dashed"></i>停运</span>
+        </div>
+      </div>
+      <div class="panel" id="result"><span class="muted">请先在地图上点击起点与终点。</span></div>
+    </div>
+  </div>
+  <script src="subway-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

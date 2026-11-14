@@ -1,0 +1,25 @@
+{
+  "name": "uid422",
+  "version": "1.0.0",
+  "description": "抽象地铁换乘规划：Canvas 可视化 + 最短时间/最少换乘双算法 + 停运绕行",
+  "main": "subway-data.js",
+  "scripts": {
+    "test": "node test.js",
+    "browser": "node browser-smoke.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsafjasf/20261115-2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lsafjasf/20261115-2/issues"
+  },
+  "homepage": "https://github.com/lsafjasf/20261115-2#readme",
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}
