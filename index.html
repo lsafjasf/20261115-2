@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#17332b" />
+    <title>印造所 · 圆形图章生成器</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="印造所首页">
+          <span class="brand-mark">印</span>
+          <span class="brand-copy">
+            <strong>印造所</strong>
+            <small>SEAL ATELIER / 01</small>
+          </span>
+        </a>
+        <p class="topbar-note">圆形图章 · 透明底稿 · 可打印</p>
+        <div class="topbar-actions">
+          <span class="format-pill"><i></i> PNG / 2048 PX</span>
+          <button class="primary-button" id="export-main" type="button">
+            <span>导出透明图章</span>
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M10 2v10m0 0 4-4m-4 4L6 8M3 14v3h14v-3" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <main>
+        <section class="intro" aria-labelledby="page-title">
+          <div>
+            <p class="eyebrow"><span>01</span> CIRCULAR SEAL GENERATOR</p>
+            <h1 id="page-title">让每一道弧，<br /><em>都有落笔的呼吸。</em></h1>
+          </div>
+          <p class="intro-copy">
+            以文字与日期构建可打印的圆形印记。字距自动适配，缺口避开日期，
+            每一枚都由 seed 生成独一无二的印泥肌理。
+          </p>
+        </section>
+
+        <section class="workbench" aria-label="图章编辑工作台">
+          <div class="preview-panel">
+            <div class="panel-heading">
+              <div>
+                <span class="live-dot"></span>
+                <h2>实时预览</h2>
+                <span class="panel-meta">CANVAS / INK ONLY</span>
+              </div>
+              <div class="preview-actions" role="group" aria-label="预览背景">
+                <button class="icon-button is-active" type="button" data-view="paper" title="纸面预览">
+                  <span class="paper-icon"></span>
+                </button>
+                <button class="icon-button" type="button" data-view="checker" title="透明底预览">
+                  <span class="checker-icon"></span>
+                </button>
+              </div>
+            </div>
+
+            <div class="canvas-stage" id="canvas-stage" data-view="paper">
+              <div class="stage-corner top-left">PROOF · 100%</div>
+              <div class="stage-corner bottom-right">Ø 42 MM PRINT READY</div>
+              <div class="canvas-paper">
+                <canvas id="stamp-canvas" width="1024" height="1024" aria-label="圆形图章实时预览"></canvas>
+              </div>
+            </div>
+
+            <div class="preview-footer">
+              <div class="safety-status">
+                <span class="status-item" id="text-status"><i></i> 字环连续</span>
+                <span class="status-item" id="date-status"><i></i> 缺口已避开日期</span>
+                <span class="status-item"><i></i> 透明底可导出</span>
+              </div>
+              <div class="seed-readout">
+                <span>SEED</span>
+                <strong id="seed-readout">0427</strong>
+                <button class="shuffle-button" id="shuffle-seed" type="button" aria-label="随机生成 seed">
+                  <svg viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="M16 3v4h-4M4 17v-4h4M16 7l-3.5-3.5A7 7 0 0 0 5 5M4 13l3.5 3.5A7 7 0 0 0 15 15" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <aside class="controls-panel" aria-label="图章参数">
+            <div class="panel-heading controls-heading">
+              <div>
+                <span class="section-number">02</span>
+                <h2>图章设定</h2>
+              </div>
+              <button class="text-button" id="reset-settings" type="button">恢复默认</button>
+            </div>
+
+            <div class="control-scroll">
+              <div class="field-group">
+                <label class="field-label" for="primary-text">
+                  <span>环上文字</span>
+                  <small id="text-count">9 / 18 字</small>
+                </label>
+                <input
+                  class="text-input"
+                  id="primary-text"
+                  type="text"
+                  value="长安印社·纸上有光"
+                  maxlength="18"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+              </div>
+
+              <div class="field-group compact-field">
+                <label class="field-label" for="date-text">
+                  <span>落款日期</span>
+                  <small>底部安全区</small>
+                </label>
+                <input class="text-input date-input" id="date-text" type="text" value="2026.11.14" maxlength="12" autocomplete="off" />
+              </div>
+
+              <div class="rule"></div>
+
+              <div class="control-block">
+                <label class="range-label" for="arc-range">
+                  <span>字弧跨度</span>
+                  <output id="arc-value">198°</output>
+                </label>
+                <input class="range" id="arc-range" type="range" min="150" max="230" step="2" value="198" />
+                <div class="range-ends"><span>紧凑</span><span>舒展</span></div>
+              </div>
+
+              <div class="control-block">
+                <div class="segmented-label">
+                  <span>内圈线</span>
+                  <small>装饰层级</small>
+                </div>
+                <div class="segmented" data-control="inner-lines" role="group" aria-label="内圈线">
+                  <button type="button" data-value="0">无</button>
+                  <button class="is-active" type="button" data-value="1">单线</button>
+                  <button type="button" data-value="2">双线</button>
+                </div>
+              </div>
+
+              <div class="control-block">
+                <div class="segmented-label">
+                  <span>中心几何</span>
+                  <small>纯矢量图形</small>
+                </div>
+                <div class="logo-options" data-control="logo" role="group" aria-label="中心几何图形">
+                  <button class="is-active" type="button" data-value="mountain" title="山与日">
+                    <svg viewBox="0 0 32 24" aria-hidden="true">
+                      <circle cx="16" cy="7" r="3.2" />
+                      <path d="m3 20 8-10 4 4 5-7 9 13H3Z" />
+                    </svg>
+                    <span>山</span>
+                  </button>
+                  <button type="button" data-value="sun" title="日轮">
+                    <svg viewBox="0 0 32 24" aria-hidden="true">
+                      <circle cx="16" cy="12" r="7" />
+                      <path d="M16 1v3M16 20v3M5 12H2M30 12h-3M8.2 4.2 6 2M27.8 4.2 30 2" />
+                    </svg>
+                    <span>日</span>
+                  </button>
+                  <button type="button" data-value="diamond" title="方胜">
+                    <svg viewBox="0 0 32 24" aria-hidden="true">
+                      <path d="m16 2 10 10-10 10L6 12 16 2Z" />
+                      <path d="m16 7 5 5-5 5-5-5 5-5Z" />
+                    </svg>
+                    <span>方</span>
+                  </button>
+                  <button type="button" data-value="none" title="无图形">
+                    <svg viewBox="0 0 32 24" aria-hidden="true">
+                      <path d="M7 7l18 10M25 7 7 17" />
+                    </svg>
+                    <span>无</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="rule"></div>
+
+              <div class="dual-controls">
+                <div class="control-block">
+                  <label class="range-label" for="notch-depth">
+                    <span>缺口深度</span>
+                    <output id="notch-value">14 px</output>
+                  </label>
+                  <input class="range" id="notch-depth" type="range" min="0" max="22" step="1" value="14" />
+                </div>
+                <div class="control-block">
+                  <label class="range-label" for="notch-count">
+                    <span>缺口数量</span>
+                    <output id="notch-count-value">14</output>
+                  </label>
+                  <input class="range" id="notch-count" type="range" min="0" max="18" step="1" value="14" />
+                </div>
+              </div>
+
+              <div class="control-block wear-block">
+                <label class="range-label" for="wear-range">
+                  <span>纹理磨损</span>
+                  <output id="wear-value">44%</output>
+                </label>
+                <input class="range wear-range" id="wear-range" type="range" min="0" max="100" step="1" value="44" />
+                <div class="ink-preview">
+                  <span class="ink-swatch" id="ink-swatch"></span>
+                  <span id="ink-label">朱砂印泥 / CINNABAR</span>
+                  <div class="ink-options" role="group" aria-label="印泥颜色">
+                    <button class="is-active" type="button" data-ink="#a93628" data-label="朱砂印泥 / CINNABAR" style="--swatch:#a93628" aria-label="朱砂"></button>
+                    <button type="button" data-ink="#20221f" data-label="松烟墨 / PINE SOOT" style="--swatch:#20221f" aria-label="墨黑"></button>
+                    <button type="button" data-ink="#294f66" data-label="靛青 / INDIGO" style="--swatch:#294f66" aria-label="靛青"></button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="seed-control">
+                <label class="field-label" for="seed-input">
+                  <span>生成 seed</span>
+                  <small>同文异版</small>
+                </label>
+                <div class="seed-input-wrap">
+                  <input id="seed-input" type="number" min="1" max="99999" value="427" />
+                  <button id="seed-dice" type="button" aria-label="随机 seed">↻</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="export-bar">
+              <div>
+                <span>导出尺寸</span>
+                <strong>2048 × 2048 px</strong>
+              </div>
+              <button class="primary-button wide" id="export-bottom" type="button">
+                <span>导出 PNG</span>
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="M10 2v10m0 0 4-4m-4 4L6 8M3 14v3h14v-3" />
+                </svg>
+              </button>
+            </div>
+          </aside>
+        </section>
+
+        <section class="compare-section" aria-labelledby="compare-title">
+          <div class="compare-heading">
+            <div>
+              <p class="eyebrow"><span>03</span> SAME WORDS, DIFFERENT SEEDS</p>
+              <h2 id="compare-title">同文异印 <em>对照样本</em></h2>
+            </div>
+            <div class="compare-actions">
+              <p>相同文字与参数，仅改变 seed。<br />比较缺口相位、印泥颗粒与边缘磨损。</p>
+              <button class="outline-button" id="refresh-compare" type="button">
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="M16 3v4h-4M4 17v-4h4M16 7l-3.5-3.5A7 7 0 0 0 5 5M4 13l3.5 3.5A7 7 0 0 0 15 15" />
+                </svg>
+                换一组 seed
+              </button>
+            </div>
+          </div>
+
+          <div class="comparison-grid">
+            <article class="sample-card" data-sample="a">
+              <div class="sample-head">
+                <div>
+                  <span class="sample-index">A / 对照</span>
+                  <strong>SEED <span data-sample-seed>0427</span></strong>
+                </div>
+                <span class="sample-tag">同参数 · 相位 A</span>
+              </div>
+              <div class="sample-canvas-wrap">
+                <canvas class="sample-canvas" id="compare-canvas-a" width="720" height="720"></canvas>
+                <span class="canvas-registration tl"></span>
+                <span class="canvas-registration br"></span>
+              </div>
+              <div class="sample-meta">
+                <div><span>弧段适配</span><strong data-sample-fill>—</strong></div>
+                <div><span>最小字距</span><strong data-sample-gap>—</strong></div>
+                <div><span>缺口避让</span><strong class="safe-text">安全</strong></div>
+              </div>
+              <button class="sample-export" type="button" data-export-sample="a">
+                导出此版 PNG <span>↗</span>
+              </button>
+            </article>
+
+            <div class="compare-axis" aria-hidden="true">
+              <span>SEED VARIATION</span>
+              <i></i>
+              <b>VS</b>
+            </div>
+
+            <article class="sample-card" data-sample="b">
+              <div class="sample-head">
+                <div>
+                  <span class="sample-index">B / 变体</span>
+                  <strong>SEED <span data-sample-seed>1284</span></strong>
+                </div>
+                <span class="sample-tag">同参数 · 相位 B</span>
+              </div>
+              <div class="sample-canvas-wrap">
+                <canvas class="sample-canvas" id="compare-canvas-b" width="720" height="720"></canvas>
+                <span class="canvas-registration tl"></span>
+                <span class="canvas-registration br"></span>
+              </div>
+              <div class="sample-meta">
+                <div><span>弧段适配</span><strong data-sample-fill>—</strong></div>
+                <div><span>最小字距</span><strong data-sample-gap>—</strong></div>
+                <div><span>缺口避让</span><strong class="safe-text">安全</strong></div>
+              </div>
+              <button class="sample-export" type="button" data-export-sample="b">
+                导出此版 PNG <span>↗</span>
+              </button>
+            </article>
+          </div>
+
+          <div class="compare-notes">
+            <span><i>01</i> 文字环整体等弧分布，不因 seed 产生断裂。</span>
+            <span><i>02</i> 底部日期扇区被列为缺口禁入区。</span>
+            <span><i>03</i> 两版仅 seed 与磨损相位不同。</span>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <span>INK SEAL LAB / 2026</span>
+        <span>PURE CANVAS · NO BITMAP LOGO · TRANSPARENT PNG</span>
+        <span>为纸张而作</span>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      <span class="toast-icon">✓</span>
+      <span id="toast-message">已导出透明 PNG</span>
+    </div>
+
+    <script src="stamp.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
