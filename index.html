@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>程序化彩色玻璃窗</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; gap: 24px;
+    align-items: flex-start; justify-content: center; flex-wrap: wrap;
+    background: radial-gradient(1200px 800px at 30% 20%, #1b1d26, #0b0c10);
+    color: #e8e9ee; font: 14px/1.5 system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+    padding: 24px;
+  }
+  .panel {
+    width: 260px; padding: 18px; border-radius: 12px;
+    background: #171922; border: 1px solid #2a2d3a;
+  }
+  .panel h1 { font-size: 17px; margin: 0 0 14px; }
+  .row { margin-bottom: 14px; }
+  .row label { display: flex; justify-content: space-between; margin-bottom: 4px; color: #aab; }
+  .row label output { color: #e8e9ee; font-variant-numeric: tabular-nums; }
+  input[type="range"] { width: 100%; accent-color: #7d9bff; }
+  select, input[type="text"] {
+    width: 100%; padding: 6px 8px; border-radius: 6px;
+    background: #0f1118; color: #e8e9ee; border: 1px solid #2a2d3a;
+  }
+  .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+  button {
+    padding: 8px 10px; border-radius: 8px; border: 1px solid #3a3e50;
+    background: #232635; color: #e8e9ee; cursor: pointer; font-size: 13px;
+  }
+  button:hover { background: #2d3147; }
+  button.primary { background: #3b5bdb; border-color: #3b5bdb; }
+  button.primary:hover { background: #4c6ef5; }
+  #status { min-height: 18px; font-size: 12px; color: #8f9; margin-top: 10px; }
+  #status.bad { color: #f88; }
+  canvas {
+    width: min(78vmin, 720px); height: min(78vmin, 720px);
+    border-radius: 12px; box-shadow: 0 12px 60px #000a;
+    background: #0b0c10;
+  }
+</style>
+</head>
+<body>
+  <div class="panel">
+    <h1>彩色玻璃窗生成器</h1>
+    <div class="row">
+      <label>中心图形</label>
+      <select id="motif">
+        <option value="auto">随种子自动</option>
+        <option value="rose">玫瑰花瓣</option>
+        <option value="star">星形</option>
+        <option value="medallion">同心圆饰</option>
+      </select>
+    </div>
+    <div class="row">
+      <label>环带数量 <output id="ringsOut"></output></label>
+      <input type="range" id="rings" min="1" max="6" step="1" value="4">
+    </div>
+    <div class="row">
+      <label>色片大小 <output id="tileOut"></output></label>
+      <input type="range" id="tileSize" min="40" max="220" step="5" value="95">
+    </div>
+    <div class="row">
+      <label>边框粗细 <output id="borderOut"></output></label>
+      <input type="range" id="borderWidth" min="3" max="26" step="1" value="12">
+    </div>
+    <div class="row">
+      <label>种子 Seed</label>
+      <input type="text" id="seed" value="rose-2026">
+    </div>
+    <div class="btns">
+      <button id="randomSeed">随机种子</button>
+      <button id="presetA">图案 A</button>
+      <button id="presetB">图案 B</button>
+      <button id="exportSvg">导出 SVG</button>
+      <button id="exportPng" class="primary">导出 PNG</button>
+    </div>
+    <div id="status"></div>
+  </div>
+  <canvas id="view" width="1000" height="1000"></canvas>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
