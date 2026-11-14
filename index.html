@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="梧桐街区噪声采样交互热图，支持昼夜标准切换、采样点筛选与框选统计。"
+    />
+    <title>声境 · 梧桐街区噪声采样热图</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="声境首页">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 36 36" fill="none">
+              <path d="M8 19v-2M12.5 23V13M17 27V9M21.5 22V14M26 19v-2" />
+            </svg>
+          </span>
+          <span>
+            <strong>声境</strong>
+            <small>SOUNDSCAPE LAB</small>
+          </span>
+        </a>
+        <div class="topbar-meta">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span>内置样例 · 2026.11.14</span>
+          <span class="topbar-divider"></span>
+          <span>梧桐街区观测站</span>
+        </div>
+      </header>
+
+      <main>
+        <section class="intro" aria-labelledby="page-title">
+          <div>
+            <p class="eyebrow"><span></span> 社区声环境观察计划 / NO. 07</p>
+            <h1 id="page-title">街区噪声采样热图</h1>
+            <p class="intro-copy">
+              循着声音穿过街巷，比较昼夜声压分布。拖动框选任意街区，读取区域内的采样均值与超标情况。
+            </p>
+          </div>
+          <div class="intro-summary" aria-label="数据集摘要">
+            <div><b id="head-sample-count">26</b><span>采样点</span></div>
+            <div><b>8</b><span>街道段</span></div>
+            <div><b>0.5</b><span>米 / 像素</span></div>
+          </div>
+        </section>
+
+        <section class="workspace">
+          <article class="map-card" aria-labelledby="map-title">
+            <div class="map-head">
+              <div class="map-title-wrap">
+                <span class="section-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z" />
+                    <circle cx="12" cy="10" r="2.2" />
+                  </svg>
+                </span>
+                <div>
+                  <h2 id="map-title">梧桐街区 · 采样地图</h2>
+                  <p>东纬路—榆林道 · 约 500 × 310 m</p>
+                </div>
+              </div>
+              <div class="map-actions">
+                <span class="map-mode-badge" id="map-mode-badge">昼间 · 70 dB</span>
+                <button class="icon-button" id="clear-selection" type="button" aria-label="清除框选">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M5 5l14 14M19 5 5 19" />
+                  </svg>
+                  <span>清除框选</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="canvas-wrap" id="canvas-wrap">
+              <canvas
+                id="noise-map"
+                role="img"
+                aria-label="梧桐街区噪声热图。拖动鼠标可框选区域，带编号的圆形标记为超过当前标准的采样点。"
+              ></canvas>
+              <div class="canvas-hint" id="canvas-hint">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4" />
+                </svg>
+                <span>按住并拖动，框选一片区域</span>
+              </div>
+              <div class="map-tooltip" id="map-tooltip" role="status" hidden></div>
+            </div>
+
+            <div class="map-foot">
+              <p class="map-legend-note">
+                <span class="legend-pulse" aria-hidden="true"></span>
+                热区由当前筛选点位的声压值插值生成
+              </p>
+              <p class="map-foot-meta">
+                <span id="visible-point-label">26 个点位参与计算</span>
+                <span class="foot-divider"></span>
+                <span>1 px ≈ 0.5 m</span>
+              </p>
+            </div>
+          </article>
+
+          <aside class="control-panel" aria-label="噪声数据控制与统计">
+            <section class="panel-section standard-section">
+              <div class="section-heading">
+                <span class="step-no">01</span>
+                <div>
+                  <h2>选择评价时段</h2>
+                  <p>切换昼、夜标准，重新计算图面</p>
+                </div>
+              </div>
+              <div class="period-switch" role="group" aria-label="评价时段">
+                <button class="period-btn is-active" type="button" data-period="day" aria-pressed="true">
+                  <span class="period-icon sun" aria-hidden="true"></span>
+                  <span><b>昼间</b><small>06:00—22:00</small></span>
+                  <strong>70 <em>dB</em></strong>
+                </button>
+                <button class="period-btn" type="button" data-period="night" aria-pressed="false">
+                  <span class="period-icon moon" aria-hidden="true"></span>
+                  <span><b>夜间</b><small>22:00—06:00</small></span>
+                  <strong>55 <em>dB</em></strong>
+                </button>
+              </div>
+              <div class="threshold-note">
+                <span>当前限值</span>
+                <b id="threshold-value">70 dB(A)</b>
+                <span class="threshold-tag" id="threshold-tag">昼间二类声环境</span>
+              </div>
+            </section>
+
+            <section class="panel-section">
+              <div class="section-heading compact">
+                <span class="step-no">02</span>
+                <div>
+                  <h2>筛选采样点</h2>
+                  <p>筛选结果同步作用于热区与图例</p>
+                </div>
+              </div>
+              <div class="filter-switch" role="group" aria-label="采样点筛选">
+                <button class="filter-btn is-active" type="button" data-filter="all" aria-pressed="true">
+                  全部 <span id="filter-count-all">26</span>
+                </button>
+                <button class="filter-btn" type="button" data-filter="over" aria-pressed="false">
+                  超标 <span id="filter-count-over">0</span>
+                </button>
+                <button class="filter-btn" type="button" data-filter="safe" aria-pressed="false">
+                  达标 <span id="filter-count-safe">0</span>
+                </button>
+              </div>
+            </section>
+
+            <section class="panel-section stats-section" aria-labelledby="stats-title">
+              <div class="stats-head">
+                <div class="section-heading compact">
+                  <span class="step-no">03</span>
+                  <div>
+                    <h2 id="stats-title">区域平均声压</h2>
+                    <p id="stats-subtitle">拖动地图框选后计算</p>
+                  </div>
+                </div>
+                <span class="selection-state" id="selection-state">尚未框选</span>
+              </div>
+
+              <div class="primary-stat">
+                <div class="stat-number-wrap">
+                  <span class="stat-value" id="selection-average">—</span>
+                  <span class="stat-unit" id="selection-unit">dB(A)</span>
+                </div>
+                <div class="stat-caption" id="selection-caption">框选区域内全部采样点的算术平均声压</div>
+              </div>
+
+              <div class="stat-grid">
+                <div>
+                  <span>框选点位</span>
+                  <b id="selection-count">—</b>
+                  <small id="selection-position">等待框选</small>
+                </div>
+                <div>
+                  <span>区域超标</span>
+                  <b id="selection-over">—</b>
+                  <small>按当前标准</small>
+                </div>
+                <div>
+                  <span>框选面积</span>
+                  <b id="selection-area">—</b>
+                  <small>估算值</small>
+                </div>
+              </div>
+
+              <div class="baseline-row">
+                <span>当前筛选均值</span>
+                <b id="overall-average">— dB</b>
+                <span>峰值</span>
+                <b id="overall-max">— dB</b>
+              </div>
+            </section>
+
+            <section class="panel-section legend-section" aria-labelledby="legend-title">
+              <div class="legend-head">
+                <div>
+                  <h2 id="legend-title">声压分级图例</h2>
+                  <p id="legend-subtitle">昼间 · 相对 70 dB 标准</p>
+                </div>
+                <span id="legend-total">26 个点位</span>
+              </div>
+              <div class="legend-list" id="legend-list"></div>
+            </section>
+          </aside>
+        </section>
+
+        <footer class="page-footer">
+          <span>数据说明：内置模拟采样数据，仅用于交互演示。</span>
+          <span>均值按区域内采样点 dB(A) 算术平均，热区采用反距离加权插值。</span>
+        </footer>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
