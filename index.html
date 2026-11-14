@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#05080a" />
+    <title>同频 · DUAL SYNC</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <main class="console">
+      <header class="masthead">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <p class="eyebrow">LIVE INSTALLATION / 联合演出</p>
+            <h1>同频 <span>DUAL SYNC</span></h1>
+          </div>
+        </div>
+        <div class="header-tools">
+          <div class="phase-readout">
+            <span>SECTION</span>
+            <strong id="stage-number">01 / 03</strong>
+          </div>
+          <button class="pause-button" id="pause-button" type="button" aria-label="暂停装置">
+            <span class="pause-icon" aria-hidden="true">Ⅱ</span>
+            <span class="pause-label">暂停</span>
+            <kbd>P</kbd>
+          </button>
+        </div>
+      </header>
+
+      <section class="rig" aria-label="声光装置主控台">
+        <div class="rig-topline">
+          <span class="live-dot"><i></i> ARMED</span>
+          <span id="section-name">SUB MERGE / 低频汇流</span>
+          <span id="tempo-readout">84 BPM</span>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="stage-canvas" aria-label="灯光、节拍网格和低频波形"></canvas>
+          <div class="canvas-corners" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div class="status-pill" id="status-pill" aria-live="polite">
+            <i></i><span id="status-text">等待两名操作者就位</span>
+          </div>
+          <div class="pause-veil" id="pause-veil" hidden>
+            <div>
+              <p>TRANSMISSION HELD</p>
+              <strong>声音与灯光已同步暂停</strong>
+              <span>按 P 或点击继续</span>
+            </div>
+          </div>
+        </div>
+        <div class="rig-metrics">
+          <div class="metric">
+            <span>BASS FREQ</span>
+            <strong><b id="frequency-value">65.0</b> HZ</strong>
+            <div class="meter"><i id="frequency-meter"></i></div>
+          </div>
+          <div class="metric">
+            <span>GAIN</span>
+            <strong><b id="volume-value">44</b> %</strong>
+            <div class="meter"><i id="volume-meter"></i></div>
+          </div>
+          <div class="metric metric-wide">
+            <span>DUAL LOCK</span>
+            <strong><b id="locked-value">0</b> / <b id="beat-total">4</b></strong>
+            <div class="meter"><i id="locked-meter"></i></div>
+          </div>
+          <div class="metric metric-status">
+            <span>SIGNAL</span>
+            <strong id="signal-value">STANDBY</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="control-deck" aria-label="双人操作区">
+        <article class="player-card player-a">
+          <div class="player-id"><span>A</span><p>低频手<br /><small>LOW END</small></p></div>
+          <div class="player-copy">
+            <h2>调频与推力</h2>
+            <p>让低音落在目标频段，并控制每次脉冲的声压。</p>
+          </div>
+          <div class="key-row">
+            <div class="key-pair"><kbd>A</kbd><kbd>D</kbd><span>频率</span></div>
+            <div class="key-pair"><kbd>W</kbd><kbd>S</kbd><span>音量</span></div>
+            <div class="key-pair key-fire"><kbd>SPACE</kbd><span>击发</span></div>
+          </div>
+          <div class="target-band" id="frequency-target">目标频段 52–68 HZ</div>
+        </article>
+
+        <div class="deck-center" aria-hidden="true">
+          <span>SYNC</span><i></i><b>±180 ms</b>
+        </div>
+
+        <article class="player-card player-b">
+          <div class="player-id"><span>B</span><p>灯光手<br /><small>LIGHT ARRAY</small></p></div>
+          <div class="player-copy">
+            <h2>三灯选位</h2>
+            <p>读下一拍的目标灯位，和低频手在同一时刻触发。</p>
+          </div>
+          <div class="key-row lamp-keys">
+            <div class="lamp-key"><kbd>1</kbd><span>左灯</span></div>
+            <div class="lamp-key"><kbd>2</kbd><span>中灯</span></div>
+            <div class="lamp-key"><kbd>3</kbd><span>右灯</span></div>
+          </div>
+          <div class="target-band" id="lamp-target">下一灯位 · 等待开始</div>
+        </article>
+      </section>
+
+      <footer class="footer">
+        <span>WEB AUDIO / THREE MOVEMENTS</span>
+        <span>双人同拍 · 三灯锁定 · 三段完成</span>
+        <span id="audio-indicator">AUDIO OFFLINE</span>
+      </footer>
+    </main>
+
+    <div class="intro" id="intro">
+      <div class="intro-panel">
+        <p class="eyebrow">TWO OPERATORS / ONE SIGNAL</p>
+        <h2>别让声音<br />错过那束光。</h2>
+        <p class="intro-lede">
+          低频手与灯光手共用一个节拍窗口。每个目标拍，一个人按空格，另一个人按对应的灯位键。
+          两人的按键必须落在同一时刻，并保持调音在目标范围内。
+        </p>
+        <div class="intro-roles">
+          <div><span>A</span><p>调整频率、音量，按下 <kbd>SPACE</kbd></p></div>
+          <div><span>B</span><p>辨认灯位，按下 <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></p></div>
+        </div>
+        <div class="intro-actions">
+          <button id="start-button" type="button" class="start-button">
+            <span>接通装置</span><small>START TRANSMISSION</small>
+          </button>
+          <p>完成三段节奏展示即可锁定演出<br />按 <kbd>P</kbd> 可随时同步暂停</p>
+        </div>
+      </div>
+      <div class="intro-grid" aria-hidden="true"></div>
+    </div>
+
+    <div class="result-screen" id="result-screen" hidden>
+      <p class="eyebrow" id="result-kicker">INSTALLATION COMPLETE</p>
+      <h2 id="result-title">三段同频。</h2>
+      <p id="result-copy">声音、灯位与时间已经锁在一起。</p>
+      <div class="result-stats" id="result-stats"></div>
+      <button class="start-button" id="replay-button" type="button">
+        <span>再次接通</span><small>REPLAY</small>
+      </button>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
