@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>三传感器漂移校准对比</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>三传感器漂移监测与校准</h1>
+  <div class="toolbar">
+    <button id="btnMode">视图：原始曲线</button>
+    <button id="btnAddCal">添加校准点（点击主图）</button>
+    <button id="btnClearCal">清除校准点</button>
+    <button id="btnExport">导出前后对比 PNG</button>
+  </div>
+</header>
+<main>
+  <section class="chart-wrap">
+    <canvas id="main" width="1100" height="460"></canvas>
+    <canvas id="overview" width="1100" height="90"></canvas>
+    <p class="hint">在下方缩略图上拖动窗口整体或左右边缘以改变时间窗口；主图点击可放置校准点。</p>
+  </section>
+  <section class="panel">
+    <h2>当前窗口统计（误差 = 传感器值 − 参考值）</h2>
+    <table id="stats">
+      <thead>
+        <tr><th>传感器</th><th>校准前平均误差</th><th>校准前最大偏差</th>
+            <th>校准后平均误差</th><th>校准后最大偏差</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div id="calInfo"></div>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
