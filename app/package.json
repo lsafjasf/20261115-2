@@ -1,0 +1,19 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test-layout.mjs && node verify.mjs",
+    "test:unit": "node test-layout.mjs",
+    "test:e2e": "node verify.mjs",
+    "serve": "node serve.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>三折产品说明折页设计器</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>三折产品说明折页</h1>
+    <p id="restore-flag">新建版面</p>
+    <div class="actions">
+      <button id="btn-png" class="primary">导出 PNG</button>
+      <button id="btn-svg">导出 SVG</button>
+      <button id="btn-json">保存版面 JSON</button>
+      <label class="file-btn">导入 JSON
+        <input id="btn-import" type="file" accept="application/json,.json" hidden>
+      </label>
+      <label class="file-btn">上传图片到所选块
+        <input id="btn-image" type="file" accept="image/*" hidden>
+      </label>
+      <button id="btn-reset">重置</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="sidebar">
+      <section class="panel-box">
+        <h2>三段内容（自动分配）</h2>
+        <div id="inputs"></div>
+      </section>
+
+      <section class="panel-box">
+        <h2>块顺序（可拖动 / 按钮调整）</h2>
+        <div id="order" class="order-list"></div>
+        <div class="drop-zones">
+          <div class="drop-zone" data-panel="cover">拖到封面</div>
+          <div class="drop-zone" data-panel="inner">拖到内页</div>
+          <div class="drop-zone" data-panel="back">拖到背页</div>
+        </div>
+      </section>
+
+      <section class="panel-box">
+        <h2>缩略图</h2>
+        <canvas id="thumb"></canvas>
+      </section>
+    </aside>
+
+    <section class="canvas-wrap">
+      <canvas id="stage"></canvas>
+      <p class="hint">蓝色虚线为安全边距，灰色虚线为折线；在画布上拖动任意块，位置会被限制在所属面板安全区内，文字不会越过折线。</p>
+    </section>
+  </main>
+
+  <script src="layout.js"></script>
+  <script src="state.js"></script>
+  <script src="render.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
