@@ -1,0 +1,12 @@
+{
+  "name": "mixed-script-typesetter",
+  "version": "1.0.0",
+  "description": "Auto column layout with shape exclusion, pinning, kinsoku checks, Canvas preview and SVG/PNG export",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node test/layout.test.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}
