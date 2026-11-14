@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="TideLens 一周逐小时潮位热图、折线图与站点剖面图。"
+    />
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+    <title>TideLens · 一周潮位观测</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="TideLens 首页">
+          <span class="brand-mark" aria-hidden="true">
+            <i></i><i></i><i></i>
+          </span>
+          <span>
+            <strong>TIDELENS</strong>
+            <small>潮位观测台</small>
+          </span>
+        </a>
+        <div class="dataset-stamp">
+          <span class="pulse-dot"></span>
+          <span>SYNTHETIC DATASET</span>
+          <b>08—14 NOV 2026</b>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <div class="hero-copy">
+            <p class="eyebrow"><span>COASTAL INTELLIGENCE</span><span>/ 近岸潮位</span></p>
+            <h1 id="page-title">一周潮位，<br /><em>一眼看见异常。</em></h1>
+            <p class="intro">
+              从逐小时站点观测中捕捉潮汐节律。锁定时间窗口，切换热图、折线与剖面，
+              异常高水位将以独立色阶持续标记。
+            </p>
+          </div>
+          <div class="hero-metrics" aria-label="数据摘要">
+            <div class="metric">
+              <span class="metric-label">TIME STEPS</span>
+              <strong id="metricSteps">168</strong>
+              <small>逐小时记录</small>
+            </div>
+            <div class="metric">
+              <span class="metric-label">STATIONS</span>
+              <strong id="metricStations">07</strong>
+              <small>沿岸站点</small>
+            </div>
+            <div class="metric metric-alert">
+              <span class="metric-label">ANOMALIES</span>
+              <strong id="metricAnomalies">00</strong>
+              <small>异常高水位</small>
+            </div>
+          </div>
+        </section>
+
+        <section class="workspace" aria-label="潮位可视化工作台">
+          <div class="workspace-top">
+            <div class="view-switcher" role="tablist" aria-label="视图切换">
+              <button
+                class="view-tab is-active"
+                id="tab-heatmap"
+                data-view="heatmap"
+                role="tab"
+                aria-selected="true"
+                aria-controls="chartPanel"
+              >
+                <span class="tab-index">01</span>
+                <span>热图</span>
+              </button>
+              <button
+                class="view-tab"
+                id="tab-line"
+                data-view="line"
+                role="tab"
+                aria-selected="false"
+                aria-controls="chartPanel"
+              >
+                <span class="tab-index">02</span>
+                <span>折线</span>
+              </button>
+              <button
+                class="view-tab"
+                id="tab-profile"
+                data-view="profile"
+                role="tab"
+                aria-selected="false"
+                aria-controls="chartPanel"
+              >
+                <span class="tab-index">03</span>
+                <span>剖面</span>
+              </button>
+            </div>
+
+            <button class="export-button" id="exportButton" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 18v2h16v-2" />
+              </svg>
+              导出当前视图
+              <span>PNG</span>
+            </button>
+          </div>
+
+          <div class="station-bar">
+            <div class="station-focus">
+              <span class="focus-label">高亮站点</span>
+              <span class="focus-swatch" id="focusSwatch"></span>
+              <strong id="activeStationName">厦门</strong>
+              <span class="focus-code" id="activeStationCode">XMN · 24.48°N</span>
+            </div>
+            <div class="station-tabs" id="stationTabs" role="group" aria-label="选择高亮站点"></div>
+          </div>
+
+          <div class="chart-panel" id="chartPanel" role="tabpanel" aria-labelledby="tab-heatmap">
+            <div class="chart-header">
+              <div>
+                <h2 id="chartTitle">逐小时潮位热图</h2>
+                <p id="chartSubtitle">颜色越亮，潮位越高；橙红色单元为异常高水位。</p>
+              </div>
+              <div class="chart-readout" aria-live="polite">
+                <span>剖面时刻</span>
+                <strong id="cursorReadout">11/11 12:00</strong>
+                <button id="cursorPrev" type="button" aria-label="上一小时">−</button>
+                <button id="cursorNext" type="button" aria-label="下一小时">+</button>
+              </div>
+            </div>
+
+            <div class="canvas-wrap" id="canvasWrap">
+              <canvas
+                id="tideCanvas"
+                role="img"
+                aria-label="潮位图表，使用鼠标悬停查看时间和潮高"
+              ></canvas>
+              <div class="tooltip" id="tooltip" role="status" aria-live="polite"></div>
+            </div>
+
+            <div class="chart-footer">
+              <div class="legend" id="legend" aria-label="潮位色标">
+                <div class="legend-block">
+                  <span class="legend-title">常规潮位</span>
+                  <span class="legend-ramp normal-ramp"></span>
+                  <span class="legend-range">0.30 — 2.70 m</span>
+                </div>
+                <div class="legend-block">
+                  <span class="legend-title legend-alert">异常高水位</span>
+                  <span class="legend-ramp alert-ramp"></span>
+                  <span class="legend-range">≥ 2.70 m</span>
+                </div>
+              </div>
+              <p class="chart-hint" id="chartHint">悬停查看潮高 · 点击单元锁定站点与时刻</p>
+            </div>
+          </div>
+
+          <div class="time-window" aria-labelledby="window-title">
+            <div class="window-heading">
+              <div>
+                <p class="section-kicker">SHARED TIME WINDOW</p>
+                <h2 id="window-title">观测时间窗</h2>
+              </div>
+              <div class="window-summary">
+                <span id="windowStartLabel">11/08 00:00</span>
+                <i aria-hidden="true">→</i>
+                <span id="windowEndLabel">11/14 23:00</span>
+                <b id="windowDuration">168 H</b>
+              </div>
+              <div class="preset-group" aria-label="时间窗预设">
+                <button type="button" data-preset="24">24H</button>
+                <button type="button" data-preset="48">48H</button>
+                <button type="button" data-preset="168">整周</button>
+              </div>
+            </div>
+
+            <div class="dual-range" id="rangeControl">
+              <div class="range-track" aria-hidden="true">
+                <div class="range-fill" id="rangeFill"></div>
+              </div>
+              <input
+                id="startRange"
+                type="range"
+                min="0"
+                max="167"
+                value="0"
+                step="1"
+                aria-label="时间窗开始"
+              />
+              <input
+                id="endRange"
+                type="range"
+                min="0"
+                max="167"
+                value="167"
+                step="1"
+                aria-label="时间窗结束"
+              />
+            </div>
+            <div class="range-labels" id="rangeLabels" aria-hidden="true"></div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <span>TIDELENS / VISUAL SYSTEM 04</span>
+        <span>合成演示数据 · 仅用于可视化验证</span>
+        <span>UTC+08:00</span>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
