@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>水杯琴 · Glass Harp</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header>
+  <h1>水杯琴 Glass Harp</h1>
+  <p class="hint">
+    单击杯口 = 敲击（越靠杯沿用力越大，过强会裂杯）；按住并沿杯口拖动 = 摩擦（持续升温，音高随温度下降）。
+  </p>
+</header>
+
+<section class="hud">
+  <div class="hud-block">
+    <span class="label">状态</span>
+    <span id="status">准备演奏</span>
+  </div>
+  <div class="hud-block">
+    <span class="label">已完成音符</span>
+    <span id="progress">0 / 12</span>
+  </div>
+  <div class="hud-block">
+    <span class="label">当前音高偏移</span>
+    <span id="detune">+0 cent</span>
+  </div>
+  <div class="hud-block">
+    <span class="label">破损杯子</span>
+    <span id="broken">0</span>
+  </div>
+</section>
+
+<canvas id="stage" width="1120" height="520"></canvas>
+
+<section class="score">
+  <h2>目标旋律（欢乐颂前 12 音）</h2>
+  <ol id="target"></ol>
+</section>
+
+<section class="controls">
+  <button id="btn-auto">▶ 自动演奏</button>
+  <button id="btn-record">● 开始录音</button>
+  <button id="btn-reset">↺ 重置</button>
+  <span id="rec-info"></span>
+</section>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

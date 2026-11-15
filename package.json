@@ -1,0 +1,29 @@
+{
+  "name": "uid379",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u00002\u00000\u00002\u00006\u00001\u00001\u00001\u00005\u0000-\u00002\u0000\r\u0000 \u0000",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node tests/e2e.mjs && node tests/pointer.mjs",
+    "analyze": "node tests/analyze-wav.mjs",
+    "start": "node tests/serve.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsafjasf/20261115-2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/lsafjasf/20261115-2/issues"
+  },
+  "homepage": "https://github.com/lsafjasf/20261115-2#readme",
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}
