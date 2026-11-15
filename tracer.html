@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>线稿描摹为 SVG</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 24px; background: #f6f6f6; color: #222; }
+  h1 { font-size: 20px; }
+  .panel { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .controls label { display: inline-block; margin: 6px 16px 6px 0; font-size: 14px; }
+  .controls input[type=range] { vertical-align: middle; width: 160px; }
+  .val { display: inline-block; min-width: 36px; font-variant-numeric: tabular-nums; color: #555; }
+  #warn { display: none; color: #b00020; font-weight: 600; margin-top: 8px; }
+  #stats { font-size: 13px; color: #555; margin-top: 8px; }
+  canvas { border: 1px solid #ccc; background: #fff; image-rendering: pixelated; }
+  button { padding: 6px 14px; border: 1px solid #888; border-radius: 6px; background: #fff; cursor: pointer; }
+  button:hover { background: #eee; }
+  .compare { display: flex; gap: 16px; flex-wrap: wrap; }
+  .compare figure { margin: 0; }
+  .compare figcaption { font-size: 13px; color: #555; margin-bottom: 4px; }
+  .compare svg, .compare .zoom { border: 1px solid #ccc; background: #fff; }
+  .zoom { width: 180px; height: 180px; overflow: hidden; position: relative; }
+  .zoom svg { position: absolute; transform-origin: 0 0; border: none; }
+</style>
+</head>
+<body>
+<h1>黑白线稿 → 可编辑 SVG 描摹</h1>
+
+<div class="panel controls">
+  <label>阈值 <input id="threshold" type="range" min="0" max="255" value="128"><span class="val" id="thresholdVal">128</span></label>
+  <label>平滑度 <input id="smoothing" type="range" min="0" max="10" step="0.5" value="3"><span class="val" id="smoothingVal">3</span></label>
+  <label>最小区域 <input id="minArea" type="range" min="0" max="400" step="10" value="40"><span class="val" id="minAreaVal">40</span></label>
+  <label><input id="showRaster" type="checkbox" checked> 显示原图</label>
+  <label><input id="showVector" type="checkbox" checked> 显示矢量路径</label>
+  <button id="regen">重新生成样例</button>
+  <button id="export">导出 SVG</button>
+  <div id="stats"></div>
+  <div id="warn"></div>
+</div>
+
+<div class="panel">
+  <canvas id="preview" width="480" height="360" style="width:720px;height:540px"></canvas>
+</div>
+
+<div class="panel">
+  <h2 style="font-size:16px">平滑度对比（左图 / 局部放大 ×4，验证无像素锯齿）</h2>
+  <div class="compare">
+    <figure>
+      <figcaption id="capA"></figcaption>
+      <div id="svgA"></div>
+    </figure>
+    <figure>
+      <figcaption id="capB"></figcaption>
+      <div id="svgB"></div>
+    </figure>
+  </div>
+</div>
+
+<script src="tracer.js"></script>
+</body>
+</html>
