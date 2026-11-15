@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="用 Web Audio 实时合成列车经过，观察多普勒频移、距离衰减、声像与滤波的联动。"
+    />
+    <title>轨旁声场 · 列车多普勒实验</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b1010'/%3E%3Cpath d='M7 20h18M9 16h14M12 12h8' stroke='%23ffb85c' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-noise" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="轨旁声场首页">
+        <span class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        <span>轨旁声场</span>
+        <small>TRACKSIDE ACOUSTICS</small>
+      </a>
+      <div class="topbar-meta">
+        <span class="audio-status" id="audioStatus">
+          <i class="status-dot"></i>
+          <span>音频待启动</span>
+        </span>
+        <span class="topbar-divider"></span>
+        <span class="topbar-code">FIELD NOTE / 001</span>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="intro" aria-labelledby="pageTitle">
+        <div class="intro-copy">
+          <p class="eyebrow">ACOUSTIC MOTION STUDY · 实时声场</p>
+          <h1 id="pageTitle">
+            听见列车
+            <span>由远及近。</span>
+          </h1>
+        </div>
+        <div class="intro-note">
+          <span class="note-index">01</span>
+          <p>
+            没有预录列车音频。汽笛、轮轨轰鸣、距离衰减与多普勒频移都由
+            Web Audio 逐帧合成，并与画面共用同一条运动轨迹。
+          </p>
+          <div class="intro-tags" aria-label="技术特征">
+            <span>Web Audio</span>
+            <span>Doppler</span>
+            <span>Canvas</span>
+            <span>No samples</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="列车经过声学实验台">
+        <div class="visual-column">
+          <article class="stage-card">
+            <header class="stage-head">
+              <div>
+                <span class="panel-kicker">LIVE SIMULATION</span>
+                <h2>轨旁监听台</h2>
+              </div>
+              <div class="stage-head-meta">
+                <span id="passPhase" class="phase-badge">等待发车</span>
+                <span class="mono" id="sampleRateLabel">AUDIO -- kHz</span>
+              </div>
+            </header>
+
+            <div class="canvas-shell" id="canvasShell">
+              <canvas
+                id="sceneCanvas"
+                role="img"
+                aria-label="轨道、列车、监听者和实时音频频谱的动画视图"
+              ></canvas>
+              <div class="canvas-corner canvas-corner--tl" aria-hidden="true">
+                <span>PLAN VIEW</span>
+                <span id="worldScaleLabel">1 : 1</span>
+              </div>
+              <div class="canvas-corner canvas-corner--tr" aria-hidden="true">
+                <span id="runClock">00:00.0</span>
+              </div>
+              <div class="canvas-readout" aria-hidden="true">
+                <div>
+                  <span>DISTANCE</span>
+                  <strong id="hudDistance">-- m</strong>
+                </div>
+                <div>
+                  <span>RADIAL V</span>
+                  <strong id="hudRadial">-- m/s</strong>
+                </div>
+                <div>
+                  <span>PITCH</span>
+                  <strong id="hudPitch">-- Hz</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="transport">
+              <button class="button button--primary" id="playButton" type="button">
+                <span class="play-icon" aria-hidden="true"></span>
+                <span class="button-label">开始通过</span>
+                <kbd>Space</kbd>
+              </button>
+              <button class="button button--icon" id="resetButton" type="button" title="重置">
+                <span aria-hidden="true">↺</span>
+                <span class="sr-only">重置</span>
+              </button>
+              <button class="button button--icon" id="muteButton" type="button" title="静音">
+                <span aria-hidden="true" id="muteIcon">VOL</span>
+                <span class="sr-only">静音</span>
+              </button>
+              <div class="transport-progress">
+                <div class="progress-track" aria-hidden="true">
+                  <span id="progressFill"></span>
+                  <i id="progressPassMark"></i>
+                </div>
+                <div class="progress-labels">
+                  <span id="elapsedLabel">00.0 s</span>
+                  <span id="durationLabel">12.0 s</span>
+                </div>
+              </div>
+              <span class="transport-status" id="transportStatus">待启动</span>
+            </div>
+          </article>
+
+          <article class="comparison-card">
+            <header class="card-head">
+              <div>
+                <span class="panel-kicker">A / B FREQUENCY</span>
+                <h2>静止与运动</h2>
+              </div>
+              <span class="comparison-verdict" id="comparisonVerdict">等待经过</span>
+            </header>
+            <div class="comparison-body">
+              <div class="frequency-pair">
+                <div class="freq-block freq-block--static">
+                  <span class="freq-label">静止声源</span>
+                  <strong>392.0<small>Hz</small></strong>
+                  <span class="freq-caption">频率恒定 · 无多普勒</span>
+                </div>
+                <div class="delta-gauge" aria-label="运动声源相对静止声源的音分差">
+                  <div class="delta-scale">
+                    <span>-400</span><span>0</span><span>+400</span>
+                  </div>
+                  <div class="delta-track">
+                    <i class="delta-center"></i>
+                    <span id="deltaFill"></span>
+                    <b id="deltaMarker"></b>
+                  </div>
+                  <span class="delta-value" id="deltaCentsLabel">0 cents</span>
+                </div>
+                <div class="freq-block freq-block--moving">
+                  <span class="freq-label">运动声源</span>
+                  <strong id="movingFrequency">392.0<small>Hz</small></strong>
+                  <span class="freq-caption" id="movingCaption">径向速度为 0</span>
+                </div>
+              </div>
+              <div class="trace-wrap">
+                <div class="trace-head">
+                  <span>频率轨迹</span>
+                  <span class="trace-legend">
+                    <i class="legend-moving"></i>运动
+                    <i class="legend-static"></i>静止
+                  </span>
+                </div>
+                <canvas
+                  id="traceCanvas"
+                  role="img"
+                  aria-label="静止声源恒定频率与运动声源多普勒频率轨迹对比图"
+                ></canvas>
+              </div>
+            </div>
+            <div class="comparison-facts">
+              <div>
+                <span>多普勒系数</span>
+                <strong id="dopplerFactor">1.000×</strong>
+              </div>
+              <div>
+                <span>径向速度</span>
+                <strong id="radialReadout">0.0 m/s</strong>
+              </div>
+              <div>
+                <span>音高变化</span>
+                <strong id="pitchDirection">保持原音高</strong>
+              </div>
+              <div>
+                <span>本次频移</span>
+                <strong id="pitchSwing">+0.0 / −0.0</strong>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <aside class="control-column" aria-label="实验参数">
+          <article class="control-card">
+            <header class="control-head">
+              <div>
+                <span class="panel-kicker">PARAMETERS</span>
+                <h2>实验参数</h2>
+              </div>
+              <button class="preset-button" id="presetButton" type="button">近距离预设</button>
+            </header>
+
+            <div class="control-group">
+              <div class="control-label">
+                <label for="speedInput">声源速度</label>
+                <output id="speedOutput" for="speedInput">30 m/s</output>
+              </div>
+              <input
+                id="speedInput"
+                class="range"
+                type="range"
+                min="12"
+                max="80"
+                step="1"
+                value="30"
+              />
+              <div class="range-scale"><span>12</span><span>80 m/s</span></div>
+              <p class="control-help">改变径向速度，也就改变多普勒频移的幅度。</p>
+            </div>
+
+            <div class="control-group">
+              <div class="control-label">
+                <label for="durationInput">播放长度</label>
+                <output id="durationOutput" for="durationInput">12.0 s</output>
+              </div>
+              <input
+                id="durationInput"
+                class="range"
+                type="range"
+                min="6"
+                max="18"
+                step="0.5"
+                value="12"
+              />
+              <div class="range-scale"><span>6 s</span><span>18 s</span></div>
+              <p class="control-help">决定一次完整经过的观察时长与可见轨道范围。</p>
+            </div>
+
+            <div class="control-divider"><span>监听位置</span></div>
+
+            <div class="control-group">
+              <div class="control-label">
+                <label for="listenerXInput">沿轨位置</label>
+                <output id="listenerXOutput" for="listenerXInput">0 m</output>
+              </div>
+              <input
+                id="listenerXInput"
+                class="range"
+                type="range"
+                min="-40"
+                max="40"
+                step="1"
+                value="0"
+              />
+              <div class="range-scale"><span>−40 m</span><span>+40 m</span></div>
+            </div>
+
+            <div class="control-group">
+              <div class="control-label">
+                <label for="listenerYInput">离轨距离</label>
+                <output id="listenerYOutput" for="listenerYInput">7 m</output>
+              </div>
+              <input
+                id="listenerYInput"
+                class="range"
+                type="range"
+                min="3"
+                max="24"
+                step="1"
+                value="7"
+              />
+              <div class="range-scale"><span>3 m</span><span>24 m</span></div>
+            </div>
+
+            <div class="live-chain" aria-label="实时音频参数">
+              <div class="chain-head">
+                <span>声音随距离变化</span>
+                <i class="live-pulse"></i>
+              </div>
+              <div class="chain-row">
+                <span>距离增益</span>
+                <strong id="gainReadout">−∞ dB</strong>
+              </div>
+              <div class="chain-row">
+                <span>立体声像</span>
+                <strong id="panReadout">C</strong>
+              </div>
+              <div class="chain-row">
+                <span>低通滤波</span>
+                <strong id="filterReadout">5.0 kHz</strong>
+              </div>
+              <div class="chain-line" aria-hidden="true">
+                <i>OSC</i><span></span><i>GAIN</i><span></span><i>LPF</i><span></span><i>PAN</i>
+              </div>
+            </div>
+
+            <button class="demo-button" id="demoButton" type="button">
+              <span class="demo-button-index">PLAY 01</span>
+              <span>完成一次近距离通过</span>
+              <span aria-hidden="true">→</span>
+            </button>
+            <p class="demo-note">
+              默认距离 7 m。演示会自动记录经过时的最高、最低频率与最近距离。
+            </p>
+          </article>
+
+          <article class="method-card">
+            <span class="panel-kicker">SIGNAL PATH</span>
+            <h2>同一个位置，驱动四种变化</h2>
+            <ul class="method-list">
+              <li><span>01</span>距离越近，振幅越高</li>
+              <li><span>02</span>左右方位驱动 StereoPanner</li>
+              <li><span>03</span>距离越远，低通截止越低</li>
+              <li><span>04</span>径向速度实时改变振荡器频率</li>
+            </ul>
+            <div class="formula">
+              <span>f<sub>obs</sub> = f<sub>0</sub> ·</span>
+              <span class="fraction"><i>c</i><b>c − v<sub>r</sub></b></span>
+            </div>
+          </article>
+
+          <article class="run-card" id="runCard">
+            <div class="run-card-head">
+              <span class="panel-kicker">PASS LOG</span>
+              <span class="run-badge" id="runBadge">0 次</span>
+            </div>
+            <div class="run-empty" id="runEmpty">
+              <span>尚未完成经过</span>
+              <p>播放完整段落后，这里会记录一次可复核的近距离通过。</p>
+            </div>
+            <ol class="run-list" id="runList"></ol>
+          </article>
+        </aside>
+      </section>
+
+      <footer class="footer">
+        <span>实时计算 · 无音频采样</span>
+        <span>c = 343 m/s · f₀ = 392 Hz · FFT 2048</span>
+        <span>CANVAS / WEB AUDIO API</span>
+      </footer>
+    </main>
+
+    <script src="./physics.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
