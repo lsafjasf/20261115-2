@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>噪声五色配色工作室</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <div>
+        <h1>噪声五色配色工作室</h1>
+        <p class="subtitle">值噪声驱动 HSL 采样 · 锁定保持 · WCAG 可读性 · CSS 变量导出</p>
+      </div>
+      <div class="header-actions">
+        <button id="regenerate-btn" class="primary-btn" type="button">重新生成</button>
+        <button id="random-seed-btn" type="button">随机种子</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="panel controls" aria-label="噪声参数">
+        <h2>噪声参数</h2>
+        <label class="control">
+          <span class="control-label">主色相 <output id="base-hue-value">210°</output></span>
+          <input id="base-hue" type="range" min="0" max="360" step="1" value="210" />
+        </label>
+        <label class="control">
+          <span class="control-label">色相扰动范围 <output id="hue-spread-value">48°</output></span>
+          <input id="hue-spread" type="range" min="0" max="180" step="1" value="48" />
+        </label>
+        <div class="range-pair">
+          <label class="control">
+            <span class="control-label">饱和度下限 <output id="sat-min-value">42%</output></span>
+            <input id="sat-min" type="range" min="0" max="100" step="1" value="42" />
+          </label>
+          <label class="control">
+            <span class="control-label">饱和度上限 <output id="sat-max-value">78%</output></span>
+            <input id="sat-max" type="range" min="0" max="100" step="1" value="78" />
+          </label>
+        </div>
+        <div class="range-pair">
+          <label class="control">
+            <span class="control-label">明度下限 <output id="light-min-value">32%</output></span>
+            <input id="light-min" type="range" min="0" max="100" step="1" value="32" />
+          </label>
+          <label class="control">
+            <span class="control-label">明度上限 <output id="light-max-value">78%</output></span>
+            <input id="light-max" type="range" min="0" max="100" step="1" value="78" />
+          </label>
+        </div>
+        <label class="control seed-control">
+          <span class="control-label">噪声种子 <output id="seed-value">20261115</output></span>
+          <input id="seed" type="number" min="0" step="1" value="20261115" />
+        </label>
+        <p class="hint">调节滑块会按当前参数重新采样，已锁定色块不受影响。</p>
+      </aside>
+
+      <section class="panel" aria-label="配色结果">
+        <div class="section-title">
+          <h2>五个色块</h2>
+          <span id="lock-summary" class="lock-summary">已锁定 0 / 5</span>
+        </div>
+        <div id="swatch-grid" class="swatch-grid"></div>
+      </section>
+    </main>
+
+    <section class="panel canvas-panel" aria-label="Canvas 色卡">
+      <h2>Canvas 色卡</h2>
+      <div class="canvas-scroll">
+        <canvas id="swatch-canvas" aria-label="五色色卡画布"></canvas>
+      </div>
+    </section>
+
+    <section class="panel canvas-panel" aria-label="Canvas 模拟界面">
+      <h2>Canvas 模拟界面</h2>
+      <div class="canvas-scroll">
+        <canvas id="interface-canvas" aria-label="模拟产品界面画布"></canvas>
+      </div>
+    </section>
+
+    <section class="panel export-panel" aria-label="CSS 变量导出">
+      <div class="section-title">
+        <h2>CSS 变量</h2>
+        <div class="header-actions">
+          <button id="copy-css-btn" type="button">复制</button>
+          <button id="download-css-btn" class="primary-btn" type="button">下载 .css</button>
+        </div>
+      </div>
+      <pre id="css-output" class="css-output" tabindex="0"></pre>
+      <span id="export-status" class="export-status" role="status"></span>
+    </section>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

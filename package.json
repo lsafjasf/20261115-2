@@ -1,0 +1,11 @@
+{
+  "name": "noise-palette-studio",
+  "version": "1.0.0",
+  "description": "噪声驱动的五色配色生成器：锁定、可读性预览、Canvas 色卡与 CSS 变量导出",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "demo": "node scripts/demo-lock.mjs"
+  }
+}
