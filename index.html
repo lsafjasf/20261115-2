@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07151b" />
+    <meta
+      name="description"
+      content="极地冷链：在升温环境中调度三辆药品冷链车，管理路线、制冷与换电顺序。"
+    />
+    <title>极地冷链 / POLAR FREIGHT</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" role="img">
+              <path d="M16 4v24M4 16h24M7.5 7.5l17 17M24.5 7.5l-17 17" />
+              <circle cx="16" cy="16" r="3.5" />
+            </svg>
+          </div>
+          <div>
+            <p class="eyebrow">POLAR FREIGHT / CONTROL 04</p>
+            <h1>极地冷链</h1>
+          </div>
+        </div>
+        <div class="telemetry">
+          <div class="metric">
+            <span>外部温度</span>
+            <strong id="ambient-readout">24.6°C <i>↑</i></strong>
+          </div>
+          <div class="metric">
+            <span>任务时钟</span>
+            <strong id="clock-readout">T+ 00:00</strong>
+          </div>
+          <div class="metric">
+            <span>温度上限</span>
+            <strong class="limit">8.0°C</strong>
+          </div>
+          <button class="sound-toggle" id="sound-toggle" type="button" aria-pressed="false">
+            <span class="sound-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span id="sound-label">音频关闭</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="map-panel panel" aria-labelledby="map-title">
+          <div class="panel-heading">
+            <div>
+              <span class="status-dot"></span>
+              <p class="eyebrow">实时运输图</p>
+              <h2 id="map-title">冷库 01 → 机场 C-04</h2>
+            </div>
+            <div class="map-progress">
+              <span id="mission-state">等待发车</span>
+              <strong id="progress-readout">0%</strong>
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="map-canvas" aria-label="三辆冷链车的实时路线、货温与电量"></canvas>
+            <div class="map-corner corner-top">
+              <span class="eyebrow">SECTOR 04 / AIRPORT CORRIDOR</span>
+              <span>36.2°N · 118.7°E</span>
+            </div>
+            <div class="limit-card">
+              <span>CARGO UPPER LIMIT</span>
+              <strong>8.0<span>°C</span></strong>
+              <small>所有车辆到达时须低于上限</small>
+              <em>室外 +34°C</em>
+            </div>
+            <div class="map-legend">
+              <span>货温色带</span>
+              <div class="temp-ramp"></div>
+              <div class="ramp-labels"><span>2°</span><span>4°</span><span>6°</span><span>8°</span><span>10°</span></div>
+            </div>
+            <div class="lane-legend">
+              <span><i class="lane-sample north"></i>北线 · 31.6 km</span>
+              <span><i class="lane-sample direct"></i>中线 · 24.2 km</span>
+              <span><i class="lane-sample south"></i>南线 · 34.1 km</span>
+            </div>
+          </div>
+        </section>
+
+        <aside class="control-panel panel" aria-label="任务控制台">
+          <div class="panel-heading mission-heading">
+            <div>
+              <p class="eyebrow">MISSION BRIEF</p>
+              <h2>药品优先 · 准点交付</h2>
+            </div>
+            <span class="mission-code">OP-02</span>
+          </div>
+
+          <div class="brief-strip">
+            <span>货温 <b>&lt; 8.0°C</b></span>
+            <span>截止 <b>T+ 01:08</b></span>
+            <span>准点 <b>≥ 2 / 3</b></span>
+            <span>升温 <b class="warm-rate">+0.14°C/s</b></span>
+          </div>
+
+          <div class="truck-list" id="truck-list"></div>
+
+          <section class="swap-section" aria-labelledby="swap-title">
+            <div class="section-title">
+              <div>
+                <p class="eyebrow">BATTERY EXCHANGE</p>
+                <h3 id="swap-title">换电顺序</h3>
+              </div>
+              <span class="tiny-note">优先级可调</span>
+            </div>
+            <div class="swap-grid" id="swap-grid"></div>
+          </section>
+
+          <section class="log-section" aria-labelledby="log-title">
+            <div class="section-title">
+              <div>
+                <p class="eyebrow">EVENT STREAM</p>
+                <h3 id="log-title">调度记录</h3>
+              </div>
+              <span class="live-tag"><i></i> LIVE</span>
+            </div>
+            <div class="event-log" id="event-log" role="log" aria-live="polite"></div>
+          </section>
+
+          <div class="controls-bar">
+            <div class="speed-control" role="group" aria-label="仿真速度">
+              <button type="button" data-speed="1" class="speed-btn active">1×</button>
+              <button type="button" data-speed="2" class="speed-btn">2×</button>
+              <button type="button" data-speed="4" class="speed-btn">4×</button>
+              <button type="button" id="pause-btn" class="pause-btn" aria-label="暂停仿真">Ⅱ</button>
+            </div>
+            <button type="button" id="primary-action" class="primary-action">
+              <span id="primary-label">开始运输</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </aside>
+      </main>
+
+      <div class="result-overlay" id="result-overlay" hidden>
+        <div class="result-card" role="dialog" aria-modal="true" aria-labelledby="result-title">
+          <button class="result-close" id="result-close" type="button" aria-label="关闭结果">×</button>
+          <p class="eyebrow" id="result-kicker">MISSION REPORT</p>
+          <span class="result-stamp" id="result-stamp">通过</span>
+          <h2 id="result-title">药品安全抵达</h2>
+          <p class="result-summary" id="result-summary"></p>
+          <div class="result-stats" id="result-stats"></div>
+          <div class="result-actions">
+            <button type="button" class="ghost-btn" id="result-review">查看运输图</button>
+            <button type="button" class="primary-action compact" id="result-restart">重新规划</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
