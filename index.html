@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07141b">
+  <title>叶尖检修 · WTG-04</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2307141b'/%3E%3Cpath d='M16 6v20M9 11l14 10M23 11L9 21' stroke='%23ff9a3d' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="game-frame" id="app">
+    <canvas id="scene" aria-label="海上风机叶尖检修场景"></canvas>
+    <div class="scene-wash"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <i></i><i></i><i></i>
+        </span>
+        <div>
+          <strong>OFFSHORE SERVICE</strong>
+          <span>叶尖检修 · WTG-04</span>
+        </div>
+      </div>
+      <div class="mission-tag">
+        <span class="live-dot"></span>
+        <span id="missionTag">船员在船 · 待命</span>
+        <span class="mission-clock" id="missionClock">00:00</span>
+      </div>
+      <button class="audio-button" id="audioBtn" type="button" aria-pressed="false">
+        <span class="audio-bars" id="audioBars" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i>
+        </span>
+        <span id="audioLabel">声音关闭</span>
+      </button>
+    </header>
+
+    <aside class="weather-panel" aria-label="风况遥测">
+      <div class="weather-head">
+        <span>甲板风速</span>
+        <span class="sensor-state"><i></i> LIVE</span>
+      </div>
+      <div class="wind-reading">
+        <span id="windValue">--</span>
+        <small>m/s</small>
+        <span class="wind-arrow" id="windArrow">→</span>
+      </div>
+      <div class="wind-window" id="windWindow">
+        <i></i>
+        <span id="windState">风窗开启</span>
+        <em id="windMargin">余量 0.0</em>
+      </div>
+      <div class="mini-chart">
+        <canvas id="windChart" aria-label="未来 30 秒风速预报"></canvas>
+        <span>+30s 风况预报</span>
+      </div>
+    </aside>
+
+    <aside class="brief-panel">
+      <span class="eyebrow">WORK ORDER / 1138</span>
+      <h1>更换叶尖前缘<br>损伤修复包</h1>
+      <p>靠泊塔基，升至 70% 检修高度。摆角进入绿区后锁定平台，完成复合材料修复并全员撤回。</p>
+      <div class="brief-meta">
+        <span><b id="limitReadout">10</b> m/s 作业上限</span>
+        <span><b>70%</b> 目标高度</span>
+      </div>
+    </aside>
+
+    <div class="event-banner" id="eventBanner" role="status" aria-live="polite">
+      <span class="event-icon">!</span>
+      <span id="eventText">风窗开启，可以开始靠泊</span>
+    </div>
+
+    <section class="console" aria-label="检修控制台">
+      <article class="console-card step-card">
+        <div class="card-heading">
+          <span class="card-index">01</span>
+          <div><h2>作业序列</h2><span id="phaseLabel">靠泊塔基</span></div>
+        </div>
+        <ol class="steps" id="steps">
+          <li data-step="dock"><i>1</i><span>船位靠泊</span><em>待执行</em></li>
+          <li data-step="lift"><i>2</i><span>升至叶尖</span><em>待执行</em></li>
+          <li data-step="repair"><i>3</i><span>锁定检修</span><em>待执行</em></li>
+          <li data-step="return"><i>4</i><span>安全返船</span><em>待执行</em></li>
+        </ol>
+      </article>
+
+      <article class="console-card control-card">
+        <div class="card-heading">
+          <span class="card-index">02</span>
+          <div><h2>船位</h2><span id="boatState">距塔基 0 m</span></div>
+        </div>
+        <div class="range-line">
+          <span>航道</span>
+          <input id="boatRange" type="range" min="20" max="95" step="0.5" value="40" aria-label="控制检修船横移位置">
+          <strong id="boatReadout">40%</strong>
+        </div>
+        <div class="dock-guide">
+          <span class="dock-target"></span>
+          <span>靠泊窗 78–86%</span>
+        </div>
+        <button class="action-button primary" id="dockBtn" type="button">对接并登塔</button>
+      </article>
+
+      <article class="console-card control-card lift-card">
+        <div class="card-heading">
+          <span class="card-index">03</span>
+          <div><h2>升降平台</h2><span id="liftState">卷扬机待命</span></div>
+        </div>
+        <div class="lift-layout">
+          <div>
+            <div class="range-line">
+              <span>高度</span>
+              <input id="liftRange" type="range" min="0" max="100" step="1" value="0" aria-label="控制升降平台高度">
+              <strong id="liftReadout">0%</strong>
+            </div>
+            <div class="sway-meter">
+              <span>摆角</span>
+              <div class="sway-track"><b id="safeZone"></b><i id="swayNeedle"></i></div>
+              <strong id="swayReadout">0.0°</strong>
+            </div>
+          </div>
+          <button class="action-button lock" id="lockBtn" type="button" disabled>锁定平台</button>
+        </div>
+        <div class="repair-row">
+          <button class="action-button repair" id="repairBtn" type="button" disabled>
+            <span>按住检修</span><b id="repairProgress">0%</b>
+          </button>
+          <button class="action-button ghost" id="lowerBtn" type="button" disabled>快速降至塔基</button>
+          <button class="action-button ghost" id="returnBtn" type="button" disabled>返回船舱</button>
+        </div>
+      </article>
+
+      <article class="console-card wind-card">
+        <div class="card-heading">
+          <span class="card-index">04</span>
+          <div><h2>风窗上限</h2><span id="windowHint">选择可接受的最大风速</span></div>
+        </div>
+        <div class="limit-switch" id="limitSwitch" role="group" aria-label="作业风窗上限">
+          <button type="button" data-limit="8"><b>8</b><span>稳健</span></button>
+          <button type="button" data-limit="10" class="active"><b>10</b><span>标准</span></button>
+          <button type="button" data-limit="12"><b>12</b><span>抢修</span></button>
+        </div>
+        <div class="window-status" id="windowStatus">
+          <div><i></i><span id="windowStatusText">风窗开启</span></div>
+          <em id="nextWindow">距关闭约 -- s</em>
+        </div>
+        <div class="wind-scale">
+          <span>0</span><span>10</span><span>20</span><span>30 m/s</span>
+          <i id="windScaleMark"></i>
+        </div>
+      </article>
+    </section>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="result-layer" id="resultLayer" aria-hidden="true">
+      <div class="result-card">
+        <span class="result-kicker" id="resultKicker">MISSION COMPLETE</span>
+        <div class="result-seal" id="resultSeal">✓</div>
+        <h2 id="resultTitle">叶尖修复完成</h2>
+        <p id="resultText">全员已安全返回船舱。</p>
+        <div class="result-stats">
+          <div><span>作业用时</span><b id="resultTime">00:00</b></div>
+          <div><span>最终风况</span><b id="resultWind">0.0 m/s</b></div>
+        </div>
+        <button class="action-button primary" id="restartBtn" type="button">重新开始检修</button>
+      </div>
+    </div>
+  </main>
+  <script type="module" src="./src/game.js"></script>
+</body>
+</html>

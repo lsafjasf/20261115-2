@@ -1,0 +1,16 @@
+{
+  "name": "offshore-blade-repair",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "固定场景的海上风机叶尖检修 Canvas 模拟",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "test": "node tests/game.e2e.js",
+    "validate": "node tests/game.e2e.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}
