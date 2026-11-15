@@ -1,0 +1,17 @@
+{
+  "name": "uid396",
+  "version": "1.0.0",
+  "description": "字幕规则编辑器：中文避头尾、英文单词完整性、最大行宽，Canvas 预览与 WebVTT/PNG 导出",
+  "scripts": {
+    "test": "node --test tests/layout.test.mjs",
+    "test:e2e": "node tests/e2e.mjs",
+    "serve": "python3 -m http.server 8765"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "puppeteer": "^25.17.0"
+  }
+}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>字幕规则编辑器 · 避头尾 / 单词完整性 / 最大行宽</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>字幕规则编辑器</h1>
+    <p class="subtitle">中文避头尾 · 英文单词完整性 · 最大行宽 · 规则修改即时重排</p>
+  </header>
+
+  <main class="layout">
+    <aside class="panel rules">
+      <h2>排版规则</h2>
+
+      <label class="field">
+        <span>最大行宽 <b id="maxWidthVal">880</b> px</span>
+        <input type="range" id="maxWidth" min="320" max="1200" step="10" value="880">
+      </label>
+
+      <label class="field">
+        <span>字号 <b id="fontSizeVal">34</b> px</span>
+        <input type="range" id="fontSize" min="18" max="56" step="1" value="34">
+      </label>
+
+      <label class="check">
+        <input type="checkbox" id="wordIntact" checked>
+        <span>英文/数字单词完整性（禁止词中断行）</span>
+      </label>
+
+      <label class="check">
+        <input type="checkbox" id="kinsoku" checked>
+        <span>中文避头尾（行首/行尾标点约束）</span>
+      </label>
+
+      <label class="field">
+        <span>禁止行首字符</span>
+        <input type="text" id="noStart" class="mono">
+      </label>
+
+      <label class="field">
+        <span>禁止行尾字符</span>
+        <input type="text" id="noEnd" class="mono">
+      </label>
+
+      <label class="check">
+        <input type="checkbox" id="showSafe" checked>
+        <span>显示安全区参考线</span>
+      </label>
+
+      <h2>节拍 (Web Audio)</h2>
+      <label class="field">
+        <span>BPM <b id="bpmVal">120</b></span>
+        <input type="range" id="bpm" min="60" max="200" step="1" value="120">
+      </label>
+
+      <div class="actions">
+        <button id="btnVtt" class="primary">导出 WebVTT</button>
+        <button id="btnFrame">导出当前帧 PNG</button>
+        <button id="btnSheet">导出 PNG 检查图</button>
+      </div>
+    </aside>
+
+    <section class="panel stage">
+      <div class="canvas-wrap">
+        <canvas id="stage" width="1280" height="720"></canvas>
+      </div>
+
+      <div class="transport">
+        <button id="play">&#9654; 播放</button>
+        <button id="stop">&#9632; 停止</button>
+        <span class="clock" id="clock">00:00 / 00:45</span>
+        <input type="range" id="seek" min="0" max="45" step="0.05" value="0">
+      </div>
+
+      <div class="cue-list" id="cueList"></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
