@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080c0e">
+  <title>SEAM/03 · 钢梁焊缝巡检</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <div>
+          <p class="eyebrow">STRUCTURAL INSPECTION UNIT</p>
+          <h1>SEAM<span>/03</span> 钢梁焊缝巡检</h1>
+        </div>
+      </div>
+
+      <div class="mission">
+        <div class="mission-copy">
+          <span class="eyebrow">今日任务</span>
+          <strong>完成三处焊缝清晰判定</strong>
+        </div>
+        <div class="mission-progress" aria-label="任务进度">
+          <span id="missionBar"></span>
+        </div>
+        <div class="mission-count"><b id="missionDone">0</b><span>/ 3</span></div>
+      </div>
+
+      <div class="top-actions">
+        <div class="telemetry">
+          <span class="signal-dot"></span>
+          <span>RAIL LINK</span>
+          <b id="topClock">08:42:16</b>
+        </div>
+        <button id="soundToggle" class="icon-button" type="button" aria-pressed="false" title="开启声音">
+          <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <span class="button-label">声音</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="visual-panel" aria-label="巡检实时画面">
+        <div class="stage-frame" id="stageFrame">
+          <canvas id="scene" aria-label="钢梁、三处焊缝、轨道巡检车与相机取景框"></canvas>
+          <div class="stage-grain" aria-hidden="true"></div>
+          <div class="stage-topline">
+            <div class="camera-tag">
+              <span class="rec-dot"></span>
+              <b>CAM 01</b>
+              <span id="cameraMode">INSPECT / LIVE</span>
+            </div>
+            <div class="frame-readout">
+              <span>WELD <b id="hudWeld">W-02</b></span>
+              <span>Z <b id="hudZoom">58.0</b> mm</span>
+              <span>EV <b id="hudEv">+0.0</b></span>
+            </div>
+          </div>
+          <div class="stage-bottomline">
+            <span class="hint-inline"><kbd>A</kbd><kbd>D</kbd> 行驶</span>
+            <span class="hint-inline"><kbd>SPACE</kbd> 拍摄</span>
+            <span id="stageState" class="stage-state">等待定位</span>
+          </div>
+          <div id="toast" class="toast" role="status" aria-live="polite"></div>
+        </div>
+
+        <section class="stations-strip" aria-label="焊缝拍摄记录">
+          <div class="strip-heading">
+            <div>
+              <span class="eyebrow">CAPTURE QUEUE</span>
+              <strong>三处焊缝</strong>
+            </div>
+            <div class="session-code">RUN <span id="runCode">0417</span></div>
+          </div>
+          <div class="station-list">
+            <button class="station-card" data-station="0" type="button">
+              <span class="station-index">01</span>
+              <span class="station-copy"><b>W-01</b><small>翼板对接缝</small></span>
+              <span class="station-status">待拍</span>
+            </button>
+            <button class="station-card is-active" data-station="1" type="button">
+              <span class="station-index">02</span>
+              <span class="station-copy"><b>W-02</b><small>腹板纵向缝</small></span>
+              <span class="station-status">待拍</span>
+            </button>
+            <button class="station-card" data-station="2" type="button">
+              <span class="station-index">03</span>
+              <span class="station-copy"><b>W-03</b><small>端部环焊缝</small></span>
+              <span class="station-status">待拍</span>
+            </button>
+          </div>
+          <div class="test-chip" id="testChip">
+            <span class="test-icon">!</span>
+            <span><b>强反光试验</b><small id="testChipText">尚未复现误判</small></span>
+          </div>
+        </section>
+      </section>
+
+      <aside class="console" aria-label="巡检控制台">
+        <div class="console-head">
+          <div>
+            <span class="eyebrow">MANUAL CONTROL</span>
+            <h2>检测参数</h2>
+          </div>
+          <div class="console-mode"><span></span>手动</div>
+        </div>
+
+        <div class="target-readout">
+          <div class="target-id">W-02</div>
+          <div class="target-meta">
+            <span>当前取景</span>
+            <strong id="targetName">腹板纵向缝</strong>
+          </div>
+          <div class="align-meter">
+            <span>对位</span>
+            <b id="alignValue">—</b>
+          </div>
+        </div>
+
+        <section class="control-block">
+          <div class="control-title">
+            <label for="speedControl">行驶速度</label>
+            <output id="speedValue">0.0 <small>m/min</small></output>
+          </div>
+          <input id="speedControl" class="range speed-range" type="range" min="0" max="100" value="0" step="1">
+          <div class="range-scale"><span>制动</span><span>20.0</span></div>
+          <div class="drive-row">
+            <button class="drive-button" id="driveLeft" type="button" aria-label="向左行驶">
+              <span>◀</span><small>A / ←</small>
+            </button>
+            <button class="brake-button" id="brakeButton" type="button">制动</button>
+            <button class="drive-button" id="driveRight" type="button" aria-label="向右行驶">
+              <span>▶</span><small>D / →</small>
+            </button>
+          </div>
+        </section>
+
+        <section class="control-block">
+          <div class="control-title">
+            <label for="focusControl">镜头焦距</label>
+            <output id="focusValue">58 <small>mm</small></output>
+          </div>
+          <input id="focusControl" class="range focus-range" type="range" min="24" max="135" value="58" step="1">
+          <div class="range-scale"><span>24 WIDE</span><span>135 TELE</span></div>
+          <div class="control-note">
+            <span>合焦窗口</span>
+            <b id="focusHint">自动对焦中</b>
+          </div>
+        </section>
+
+        <section class="control-block">
+          <div class="control-title">
+            <label for="lightControl">环形补光</label>
+            <output id="lightValue">52 <small>%</small></output>
+          </div>
+          <input id="lightControl" class="range light-range" type="range" min="0" max="100" value="52" step="1">
+          <div class="range-scale"><span>0</span><span>100</span></div>
+          <div class="control-note warning-note">
+            <span>镜面反光</span>
+            <b id="glareHint">低</b>
+          </div>
+        </section>
+
+        <div class="meter-grid">
+          <div class="meter">
+            <span>清晰度</span>
+            <div><i id="clarityBar"></i></div>
+            <b id="clarityValue">--</b>
+          </div>
+          <div class="meter">
+            <span>曝光</span>
+            <div><i id="exposureBar"></i></div>
+            <b id="exposureValue">--</b>
+          </div>
+          <div class="meter">
+            <span>运动模糊</span>
+            <div><i id="motionBar"></i></div>
+            <b id="motionValue">--</b>
+          </div>
+          <div class="meter">
+            <span>反光遮盖</span>
+            <div><i id="glareBar"></i></div>
+            <b id="glareValue">--</b>
+          </div>
+        </div>
+
+        <div class="verification" id="verification" aria-live="polite">
+          <div class="verification-head">
+            <span>VERIFICATION</span>
+            <b id="verifyState">采集中</b>
+          </div>
+          <div class="verify-row"><span>清晰判定</span><b id="verifyShots">0 / 3</b></div>
+          <div class="verify-row"><span>反光误判复现</span><b id="verifyGlare">0 / 1</b></div>
+        </div>
+
+        <button id="captureButton" class="capture-button" type="button">
+          <span class="shutter-icon" aria-hidden="true"></span>
+          <span><b>拍摄并判读</b><small>SPACE / 快门</small></span>
+          <span class="capture-code">CAP</span>
+        </button>
+
+        <button id="glareTestButton" class="test-button" type="button">
+          <span class="beaker-icon" aria-hidden="true"></span>
+          <span><b>执行强反光误判试验</b><small>自动补光至 96% 并触发一次判读</small></span>
+        </button>
+
+        <p class="operator-note"><span>操作提示</span> 先定位焊缝，再停车。焦距偏离合焦点或补光过强都会让裂纹消失。</p>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <span>SEAM/03 · REV 2.4</span>
+      <span>钢梁巡检训练台 · 非破坏性视觉检测</span>
+      <span>LOCAL SESSION <b id="footerTime">—</b></span>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
