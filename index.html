@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>旧节拍器校准 · Metronome Calibration</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>旧节拍器校准台</h1>
+    <div class="target">目标 BPM <strong id="targetBpm">90</strong> · 连续稳定 20 秒即成功</div>
+  </header>
+
+  <main>
+    <section class="panel gauges">
+      <canvas id="pendulumCanvas" width="300" height="320"></canvas>
+      <div class="readouts">
+        <div class="readout"><span>实测 BPM</span><strong id="bpmVal">--</strong></div>
+        <div class="readout"><span>摆幅 (rad)</span><strong id="ampVal">--</strong></div>
+        <div class="readout"><span>已稳定</span><strong id="stableVal">0.0s</strong></div>
+        <div class="readout"><span>漏拍 / 尖响 / 撞限</span>
+          <strong><span id="missVal">0</span> / <span id="squealVal">0</span> / <span id="knockVal">0</span></strong>
+        </div>
+        <div class="status" id="statusBadge">未启动</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <canvas id="chartCanvas" width="720" height="260"></canvas>
+      <div class="legend">
+        <span><i class="dot target"></i>目标 90 BPM</span>
+        <span><i class="dot band"></i>误差带 ±1.5 BPM</span>
+        <span><i class="dot line"></i>实测 BPM</span>
+        <span><i class="dot miss"></i>漏拍</span>
+        <span><i class="dot squeal"></i>金属尖响</span>
+      </div>
+    </section>
+
+    <section class="panel controls">
+      <label>
+        摆锤长度 <strong id="lengthLbl">0.110 m</strong>
+        <input type="range" id="lengthSlider" min="0.08" max="0.3" step="0.001" value="0.11" />
+        <small>越长越慢（主要决定 BPM）</small>
+      </label>
+      <label>
+        发条张力 <strong id="tensionLbl">0.50</strong>
+        <input type="range" id="tensionSlider" min="0" max="1" step="0.01" value="0.5" />
+        <small>过紧 → 大摆幅金属尖响；过松 → 漏拍</small>
+      </label>
+      <label>
+        阻尼 <strong id="dampingLbl">0.30</strong>
+        <input type="range" id="dampingSlider" min="0" max="1" step="0.01" value="0.3" />
+        <small>抑制擒纵抖动，过大同样会饿死摆幅</small>
+      </label>
+      <div class="buttons">
+        <button id="startBtn">启动 / 重置</button>
+        <button id="muteBtn">声音：开</button>
+        <button id="autoBtn">自动校准演示</button>
+      </div>
+      <div class="log" id="eventLog"></div>
+    </section>
+  </main>
+
+  <script src="src/metronome.js"></script>
+  <script src="src/audio-web.js"></script>
+  <script src="src/calibrator-browser.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

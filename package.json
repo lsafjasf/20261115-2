@@ -1,0 +1,10 @@
+{
+  "name": "metronome-calibration",
+  "version": "1.0.0",
+  "description": "旧机械节拍器校准模拟：摆锤/发条/阻尼调节，Web Audio 机械声与 Canvas 可视化",
+  "main": "src/metronome.js",
+  "scripts": {
+    "test": "node src/run-tests.js"
+  },
+  "license": "MIT"
+}
