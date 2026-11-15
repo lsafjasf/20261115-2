@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111417">
+  <title>THERMO CAST — 铸件热控台</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient-glow ambient-glow--hot"></div>
+  <div class="ambient-glow ambient-glow--cold"></div>
+  <div class="noise" aria-hidden="true"></div>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="THERMO CAST 首页">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M5 7h22M16 7v18M9 15h14M11 25h10"/></svg>
+        </span>
+        <span>
+          <strong>THERMO<span>/CAST</span></strong>
+          <small>精密铸件热控系统</small>
+        </span>
+      </a>
+
+      <div class="line-identity">
+        <span class="live-dot"></span>
+        <span>冷却线 <b>LN-03</b></span>
+        <i></i>
+        <span>炉次 <b id="batchCodeTop">—</b></span>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="true" title="开启或关闭声音">
+          <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>
+          <svg class="icon-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="m17 9 5 5m0-5-5 5"/></svg>
+          <span>声音</span>
+        </button>
+        <div class="system-time"><span>本地时间</span><b id="clock">--:--:--</b></div>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <section class="workbench" aria-label="冷却线实时场景">
+        <article class="panel stage-panel">
+          <header class="panel-head stage-head">
+            <div>
+              <span class="eyebrow"><i></i> REAL-TIME THERMAL VIEW</span>
+              <h1>连续铸件冷却</h1>
+            </div>
+            <div class="stage-numbers">
+              <div><span>浇铸温度</span><strong>862<small>°C</small></strong></div>
+              <div><span>目标终温</span><strong id="targetEndTemp">—<small>°C</small></strong></div>
+              <div><span>环境</span><strong>24<small>°C</small></strong></div>
+            </div>
+          </header>
+
+          <div class="canvas-frame" id="canvasFrame">
+            <canvas id="foundryCanvas" aria-label="铸件、水雾、风机与温度色带实时画面"></canvas>
+            <div class="canvas-vignette" aria-hidden="true"></div>
+            <div class="camera-label"><span>CAM 01</span> 冷却隧道 / 俯视 18°</div>
+            <div class="canvas-status">
+              <span class="pulse"></span>
+              <span id="canvasStatusText">等待装炉</span>
+            </div>
+            <div class="temperature-scale" aria-label="温度色标">
+              <span class="scale-title">表面温度</span>
+              <div class="scale-bar"></div>
+              <div class="scale-labels"><span>60°</span><span>450°</span><span>900°</span></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel curve-panel">
+          <header class="panel-head compact-head">
+            <div class="curve-title">
+              <span class="eyebrow">TARGET PROFILE / <b id="curveBatchCode">—</b></span>
+              <h2>目标冷却曲线</h2>
+            </div>
+            <div class="chart-legend" aria-label="曲线图例">
+              <span><i class="target"></i>目标区间</span>
+              <span><i class="actual"></i>三件实测</span>
+            </div>
+            <div class="chart-metric">
+              <span>曲线偏差</span>
+              <strong id="curveDeviation">0<small>°C</small></strong>
+            </div>
+          </header>
+          <div class="curve-canvas-wrap">
+            <canvas id="curveCanvas" aria-label="冷却目标曲线与三件铸件实测温度"></canvas>
+          </div>
+        </article>
+      </section>
+
+      <aside class="side-column">
+        <article class="panel batch-panel">
+          <header class="batch-head">
+            <div>
+              <span class="eyebrow">ACTIVE BATCH</span>
+              <h2 id="batchCode">BATCH —</h2>
+            </div>
+            <span class="batch-state" id="batchState">待机</span>
+          </header>
+          <div class="alloy-row">
+            <span>合金牌号</span>
+            <strong id="alloyName">INCONEL 718</strong>
+            <span class="alloy-tag" id="alloyTag">Ni-Cr-Fe</span>
+          </div>
+
+          <div class="part-list" id="partList">
+            <div class="part-card" data-part="0">
+              <div class="part-index"><span>01</span><i class="part-dot"></i></div>
+              <div class="part-info">
+                <div class="part-title"><strong>涡壳 A</strong><span>质量 <b class="part-quality">—</b></span></div>
+                <div class="part-vitals"><span class="part-temp">— °C</span><span class="part-grain">晶粒 —</span></div>
+                <div class="tiny-bar"><i></i></div>
+              </div>
+              <span class="part-status">待机</span>
+            </div>
+            <div class="part-card" data-part="1">
+              <div class="part-index"><span>02</span><i class="part-dot"></i></div>
+              <div class="part-info">
+                <div class="part-title"><strong>涡壳 B</strong><span>质量 <b class="part-quality">—</b></span></div>
+                <div class="part-vitals"><span class="part-temp">— °C</span><span class="part-grain">晶粒 —</span></div>
+                <div class="tiny-bar"><i></i></div>
+              </div>
+              <span class="part-status">待机</span>
+            </div>
+            <div class="part-card" data-part="2">
+              <div class="part-index"><span>03</span><i class="part-dot"></i></div>
+              <div class="part-info">
+                <div class="part-title"><strong>涡壳 C</strong><span>质量 <b class="part-quality">—</b></span></div>
+                <div class="part-vitals"><span class="part-temp">— °C</span><span class="part-grain">晶粒 —</span></div>
+                <div class="tiny-bar"><i></i></div>
+              </div>
+              <span class="part-status">待机</span>
+            </div>
+          </div>
+
+          <div class="batch-progress">
+            <div><span>批次进度</span><b id="batchProgressText">0%</b></div>
+            <div class="progress-track"><i id="batchProgressBar"></i></div>
+          </div>
+        </article>
+
+        <article class="panel control-panel">
+          <header class="control-head">
+            <div><span class="eyebrow">COOLING CONTROL</span><h2>冷却控制</h2></div>
+            <button class="icon-button" id="resetControls" type="button" title="恢复默认设定" aria-label="恢复默认设定">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 8.5A8 8 0 1 1 4 14M4.5 4.5v4h4"/></svg>
+            </button>
+          </header>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span class="control-icon mist-icon"><svg viewBox="0 0 24 24"><path d="M12 3s5 5.5 5 10a5 5 0 0 1-10 0c0-4.5 5-10 5-10Z"/><path d="M10 13a2.3 2.3 0 0 0 2 2.3"/></svg></span>
+              <span><strong>水雾喷淋</strong><small>局部强化冷却</small></span>
+              <output id="mistValue" for="mistSlider">48<small>%</small></output>
+            </div>
+            <input class="thermal-slider mist-slider" id="mistSlider" data-control="mist" type="range" min="0" max="100" value="48" step="1" aria-label="水雾喷淋强度">
+            <div class="slider-scale"><span>关闭</span><span>微量</span><span>强喷</span></div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span class="control-icon air-icon"><svg viewBox="0 0 24 24"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8a2.5 2.5 0 1 1-2.5 2.5"/></svg></span>
+              <span><strong>贯穿风冷</strong><small>均匀截面温度</small></span>
+              <output id="airValue" for="airSlider">56<small>%</small></output>
+            </div>
+            <input class="thermal-slider air-slider" id="airSlider" data-control="air" type="range" min="0" max="100" value="56" step="1" aria-label="贯穿风冷强度">
+            <div class="slider-scale"><span>关闭</span><span>层流</span><span>强风</span></div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span class="control-icon belt-icon"><svg viewBox="0 0 24 24"><circle cx="6" cy="16" r="3"/><circle cx="18" cy="16" r="3"/><path d="M9 16h6M3 8h18M6 13V8m12 5V8"/></svg></span>
+              <span><strong>传送速度</strong><small>决定冷却节拍</small></span>
+              <output id="beltValue" for="beltSlider">1.00<small>×</small></output>
+            </div>
+            <input class="thermal-slider belt-slider" id="beltSlider" data-control="belt" type="range" min="0.70" max="1.30" value="1.00" step="0.01" aria-label="传送带速度">
+            <div class="slider-scale"><span>缓行</span><span>标准</span><span>快进</span></div>
+          </div>
+        </article>
+
+        <article class="panel diagnostics-panel">
+          <div class="diagnostics-top">
+            <div>
+              <span class="eyebrow">LIVE QUALITY</span>
+              <h2>质量预测</h2>
+            </div>
+            <div class="quality-ring" id="qualityRing" style="--quality: 0">
+              <span><b id="predictedQuality">—</b><small>/100</small></span>
+            </div>
+          </div>
+          <div class="diagnostic-list">
+            <div class="diagnostic-row">
+              <span>曲线贴合</span><div class="diag-bar"><i id="curveBar"></i></div><b id="curveScore">—</b>
+            </div>
+            <div class="diagnostic-row">
+              <span>截面均匀</span><div class="diag-bar"><i id="uniformBar"></i></div><b id="uniformScore">—</b>
+            </div>
+            <div class="diagnostic-row">
+              <span>晶粒细度</span><div class="diag-bar"><i id="grainBar"></i></div><b id="grainScore">—</b>
+            </div>
+          </div>
+          <div class="warning-strip" id="warningStrip">
+            <span class="warning-icon">!</span>
+            <span id="warningText">设定冷却参数后开始批次</span>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="command-bar">
+      <div class="shortcuts">
+        <span><kbd>A</kbd><kbd>D</kbd> 水雾</span>
+        <span><kbd>W</kbd><kbd>S</kbd> 风冷</span>
+        <span><kbd>←</kbd><kbd>→</kbd> 传送速度</span>
+      </div>
+      <button class="start-button" id="startButton" type="button" data-testid="start-batch">
+        <span class="start-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7Z"/></svg></span>
+        <span class="start-copy"><strong id="startButtonLabel">开始冷却批次</strong><small>所有铸件达到 75 分即通过</small></span>
+        <span class="start-arrow">↗</span>
+      </button>
+      <div class="command-meta">
+        <span class="threshold-label">通过阈值</span>
+        <strong>75<small>分</small></strong>
+      </div>
+    </footer>
+  </div>
+
+  <dialog class="result-dialog" id="resultDialog">
+    <div class="result-card">
+      <div class="result-kicker" id="resultKicker">BATCH COMPLETE</div>
+      <div class="result-emblem" id="resultEmblem">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 25.5 20.5 34 37 15"/></svg>
+      </div>
+      <h2 id="resultTitle">批次合格</h2>
+      <p id="resultDescription">三件铸件均达到质量阈值。</p>
+      <div class="result-parts" id="resultParts"></div>
+      <div class="result-actions">
+        <button class="primary-button" id="nextBatchButton" type="button">下一批次 <span>→</span></button>
+        <button class="secondary-button" id="closeResultButton" type="button">查看曲线</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="js/engine.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

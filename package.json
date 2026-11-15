@@ -1,0 +1,14 @@
+{
+  "name": "thermo-cast-thermal-control",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Continuous casting thermal-control game with Canvas and Web Audio.",
+  "scripts": {
+    "start": "python3 -m http.server 4188",
+    "test": "node --test tests/engine.test.js",
+    "test:browser": "node tests/browser.test.cjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}
