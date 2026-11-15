@@ -1,0 +1,12 @@
+{
+  "name": "solar-panel-cleaning-sim",
+  "version": "1.0.0",
+  "private": true,
+  "description": "光伏板沙尘清洁模拟：Canvas 场景、发电曲线与 Web Audio 音效",
+  "scripts": {
+    "verify": "node headless/verify.js",
+    "scenarios": "node headless/run.js",
+    "smoke": "node headless/browser-smoke.js",
+    "serve": "node -e \"const http=require('http'),fs=require('fs'),p=require('path');const t={'.html':'text/html','.js':'text/javascript','.css':'text/css'};http.createServer((q,r)=>{const rel=decodeURIComponent(q.url.split('?')[0]);const f=p.join(process.cwd(),rel==='/'?'index.html':rel);fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);return r.end('404');}r.writeHead(200,{'Content-Type':t[p.extname(f)]||'text/plain'});r.end(d);});}).listen(8137,()=>console.log('http://localhost:8137'));\""
+  }
+}
