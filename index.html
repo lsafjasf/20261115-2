@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#07151f">
+    <title>潮脊泵站 · 高潮前调度</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="潮脊泵站">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>
+            <strong>潮脊泵站</strong>
+            <small>TIDAL RIDGE / 沿海调度席</small>
+          </span>
+        </a>
+        <div class="mission-readout">
+          <span class="status-pill" id="status-pill"><i></i><span>待命</span></span>
+          <span class="readout"><small>任务钟</small><b id="clock">00:00</b></span>
+          <span class="readout"><small>潮位</small><b id="tide">+0.82 m</b></span>
+          <span class="readout"><small>高潮前</small><b id="deadline">01:12</b></span>
+          <button class="icon-button" id="audio-button" type="button" aria-pressed="false">
+            <span class="audio-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span>声音</span>
+          </button>
+          <button class="icon-button pause-button" id="pause-button" type="button">
+            <span aria-hidden="true" id="pause-icon">Ⅱ</span>
+            <span id="pause-label">暂停</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="stage-panel">
+          <div class="canvas-wrap">
+            <canvas id="scene" width="1280" height="720" aria-label="泵站剖面、潮位与流量实时图"></canvas>
+
+            <div class="briefing-panel" id="briefing-panel">
+              <p class="eyebrow">汛前任务 03 / 72 秒窗口</p>
+              <h1>赶在最高潮前<br>把三池水位抬到目标线</h1>
+              <p class="briefing-copy">
+                启动两台泵，按顺序调节 A、B、C 进水闸。高位潮会形成反压，
+                泵效持续下降；关闭闸门与停泵都有延迟。三池进入目标窗口、
+                设备归位且无溢流才算完成。
+              </p>
+              <div class="briefing-actions">
+                <button class="primary-button" id="start-button" type="button">开始调度</button>
+                <button class="secondary-button" id="brief-button" type="button">执行示范调度</button>
+              </div>
+              <p class="audio-hint">首次操作后可开启实时水声与机组压力声。</p>
+            </div>
+
+            <div class="result-panel" id="result-panel" hidden>
+              <p class="eyebrow" id="result-kicker">任务终止</p>
+              <h2 id="result-title">任务结束</h2>
+              <p id="result-copy">调度记录已冻结。</p>
+              <div class="result-stats" id="result-stats"></div>
+              <div class="briefing-actions">
+                <button class="primary-button" id="retry-button" type="button">重新调度</button>
+                <button class="secondary-button" id="result-demo-button" type="button">再跑示范</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-bar">
+            <div class="timeline-summary">
+              <span class="live-dot"></span>
+              <span id="timeline-state">系统待命 · 潮汐序列已锁定</span>
+            </div>
+            <div class="speed-control" role="group" aria-label="仿真速度">
+              <button type="button" data-speed="1" class="active">1×</button>
+              <button type="button" data-speed="2">2×</button>
+              <button type="button" data-speed="4">4×</button>
+            </div>
+          </div>
+        </section>
+
+        <aside class="console-panel">
+          <div class="console-heading">
+            <div>
+              <p class="eyebrow">LIVE TELEMETRY</p>
+              <h2>蓄水目标</h2>
+            </div>
+            <span class="console-code">PS-07</span>
+          </div>
+
+          <div class="target-list" id="target-list"></div>
+
+          <div class="console-heading controls-heading">
+            <div>
+              <p class="eyebrow">REMOTE CONTROL</p>
+              <h2>设备控制</h2>
+            </div>
+            <span class="delay-note">动作延迟已启用</span>
+          </div>
+
+          <div class="control-group">
+            <div class="group-label"><span>泵组</span><span id="pump-flow-label">0.0 m³/s</span></div>
+            <div class="device-grid two-up">
+              <button class="device-button pump" type="button" data-control="pump" data-index="0">
+                <span class="device-top"><i class="device-icon pump-icon"></i><b>P-01</b><em>待机</em></span>
+                <span class="device-meter"><i></i></span>
+                <span class="device-foot"><span>0 %</span><span>8.5 m³/s</span></span>
+              </button>
+              <button class="device-button pump" type="button" data-control="pump" data-index="1">
+                <span class="device-top"><i class="device-icon pump-icon"></i><b>P-02</b><em>待机</em></span>
+                <span class="device-meter"><i></i></span>
+                <span class="device-foot"><span>0 %</span><span>8.5 m³/s</span></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="group-label"><span>进水闸</span><span>TRAVEL 2.6 s</span></div>
+            <div class="device-grid three-up">
+              <button class="device-button gate" type="button" data-control="gate" data-index="0">
+                <span class="device-top"><i class="device-icon gate-icon"></i><b>A</b><em>关闭</em></span>
+                <span class="device-meter"><i></i></span>
+                <span class="device-foot"><span>0 %</span><span>2.7 m</span></span>
+              </button>
+              <button class="device-button gate" type="button" data-control="gate" data-index="1">
+                <span class="device-top"><i class="device-icon gate-icon"></i><b>B</b><em>关闭</em></span>
+                <span class="device-meter"><i></i></span>
+                <span class="device-foot"><span>0 %</span><span>3.25 m</span></span>
+              </button>
+              <button class="device-button gate" type="button" data-control="gate" data-index="2">
+                <span class="device-top"><i class="device-icon gate-icon"></i><b>C</b><em>关闭</em></span>
+                <span class="device-meter"><i></i></span>
+                <span class="device-foot"><span>0 %</span><span>3.85 m</span></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="group-label"><span>总管旁通</span><span id="canal-flow-label">0.0 m³/s</span></div>
+            <button class="device-button canal" type="button" data-control="canal">
+              <span class="device-top"><i class="device-icon canal-icon"></i><b>R-01 回水渠</b><em>关闭</em></span>
+              <span class="device-meter"><i></i></span>
+              <span class="device-foot"><span>0 %</span><span>泄压至海侧</span></span>
+            </button>
+          </div>
+
+          <div class="system-readout">
+            <div><span>泵后流量</span><b id="flow-readout">0.0 <small>m³/s</small></b></div>
+            <div><span>总管压力</span><b id="pressure-readout">0.18 <small>MPa</small></b></div>
+            <div><span>潮压泵效</span><b id="efficiency-readout">100 <small>%</small></b></div>
+          </div>
+
+          <div class="log-block">
+            <div class="group-label"><span>调度记录</span><span>最新优先</span></div>
+            <ol id="event-log" class="event-log"></ol>
+          </div>
+
+          <button class="fault-button" id="overflow-test-button" type="button">
+            <span>复现故障</span>
+            <small>B 闸晚关 → 溢流测试</small>
+          </button>
+        </aside>
+      </main>
+
+      <footer class="footer">
+        <span>潮汐数据固定序列 · 72 秒高潮窗口</span>
+        <span>1 / 2 / 3 泵组 · Q / W / E 闸门 · 空格 回水渠</span>
+        <span>PS-07 / 东风闸站</span>
+      </footer>
+    </div>
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
