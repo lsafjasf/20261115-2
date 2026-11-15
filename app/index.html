@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#07111d" />
+    <title>风雪山口 · 双车救援</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <div>
+            <p class="eyebrow">MOUNTAIN PASS · RECOVERY UNIT 07</p>
+            <h1>风雪山口 <span>双车救援</span></h1>
+          </div>
+        </div>
+        <div class="telemetry" aria-label="环境数据">
+          <div><label>海拔</label><strong>3,780 m</strong></div>
+          <div><label>坡面</label><strong>−24°</strong></div>
+          <div><label>风速</label><strong>42 km/h</strong></div>
+          <div class="live"><i></i><strong id="clockReadout">00:00.0</strong></div>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="stage-card">
+          <div class="stage-head">
+            <div class="stage-title">
+              <span class="live-dot"></span>
+              <p>救援现场 / 北坡切面</p>
+            </div>
+            <div class="weather"><span>❄</span> 能见度 180 m · 持续降雪</div>
+          </div>
+
+          <div class="canvas-wrap">
+            <canvas id="scene" width="1200" height="700" aria-label="双车雪坡救援现场"></canvas>
+            <div class="stage-vignette" aria-hidden="true"></div>
+
+            <div class="mission-card" id="missionCard">
+              <p class="mission-kicker">CURRENT OBJECTIVE</p>
+              <h2 id="missionTitle">固定救援车</h2>
+              <p id="missionText">选择安全的锚定角度，将地锚打入雪层。</p>
+            </div>
+
+            <div class="stage-badges">
+              <span id="phaseBadge">阶段 1 / 2</span>
+              <span id="windBadge">阵风 7 级</span>
+            </div>
+
+            <div class="alert-strip" id="alertStrip">
+              <span class="alert-icon">!</span>
+              <p id="alertText">先选择锚定角度，再打入地锚固定救援车。</p>
+            </div>
+          </div>
+
+          <div class="stage-foot">
+            <span><kbd>W</kbd><kbd>S</kbd> 绞盘力度</span>
+            <span><kbd>A</kbd><kbd>D</kbd> 车辆转向</span>
+            <span><kbd>Q</kbd><kbd>E</kbd> 锚定角度</span>
+            <span><kbd>Space</kbd> 打入地锚</span>
+            <span><kbd>X</kbd> 紧急泄压</span>
+          </div>
+        </section>
+
+        <aside class="control-panel">
+          <section class="panel-section progress-section">
+            <div class="section-label"><span>救援序列</span><em>RECOVERY SEQUENCE</em></div>
+            <div class="phase-steps">
+              <div class="phase-step active" data-step="anchor">
+                <span class="step-no">01</span>
+                <div><strong>固定</strong><small>救援车自锚</small></div>
+              </div>
+              <div class="step-line"></div>
+              <div class="phase-step" data-step="front">
+                <span class="step-no">02</span>
+                <div><strong>前车</strong><small>牵引至安全区</small></div>
+              </div>
+              <div class="step-line"></div>
+              <div class="phase-step" data-step="rear">
+                <span class="step-no">03</span>
+                <div><strong>后车</strong><small>换锚后牵引</small></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel-section">
+            <div class="section-head">
+              <div class="section-label"><span>锚定角度</span><em>ANCHOR ANGLE</em></div>
+              <strong class="readout" id="angleReadout">66°</strong>
+            </div>
+            <div class="angle-visual">
+              <div class="anchor-dial" id="anchorDial" aria-hidden="true">
+                <span class="safe-arc"></span>
+                <span class="needle"></span>
+                <span class="anchor-pin"></span>
+              </div>
+              <div class="angle-copy">
+                <strong id="anchorQualityText">咬合稳定</strong>
+                <p>安全扇区 <b>54°–80°</b></p>
+                <div class="quality-track"><i id="qualityFill"></i></div>
+              </div>
+            </div>
+            <input id="angleSlider" class="range anchor-range" type="range" min="30" max="88" step="1" value="66" aria-label="锚定角度" />
+            <div class="range-labels"><span>侧向 · 30°</span><span>受力线 · 67°</span><span>88°</span></div>
+            <button id="deployBtn" class="action-btn anchor-action">
+              <span class="btn-glyph">◆</span>
+              <span><strong>打入地锚</strong><small>SPACE · 固定救援车</small></span>
+            </button>
+          </section>
+
+          <section class="panel-section">
+            <div class="section-head">
+              <div class="section-label"><span>绞盘力度</span><em>WINCH LOAD</em></div>
+              <strong class="readout" id="winchReadout">00</strong>
+            </div>
+            <div class="tension-meter" aria-hidden="true">
+              <div class="tension-zones"><span></span><span></span><span></span></div>
+              <div class="tension-fill" id="tensionFill"></div>
+              <div class="tension-marker" id="tensionMarker"></div>
+              <div class="break-mark">断索 91</div>
+            </div>
+            <input id="winchSlider" class="range winch-range" type="range" min="0" max="100" step="1" value="0" aria-label="绞盘力度" />
+            <div class="range-labels"><span>松弛</span><span>工作区 46–84</span><span>过载</span></div>
+          </section>
+
+          <section class="panel-section">
+            <div class="section-head">
+              <div class="section-label"><span>车辆转向</span><em>STEERING TRIM</em></div>
+              <strong class="readout small" id="steerReadout">居中</strong>
+            </div>
+            <div class="steer-track">
+              <span class="steer-center"></span>
+              <span class="steer-fill" id="steerFill"></span>
+              <span class="steer-knob" id="steerKnob"></span>
+            </div>
+            <input id="steerSlider" class="range steer-range" type="range" min="-100" max="100" step="1" value="0" aria-label="车辆转向" />
+            <div class="range-labels"><span>← 左打</span><span>保持车头</span><span>右打 →</span></div>
+          </section>
+
+          <section class="panel-section compact-stats">
+            <div class="stat">
+              <span>拖索张力</span>
+              <strong id="tensionStat">0%</strong>
+            </div>
+            <div class="stat">
+              <span>救援车滑移</span>
+              <strong id="slipStat">0%</strong>
+            </div>
+            <div class="stat">
+              <span>安全区车辆</span>
+              <strong id="safeStat">0 / 2</strong>
+            </div>
+          </section>
+
+          <div class="panel-actions">
+            <button id="soundBtn" class="icon-btn" aria-label="切换声音">◖ 声音</button>
+            <button id="resetBtn" class="icon-btn">↺ 重新开始</button>
+          </div>
+        </aside>
+      </main>
+
+      <div class="result-overlay hidden" id="resultOverlay" role="dialog" aria-modal="true">
+        <div class="result-card">
+          <p class="result-kicker" id="resultKicker">RECOVERY COMPLETE</p>
+          <div class="result-seal" id="resultSeal">✓</div>
+          <h2 id="resultTitle">双车救援成功</h2>
+          <p id="resultText">两辆受困车均已进入安全区，救援车仍稳固停在平台上。</p>
+          <div class="result-stats">
+            <div><span>总用时</span><strong id="resultTime">00:08.0</strong></div>
+            <div><span>峰值张力</span><strong id="resultTension">62%</strong></div>
+            <div><span>救援车滑移</span><strong id="resultSlip">0%</strong></div>
+          </div>
+          <button id="againBtn" class="action-btn result-btn">再次执行救援</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>

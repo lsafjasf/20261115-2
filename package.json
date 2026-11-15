@@ -1,0 +1,17 @@
+{
+  "name": "mountain-pass-dual-recovery",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 8080 -d app",
+    "test": "node --test \"tests/*.test.js\"",
+    "demo": "node tests/demo.js",
+    "verify": "node tests/verify.js",
+    "build:font": "node tools/build-font.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1",
+    "subset-font": "^2.9.0"
+  }
+}
