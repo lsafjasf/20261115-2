@@ -1,0 +1,10 @@
+{
+  "name": "buoy-recovery",
+  "version": "1.0.0",
+  "description": "Canvas + Web Audio 湖面浮标回收模拟（固定 seed、缆绳挂底与断缆）",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/run-tests.mjs",
+    "serve": "node serve.mjs"
+  }
+}

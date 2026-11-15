@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>湖面浮标回收 · Buoy Recovery</title>
+  <style>
+    body {
+      margin: 0;
+      background: #04101a;
+      color: #dff1f8;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 4px 0 10px;
+      font-weight: 600;
+    }
+    .wrap {
+      position: relative;
+      width: min(1200px, 96vw);
+    }
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid rgba(140, 190, 210, 0.3);
+      border-radius: 10px;
+      background: #071e2b;
+    }
+    .bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      font-size: 13px;
+    }
+    button {
+      background: #173f52;
+      color: #dff1f8;
+      border: 1px solid rgba(140, 190, 210, 0.4);
+      border-radius: 6px;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    button:hover { background: #1f556d; }
+    #status {
+      color: #9fd3e6;
+    }
+    .help {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #8fb4c2;
+      line-height: 1.7;
+      max-width: 1200px;
+    }
+    kbd {
+      background: #12303f;
+      border: 1px solid #2c5870;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <h1>湖面浮标回收任务 · 三标归位不断缆</h1>
+  <div class="wrap">
+    <canvas id="lake" width="1200" height="720"></canvas>
+  </div>
+  <div class="bar">
+    <button id="toggle-auto">自动巡航演示 (T)</button>
+    <button id="restart">重新开始 (R)</button>
+    <span id="status">靠近浮标按 E 挂缆</span>
+  </div>
+  <div class="help">
+    <kbd>W</kbd>/<kbd>↑</kbd> 前进　<kbd>S</kbd>/<kbd>↓</kbd> 倒车　<kbd>A</kbd><kbd>D</kbd>/方向键 转向　<kbd>E</kbd> 挂缆/摘缆　<kbd>T</kbd> 自动巡航　<kbd>R</kbd> 重开<br />
+    浮标连有沉重传感器，拖带后船速明显下降；横风会把船推离航线（湖面风迹显示风向）；缆绳穿过虚线浅滩会挂底，需向远离浅滩方向倒车解脱。张力条接近红色时收油，否则断缆失败。
+  </div>
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
