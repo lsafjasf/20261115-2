@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#070d12" />
+    <title>深轨 · 地下胶囊调度站</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23070d0c'/%3E%3Cpath d='M7 16h18M16 7v18' stroke='%238ff0c7' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='5' fill='none' stroke='%238ff0c7'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="深轨调度站">
+          <span class="brand-mark" aria-hidden="true">
+            <i></i><i></i><i></i>
+          </span>
+          <span>
+            <strong>深轨</strong>
+            <small>SUBLEVEL TRANSIT / S-03</small>
+          </span>
+        </a>
+        <div class="header-readout">
+          <span class="live-dot"></span>
+          <span id="header-status">等待调度</span>
+          <span class="readout-divider"></span>
+          <span class="mono" id="mission-clock">00:00.0</span>
+        </div>
+        <div class="header-actions">
+          <button class="icon-button" id="sound-toggle" type="button" aria-pressed="false" title="启用磁悬浮声">
+            <span class="sound-icon" aria-hidden="true"></span>
+            <span class="label">声音</span>
+          </button>
+          <button class="icon-button" id="help-button" type="button" title="查看调度说明">
+            <span class="help-icon" aria-hidden="true">?</span>
+            <span class="label">说明</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="visual-stage" aria-label="地下隧道剖面">
+          <div class="stage-topline">
+            <span class="eyebrow">CROSS-SECTION 03-A</span>
+            <span class="stage-coordinate mono">31°14'03"N / 121°28'19"E</span>
+          </div>
+          <canvas id="tunnel-canvas" aria-label="三岔地下隧道、自动舱与占用区可视化"></canvas>
+          <div class="legend" aria-hidden="true">
+            <span><i class="legend-line"></i>隧道</span>
+            <span><i class="legend-zone"></i>占用区</span>
+            <span><i class="legend-fault"></i>故障闭锁</span>
+          </div>
+          <div class="canvas-hud">
+            <div class="hud-item">
+              <span class="hud-label">区间占用</span>
+              <strong class="mono" id="hud-occupied">0 / 9</strong>
+            </div>
+            <div class="hud-item">
+              <span class="hud-label">平均深度</span>
+              <strong class="mono">-96.4 m</strong>
+            </div>
+            <div class="hud-item hud-alert" id="hud-conflict">
+              <span class="hud-label">交会预警</span>
+              <strong class="mono">0</strong>
+            </div>
+          </div>
+          <div class="stage-footer">
+            <div class="scenario-label">
+              <span>固定场景</span>
+              <strong id="scenario-name">四舱交班</strong>
+            </div>
+            <div class="transport-controls">
+              <button class="primary-button" id="start-button" type="button">
+                <span class="play-symbol" aria-hidden="true"></span>
+                <span>开始调度</span>
+              </button>
+              <button class="secondary-button" id="fault-button" type="button" disabled>
+                <span class="fault-symbol" aria-hidden="true"></span>
+                <span>注入前车故障</span>
+              </button>
+              <div class="speed-control" aria-label="调度速度">
+                <button type="button" data-speed="1" class="active">1×</button>
+                <button type="button" data-speed="2">2×</button>
+                <button type="button" data-speed="4">4×</button>
+              </div>
+              <button class="ghost-button" id="quick-test-button" type="button">阻塞测试</button>
+              <button class="ghost-button" id="reset-button" type="button">复位</button>
+            </div>
+          </div>
+        </section>
+
+        <aside class="control-panel">
+          <section class="mission-card">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">MISSION</span>
+                <h1>四舱交班</h1>
+              </div>
+              <span class="mission-badge" id="mission-badge">待发</span>
+            </div>
+            <p class="mission-copy">让四辆自动舱依次完成运输任务。区间独占，先到先得；优先级只决定等候顺序，绝不允许正面相遇。</p>
+            <div class="mission-stats">
+              <div><span>完成</span><strong id="stat-complete">0 / 4</strong></div>
+              <div><span>改道</span><strong id="stat-reroute">0</strong></div>
+              <div><span>让行</span><strong id="stat-yield">0</strong></div>
+            </div>
+            <div class="route-condition">
+              <i></i>
+              <span>成功条件：四舱到站 + 零正面相遇</span>
+            </div>
+          </section>
+
+          <section class="pods-section">
+            <div class="section-heading compact">
+              <span class="eyebrow">FLEET / 04</span>
+              <span class="hint">点击舱体编辑线路</span>
+            </div>
+            <div class="pod-list" id="pod-list"></div>
+          </section>
+
+          <section class="route-editor" id="route-editor">
+            <div class="editor-heading">
+              <div>
+                <span class="eyebrow">ROUTE EDITOR</span>
+                <h2 id="editor-title">ALPHA 线路</h2>
+              </div>
+              <label class="priority-control">
+                <span>优先权</span>
+                <select id="priority-select" aria-label="优先权"></select>
+              </label>
+            </div>
+            <div class="editor-meta">
+              <span>起点 <strong id="editor-origin">晨星台</strong></span>
+              <span>任务 <strong id="editor-task-count">2 站</strong></span>
+            </div>
+            <ol class="stop-list" id="stop-list"></ol>
+            <div class="add-stop-row">
+              <select id="add-stop-select" aria-label="添加站点"></select>
+              <button class="small-button" id="add-stop-button" type="button">＋ 添加站点</button>
+            </div>
+            <p class="editor-note" id="editor-note">编辑后点击“开始调度”，系统会自动寻径并独占区间。</p>
+          </section>
+
+          <section class="test-section">
+            <div class="test-copy">
+              <span class="test-icon" aria-hidden="true">!</span>
+              <div>
+                <strong>错误线路阻塞测试</strong>
+                <span>用两舱对向争用同一单线区间，验证低优先级让行且无正面相遇。</span>
+              </div>
+            </div>
+            <button class="test-button" id="test-button" type="button">运行复现</button>
+          </section>
+
+          <section class="log-section">
+            <div class="section-heading compact">
+              <span class="eyebrow">DISPATCH LOG</span>
+              <span class="hint" id="log-count">0 条</span>
+            </div>
+            <div class="event-log" id="event-log" role="log"></div>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <div class="toast-region" id="toast-region" aria-live="polite"></div>
+
+    <dialog class="help-dialog" id="help-dialog">
+      <div class="dialog-heading">
+        <div>
+          <span class="eyebrow">OPERATOR MANUAL</span>
+          <h2>调度台说明</h2>
+        </div>
+        <button class="dialog-close" id="help-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="manual-grid">
+        <article>
+          <span class="manual-index">01</span>
+          <h3>编辑任务</h3>
+          <p>为每辆舱设定优先权与目的地顺序。优先权越高，在岔点竞争同一区间时越先获得通行权。</p>
+        </article>
+        <article>
+          <span class="manual-index">02</span>
+          <h3>区间独占</h3>
+          <p>同一区段只允许一辆舱进入。对向舱请求同一区段时，低优先级舱会在岔点等待，避免正面相遇。</p>
+        </article>
+        <article>
+          <span class="manual-index">03</span>
+          <h3>故障改道</h3>
+          <p>前车故障会封锁所在区间。后续舱会在下一岔点重新寻径，绕开故障区段继续任务。</p>
+        </article>
+      </div>
+      <button class="primary-button full-width" id="help-start" type="button">进入调度台</button>
+    </dialog>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
