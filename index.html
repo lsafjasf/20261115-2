@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#141612" />
+    <title>Parallax Street — 五层街景实验室</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%23191b17'/%3E%3Cpath d='M17 45V30h8v15zm11 0V17h8v28zm11 0V35h8v10z' fill='%23c9f262'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Parallax Street 首页">
+          <span class="brand-mark" aria-hidden="true">
+            <i></i><i></i><i></i>
+          </span>
+          <span class="brand-copy">
+            <strong>PARALLAX<br />STREET</strong>
+            <small>五层街景实验室 / 05</small>
+          </span>
+        </a>
+
+        <div class="topbar-center" aria-hidden="true">
+          <span class="rule"></span>
+          <span>拖动街景，听见城市</span>
+          <span class="rule"></span>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="sound-button" id="soundButton" aria-pressed="false">
+            <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <span id="soundLabel">环境声</span>
+          </button>
+          <div class="day-toggle" role="group" aria-label="昼夜模式">
+            <button class="day-choice is-active" data-mode="day" aria-pressed="true">
+              <span class="sun-icon" aria-hidden="true"></span>白昼
+            </button>
+            <button class="day-choice" data-mode="night" aria-pressed="false">
+              <span class="moon-icon" aria-hidden="true"></span>夜晚
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section class="workspace">
+        <div class="stage-column">
+          <div class="stage-frame" id="stageFrame">
+            <canvas
+              id="streetCanvas"
+              width="1600"
+              height="900"
+              aria-label="可拖动的五层二维街道，按住并左右拖动改变视角"
+            ></canvas>
+
+            <div class="stage-vignette" aria-hidden="true"></div>
+            <div class="stage-topline">
+              <span class="scene-tag"><i></i><span id="sceneTag">DAY / 14:32</span></span>
+              <span class="stage-coordinates">31°13'N &nbsp; 121°28'E</span>
+            </div>
+            <div class="stage-bottomline">
+              <div class="camera-readout">
+                <span>CAMERA</span>
+                <strong id="cameraReadout">+0.00</strong>
+              </div>
+              <div class="drag-hint" id="dragHint">
+                <span class="drag-icon" aria-hidden="true">↔</span>
+                按住拖动以产生视差
+              </div>
+            </div>
+
+            <div class="export-overlay" id="exportOverlay" hidden>
+              <div class="export-card">
+                <span class="record-dot"></span>
+                <p>正在记录 10 秒横向移动</p>
+                <div class="progress-track"><i id="exportProgress"></i></div>
+                <span class="progress-label" id="progressLabel">00.0 / 10.0 s</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="stage-meta">
+            <div class="parallax-legend">
+              <span class="legend-label">视差</span>
+              <span>远景 <i class="legend-line far"></i></span>
+              <span><i class="legend-line near"></i> 近景</span>
+              <strong id="parallaxDelta">Δ 0 px</strong>
+            </div>
+            <p>
+              深度决定横向位移，模糊模拟空气与焦外。昼夜切换保持构图不变，仅重绘光照与颜色。
+            </p>
+          </div>
+        </div>
+
+        <aside class="control-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">LAYER STACK</span>
+              <h1>景深编排</h1>
+            </div>
+            <button class="reset-button" id="resetButton" title="重置全部参数">
+              <span aria-hidden="true">↺</span> 重置
+            </button>
+          </div>
+
+          <div class="layer-list" id="layerList"></div>
+
+          <div class="panel-note">
+            <span class="note-index">NOTE 01</span>
+            <p id="depthNote">远景受视差影响小，近景移动更明显。拖动画面即可观察位移差异。</p>
+          </div>
+
+          <div class="export-dock">
+            <div class="export-info">
+              <span class="eyebrow">TAKE AWAY</span>
+              <h2>十秒街景</h2>
+              <div class="export-specs">
+                <span>WEBM</span><span>30 FPS</span><span>1600 × 900</span>
+              </div>
+            </div>
+            <button class="export-button" id="exportButton">
+              <span class="export-icon" aria-hidden="true">●</span>
+              <span>导出视频<small>EXPORT 10 SEC</small></span>
+              <span class="export-arrow" aria-hidden="true">↗</span>
+            </button>
+          </div>
+        </aside>
+      </section>
+
+      <footer class="footer">
+        <span>CANVAS COMPOSITOR / WEB AUDIO</span>
+        <span>五层：天光 → 远楼 → 近楼 → 树 → 路面</span>
+        <span>DRAG TO EXPLORE</span>
+      </footer>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
