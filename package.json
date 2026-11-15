@@ -1,0 +1,29 @@
+{
+  "name": "uid381",
+  "version": "1.0.0",
+  "description": "湖岸盲听：基于 Web Audio 空间音频的声源方位与发生顺序判断游戏",
+  "main": "index.html",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node test/blind-test.mjs",
+    "test:ui": "node test/ui-check.mjs",
+    "serve": "node test/serve.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsafjasf/20261115-2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/lsafjasf/20261115-2/issues"
+  },
+  "homepage": "https://github.com/lsafjasf/20261115-2#readme",
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}

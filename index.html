@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>湖岸盲听：芦苇 · 浅滩 · 码头</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="page">
+    <h1>湖岸盲听</h1>
+    <p class="intro">
+      三种水声藏在湖岸周围：<strong>芦苇</strong>的沙沙、<strong>浅滩</strong>的拍岸、<strong>码头</strong>的撞击。
+      用左右声道分辨左右，用声音的明暗（前后滤波）分辨岸/湖方向；风会掩盖远处声音，水面反射带来延迟。
+      移动监听点反复聆听，提交三个方向与发生顺序，全部正确才能通关。
+    </p>
+
+    <section class="controls">
+      <button id="start-btn" type="button">开始监听</button>
+      <button id="replay-btn" type="button" disabled>重新播放</button>
+      <label class="slider-label">
+        监听点沿湖岸位置：<span id="listener-pos">0 m</span>
+        <input id="listener-x" type="range" value="0" step="1" />
+      </label>
+    </section>
+
+    <form id="answer-form">
+      <fieldset>
+        <legend>三个方向（以初始监听点为准）</legend>
+        <div id="dir-selects"></div>
+      </fieldset>
+      <fieldset>
+        <legend>发生顺序（先 → 后）</legend>
+        <div class="order-row">
+          <label>第 1 <select class="order-slot"></select></label>
+          <label>第 2 <select class="order-slot"></select></label>
+          <label>第 3 <select class="order-slot"></select></label>
+        </div>
+      </fieldset>
+      <button type="submit">提交答案</button>
+    </form>
+
+    <p id="result" class="result">点击“开始监听”进入盲听。</p>
+
+    <canvas id="measure-canvas" class="hidden"></canvas>
+  </main>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8" /><title>blind harness</title></head>
+<body>
+  <script type="module">
+    import { renderOffline } from '../js/engine.js';
+    import {
+      analyze, detectBandOnsets, timbreProfile, timbreProfileChannel,
+      lowFrequencyImpulseRatio, directionFromPan,
+    } from './dsp.js';
+
+    const SEED = 20261115;
+
+    async function blindListen() {
+      // 第一段：在初始监听点完整听一遍，在各特征频段上独立检测事件起点
+      const full = await renderOffline(SEED, 0, 11.5, 32000);
+      const analysis = analyze(full);
+
+      // 第二段：移动监听点再听一遍，交叉验证左右/前后判断
+      const shifted = await renderOffline(SEED, 30, 11.5, 32000);
+      const analysisShift = analyze(shifted);
+
+      const bandOnsets = detectBandOnsets(analysis);
+      const bandOnsetsShift = detectBandOnsets(analysisShift);
+
+      const events = Object.entries(bandOnsets)
+        .filter(([, onset]) => onset !== null)
+        .map(([type, onset]) => {
+          const profile = timbreProfile(analysis, onset + 0.1, onset + 1.5);
+          const profileShift = timbreProfile(analysisShift, onset + 0.1, onset + 1.5);
+          // 用该声源特征频段的声道能量差判左右，避免被其他声源带偏
+          const sideBand = { reed: 2, shoal: 4, dock: 1 }[type];
+          const side = directionFromPan(profile.bandPan[sideBand]);
+          // 前后判定：后方声源经 720Hz 低通，自己的特征频段能量被压垮
+          // 芦苇看 900-2400Hz，浅滩看 4.5kHz+；
+          // 码头自身是低频撞击 + 中高频吱呀，后方时吱呀消失、低频占绝对主导
+          let frontEnergy;
+          let frontBack;
+          if (type === 'dock') {
+            // 码头在左侧且在岸后：左声道低频脉冲被 480Hz 低通保留，
+            // 而中高频吱呀被压垮；用低频瞬态比区分（持续声 < 10，码头撞击 > 20）
+            const impulse = lowFrequencyImpulseRatio(full, onset + 0.1, onset + 1.5, 'left');
+            frontEnergy = impulse;
+            frontBack = impulse < 15 ? 'f' : 'b';
+          } else {
+            const fbBand = type === 'reed' ? 2 : 4;
+            frontEnergy = (profile.fractions[fbBand] + profileShift.fractions[fbBand]) / 2;
+            frontBack = frontEnergy >= (type === 'reed' ? 0.25 : 0.12) ? 'f' : 'b';
+          }
+          const hf = (profile.hfFraction + profileShift.hfFraction) / 2;
+          const shiftOnset = bandOnsetsShift[type];
+          return {
+            onset: Number(onset.toFixed(2)),
+            shiftOnset: shiftOnset === null ? null : Number(shiftOnset.toFixed(2)),
+            type,
+            direction: frontBack + side,
+            evidence: {
+              hf: Number(hf.toFixed(4)),
+              frontEnergy: Number(frontEnergy.toFixed(4)),
+              pan: Number(profile.pan.toFixed(3)),
+              bandPan: profile.bandPan.map((v) => Number(v.toFixed(2))),
+              centroid: Math.round(profile.centroid),
+              impulsiveness: Number(profile.impulsiveness.toFixed(2)),
+              modulation: Number(profile.modulation.toFixed(2)),
+            },
+          };
+        });
+      events.sort((a, b) => a.onset - b.onset);
+      const onsets = events.map((e) => e.onset);
+      const order = events.map((e) => e.type);
+      const directions = {};
+      for (const e of events) directions[e.type] = e.direction;
+      return { onsets, events, order, directions };
+    }
+
+    window.__runBlind = blindListen;
+    window.__ready = true;
+  </script>
+</body>
+</html>
