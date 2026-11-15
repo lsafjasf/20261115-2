@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "title": "星河长明",
+  "subtitle": "CELESTIAL COMMEMORATION",
+  "denomination": "2.40",
+  "currency": "¥",
+  "unit": "元",
+  "theme": "#1f4e8c",
+  "patterns": {
+    "top": "chevronBand",
+    "medallion": "radialStarburst",
+    "bottom": "triangleTessellation"
+  },
+  "seed": "stamp-xinghe-2026-002"
+}

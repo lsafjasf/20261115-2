@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>程序化纪念邮票工坊</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>程序化纪念邮票工坊</h1>
+    <p class="hint">标题 · 主题色 · 三种几何纹样 · 确定性 seed，实时生成高分辨率 PNG</p>
+  </header>
+
+  <main class="workspace">
+    <section class="panel controls">
+      <form id="controls-form">
+        <label class="field">
+          <span>标题（1–12 字）</span>
+          <input id="title" name="title" type="text" maxlength="12" required />
+        </label>
+
+        <label class="field">
+          <span>英文说明</span>
+          <input id="subtitle" name="subtitle" type="text" maxlength="40" />
+        </label>
+
+        <fieldset class="field">
+          <legend>主题色</legend>
+          <div id="theme-presets" class="swatches"></div>
+          <div class="custom-color">
+            <input id="theme-custom" type="color" />
+            <code id="theme-hex"></code>
+          </div>
+        </fieldset>
+
+        <div class="row">
+          <label class="field">
+            <span>面值数字</span>
+            <input id="denomination" type="text" inputmode="decimal" />
+          </label>
+          <label class="field">
+            <span>货币符号</span>
+            <input id="currency" type="text" maxlength="2" />
+          </label>
+          <label class="field">
+            <span>单位</span>
+            <input id="unit" type="text" maxlength="2" />
+          </label>
+        </div>
+
+        <fieldset class="field">
+          <legend>三种几何纹样</legend>
+          <label class="pattern-field">
+            <span>顶部纹样（带状）</span>
+            <select id="pattern-top"></select>
+          </label>
+          <label class="pattern-field">
+            <span>中心纹样（圆形）</span>
+            <select id="pattern-medallion"></select>
+          </label>
+          <label class="pattern-field">
+            <span>底部纹样（带状）</span>
+            <select id="pattern-bottom"></select>
+          </label>
+        </fieldset>
+
+        <label class="field">
+          <span>Seed（随每次改动实时保存）</span>
+          <div class="seed-row">
+            <input id="seed" type="text" spellcheck="false" />
+            <button type="button" id="seed-shuffle" class="btn">换一枚</button>
+          </div>
+        </label>
+
+        <label class="check-field">
+          <input id="show-guides" type="checkbox" checked />
+          <span>预览显示外框与安全区辅助线</span>
+        </label>
+
+        <div class="actions">
+          <button type="button" id="export-png" class="btn primary">导出 2x 高分辨率 PNG</button>
+          <button type="button" id="export-project" class="btn">下载工程 JSON</button>
+          <button type="button" id="reload-project" class="btn">载入工程 JSON</button>
+          <input id="project-file" type="file" accept="application/json,.json" hidden />
+        </div>
+        <p id="validation" class="validation" role="status"></p>
+      </form>
+    </section>
+
+    <section class="panel preview-panel">
+      <div class="preview-meta">
+        <code id="preview-seed"></code>
+        <span id="preview-size"></span>
+      </div>
+      <div id="preview" class="preview"></div>
+      <p class="legend">
+        <i class="dash blue"></i>外框辅助线
+        <i class="dash green"></i>安全区（所有文字与装饰均在其中）
+      </p>
+    </section>
+  </main>
+
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>

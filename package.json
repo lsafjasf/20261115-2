@@ -1,0 +1,32 @@
+{
+  "name": "uid387",
+  "version": "1.0.0",
+  "description": "Programmatic commemorative stamp generator with deterministic seeds",
+  "main": "src/stamp.mjs",
+  "scripts": {
+    "render": "node src/render-png.mjs",
+    "render:all": "node src/render-png.mjs projects/stamp-shanhe.json artifacts/stamp-shanhe.png 2 && node src/render-png.mjs projects/stamp-xinghe.json artifacts/stamp-xinghe.png 2",
+    "preview": "node src/render-preview.mjs projects/stamp-shanhe.json artifacts/preview-shanhe-guides.png",
+    "verify": "node src/verify.mjs",
+    "serve": "http-server -p 8731 -c-1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsafjasf/20261115-2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lsafjasf/20261115-2/issues"
+  },
+  "homepage": "https://github.com/lsafjasf/20261115-2#readme",
+  "dependencies": {
+    "opentype.js": "^2.0.0",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

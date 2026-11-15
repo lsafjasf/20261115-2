@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "title": "山河同庆",
+  "subtitle": "COMMEMORATIVE STAMP",
+  "denomination": "1.20",
+  "currency": "¥",
+  "unit": "元",
+  "theme": "#c0392b",
+  "patterns": {
+    "top": "diamondLattice",
+    "medallion": "concentricRings",
+    "bottom": "waveBand"
+  },
+  "seed": "stamp-shanhe-2026-001"
+}
