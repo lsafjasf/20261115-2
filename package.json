@@ -1,0 +1,13 @@
+{
+  "name": "cryo-tunnel-control",
+  "version": "1.0.0",
+  "private": true,
+  "description": "速冻隧道三批次工艺调度小游戏",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/verify.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0"
+  }
+}

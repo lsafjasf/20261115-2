@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071015">
+  <title>极寒隧道 · 速冻工艺调度</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient-grid"></div>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <div class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <div>
+          <p class="eyebrow">CRYO TUNNEL / LINE 04</p>
+          <h1>极寒隧道</h1>
+        </div>
+      </div>
+
+      <div class="batch-rail" id="batchRail" aria-label="批次进度">
+        <div class="batch-step" data-step="0"><b>01</b><span>草莓</span></div>
+        <i></i>
+        <div class="batch-step" data-step="1"><b>02</b><span>饺子</span></div>
+        <i></i>
+        <div class="batch-step" data-step="2"><b>03</b><span>牛肉</span></div>
+      </div>
+
+      <div class="energy-card" id="energyCard">
+        <div class="energy-head">
+          <span>累计能耗</span>
+          <strong><span id="energyValue">0.0</span><small> / 16.5 kWh</small></strong>
+        </div>
+        <div class="energy-track"><span id="energyFill"></span><i></i></div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="sim-stage" aria-label="隧道剖面">
+        <div class="stage-topline">
+          <div class="live-chip"><span class="live-dot"></span><span id="runState">待机</span></div>
+          <div class="stage-readouts">
+            <span>隧道 <b>-30.0°C</b></span>
+            <span>风机 <b id="rpmReadout">0 rpm</b></span>
+            <span>冷气 <b id="airReadout">0.00 m/s</b></span>
+          </div>
+          <button class="icon-button" id="soundBtn" type="button" aria-pressed="false" title="启停风机声音">
+            <span class="sound-glyph">◖</span><span id="soundLabel">声音关</span>
+          </button>
+        </div>
+
+        <div class="canvas-frame">
+          <canvas id="tunnelCanvas" width="1180" height="620" aria-label="速冻隧道 Canvas 剖面"></canvas>
+          <div class="canvas-corner top-left">SECTION A–A</div>
+          <div class="canvas-corner top-right" id="batchClock">T+ 00:00</div>
+          <div class="alarm-banner" id="alarmBanner" role="alert">
+            <span>!</span>
+            <div><b>E-03 风机堵塞</b><small>冷气流量骤降 · 立即停机清理</small></div>
+          </div>
+        </div>
+
+        <div class="telemetry-strip">
+          <article class="metric-card temp-card" id="tempCard">
+            <span class="metric-label">食品中心温度</span>
+            <strong id="coreTemp">+8.0<small>°C</small></strong>
+            <div class="metric-foot"><span id="tempTrend">等待入舱</span><i id="tempDelta">目标 ≤ -18°C</i></div>
+            <div class="temp-scale"><span>+8</span><div><i id="tempNeedle"></i></div><span>-30</span></div>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">有效冷气速度</span>
+            <strong id="airMetric">0.00<small> m/s</small></strong>
+            <div class="metric-foot"><span id="airState">风门关闭</span><i id="airRisk">—</i></div>
+            <div class="bar-track"><span id="airBar"></span></div>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">实际停留</span>
+            <strong id="dwellMetric">0:00<small> min</small></strong>
+            <div class="metric-foot"><span id="dwellState">待入舱</span><i id="dwellTarget">要求 8:00</i></div>
+            <div class="bar-track warm"><span id="dwellBar"></span></div>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">飘移累计</span>
+            <strong id="driftMetric">0.0<small>%</small></strong>
+            <div class="metric-foot"><span id="driftState">稳定</span><i id="driftLimit">上限 100%</i></div>
+            <div class="bar-track"><span id="driftBar"></span></div>
+          </article>
+        </div>
+      </section>
+
+      <aside class="control-deck">
+        <div class="deck-heading">
+          <div>
+            <p class="eyebrow">BATCH CONTROL</p>
+            <h2 id="batchTitle">01 · 轻质草莓</h2>
+          </div>
+          <span class="batch-status" id="batchStatus">待启动</span>
+        </div>
+
+        <div class="recipe-card">
+          <div class="food-orbit" id="foodIcon" aria-hidden="true"><span></span></div>
+          <div class="recipe-copy">
+            <p id="foodTagline">高含水、低密度，最怕强风。</p>
+            <div class="recipe-targets">
+              <span>中心目标 <b id="targetTemp">-18°C</b></span>
+              <span>停留窗口 <b id="targetTime">8:00</b></span>
+              <span>安全风速 <b id="safeAir">≤ 0.55</b></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-stack">
+          <div class="control-row">
+            <div class="control-head">
+              <label for="damperSlider">风门开度</label>
+              <output id="damperValue">46%</output>
+            </div>
+            <input id="damperSlider" type="range" min="0" max="100" value="46" step="1" aria-describedby="damperHint">
+            <div class="range-notes"><span>弱</span><span id="damperHint">目标风量 46%</span><span>强</span></div>
+          </div>
+          <div class="control-row">
+            <div class="control-head">
+              <label for="gapSlider">托盘间距</label>
+              <output id="gapValue">30 cm</output>
+            </div>
+            <input id="gapSlider" type="range" min="10" max="40" value="30" step="1" aria-describedby="gapHint">
+            <div class="range-notes"><span>密</span><span id="gapHint">目标间距 30 cm</span><span>疏</span></div>
+          </div>
+          <div class="control-row">
+            <div class="control-head">
+              <label for="speedSlider">传送带速度</label>
+              <output id="speedValue">1.50 m/min</output>
+            </div>
+            <input id="speedSlider" type="range" min="0.6" max="2.2" value="1.5" step="0.01" aria-describedby="speedHint">
+            <div class="range-notes"><span>慢</span><span id="speedHint">目标 1.50 m/min</span><span>快</span></div>
+          </div>
+        </div>
+
+        <div class="process-note" id="processNote">
+          <span class="note-icon">◈</span>
+          <p><b>工艺提示</b><span id="processTip">先按推荐值校车，再启动。轻质食品遇到强风会横向飘移。</span></p>
+        </div>
+
+        <div class="action-row">
+          <button class="primary-button" id="startBtn" type="button"><span class="btn-pulse"></span><span>启动批次</span></button>
+          <button class="danger-button" id="blockBtn" type="button" title="模拟风机堵塞">风机堵塞</button>
+        </div>
+        <div class="secondary-row">
+          <button id="abortBtn" type="button" disabled>急停</button>
+          <button id="resetBtn" type="button">重置产线</button>
+          <button id="helpBtn" type="button">操作说明</button>
+        </div>
+
+        <div class="event-log">
+          <div class="log-head"><span>事件记录</span><i id="logTime">SHIFT 09:00</i></div>
+          <ol id="eventLog"></ol>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="status-footer">
+      <span><i class="status-dot"></i>PLC 在线</span>
+      <span>隧道长度 12.0 m</span>
+      <span>冷源 -30.0°C</span>
+      <span>批次合格线：3 / 3</span>
+      <span id="footerHint">调整三项工艺参数，使温度在规定时间达标</span>
+    </footer>
+  </div>
+
+  <div class="modal-backdrop" id="resultModal" aria-hidden="true">
+    <div class="result-card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+      <p class="eyebrow" id="resultKicker">BATCH REPORT</p>
+      <h2 id="resultTitle">批次合格</h2>
+      <p class="result-summary" id="resultSummary"></p>
+      <div class="result-stats" id="resultStats"></div>
+      <div class="result-reasons" id="resultReasons"></div>
+      <div class="modal-actions">
+        <button class="primary-button" id="modalPrimary" type="button">下一批</button>
+        <button id="modalSecondary" type="button">留在本批</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="helpModal" aria-hidden="true">
+    <div class="result-card help-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <p class="eyebrow">OPERATOR MANUAL</p>
+      <h2 id="helpTitle">工艺调度守则</h2>
+      <div class="help-grid">
+        <div><b>01 / 风门</b><span>冷气越强，中心降温越快；超过食品安全风速，轻质食品会飘移。</span></div>
+        <div><b>02 / 托盘间距</b><span>间距过密会遮挡冷气，过疏则产生旁通。按配方提示找最佳区间。</span></div>
+        <div><b>03 / 传送带</b><span>速度决定停留时间。12 m 隧道内，过快会在达标前出舱，过慢会超时并浪费能耗。</span></div>
+        <div><b>04 / 风机堵塞</b><span>点击“风机堵塞”制造故障。转速与冷气骤降，声音变为低沉摩擦音；清理后可恢复。</span></div>
+      </div>
+      <div class="modal-actions"><button class="primary-button" id="helpClose" type="button">开始值班</button></div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="engine.js"></script>
+  <script src="renderer.js"></script>
+  <script src="audio.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
