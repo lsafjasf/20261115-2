@@ -1,0 +1,14 @@
+{
+  "name": "tide-railway-dispatch",
+  "version": "1.0.0",
+  "description": "沿海铁路潮汐窗口调度游戏：Canvas 渲染 + Web Audio 音效，固定 seed 潮汐仿真",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/engine.test.mjs",
+    "test:e2e": "node tests/browser.e2e.mjs",
+    "serve": "node server.mjs"
+  },
+  "devDependencies": {
+    "puppeteer": "^25.17.0"
+  }
+}

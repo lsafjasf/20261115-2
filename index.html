@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>潮汐铁路调度</title>
+    <link rel="stylesheet" href="src/style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>潮汐铁路调度</h1>
+      <div class="hud">
+        <span>时刻 <b id="clock">0 / 1800s</b></span>
+        <span>潮位 <b id="water">0.00 m</b></span>
+        <span>封锁区段 <b id="blocks">无</b></span>
+        <span>已到达 <b id="arrived">0 / 3</b></span>
+      </div>
+    </header>
+
+    <main>
+      <section class="stage">
+        <canvas id="scene"></canvas>
+        <div class="toolbar">
+          <button id="startBtn">▶ 开始</button>
+          <button id="pauseBtn">⏸ 暂停</button>
+          <button id="speedBtn">2x</button>
+          <button id="resetBtn">↺ 重新开局</button>
+          <button id="muteBtn">🔊 音效</button>
+          <button id="demoFailBtn" class="warn">载入“漏看水位”失败局</button>
+        </div>
+        <div id="result" class="result hidden">
+          <h2></h2>
+          <p></p>
+        </div>
+      </section>
+
+      <aside class="side">
+        <h2>调度指令</h2>
+        <div id="trainControls"></div>
+        <h2>潮汐曲线（seed 20261115）</h2>
+        <canvas id="tideChart" width="320" height="150"></canvas>
+        <h2>事件日志</h2>
+        <div id="eventLog"></div>
+      </aside>
+    </main>
+
+    <footer>
+      水线漫过路基即自动封锁；列车有惯性，高速时制动距离长。三车全部到达终点且无涉水事故即成功。
+    </footer>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

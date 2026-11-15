@@ -1,0 +1,102 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  background: #101823;
+  color: #e8eef5;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 22px;
+  background: #16222f;
+  border-bottom: 1px solid #24364a;
+}
+header h1 { font-size: 18px; margin: 0; }
+.hud { display: flex; gap: 18px; font-size: 13px; color: #b8c6d6; }
+.hud b { color: #ffd166; margin-left: 4px; }
+.hud .danger, #blocks.danger { color: #ff6b6b; font-weight: 700; }
+
+main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 16px;
+  padding: 16px 22px;
+}
+.stage { position: relative; }
+#scene {
+  width: 100%;
+  background: #eaf6ff;
+  border-radius: 10px;
+  border: 1px solid #24364a;
+}
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+button {
+  background: #23405c;
+  color: #eaf2fb;
+  border: 1px solid #33567a;
+  border-radius: 6px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+button:hover { background: #2d5275; }
+button.warn { background: #5c2b2b; border-color: #8a3a3a; }
+
+.result {
+  margin-top: 12px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.result.success { background: #173d2c; border: 1px solid #2f8f63; }
+.result.failed { background: #46202a; border: 1px solid #b14545; }
+.result h2 { margin: 0 0 6px; font-size: 16px; }
+.hidden { display: none; }
+
+.side h2 { font-size: 14px; margin: 14px 0 8px; color: #9fc1e6; }
+.train-card {
+  background: #182635;
+  border: 1px solid #27405a;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  display: grid;
+  gap: 7px;
+  font-size: 12px;
+}
+.card-head { display: flex; align-items: center; gap: 8px; }
+.card-head .status { margin-left: auto; color: #ffd166; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.train-card label { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+select, input {
+  background: #0f1b27;
+  color: #e8eef5;
+  border: 1px solid #33567a;
+  border-radius: 5px;
+  padding: 3px 6px;
+  width: 130px;
+}
+#tideChart { width: 100%; border-radius: 8px; border: 1px solid #24364a; }
+#eventLog {
+  height: 210px;
+  overflow-y: auto;
+  background: #0d1620;
+  border: 1px solid #24364a;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.log-segment_flooded, .log-train_crashed, .log-game_failed { color: #ff8080; }
+.log-segment_reopened, .log-game_success, .log-train_arrived { color: #7fe0a8; }
+.log-train_stopped_station, .log-train_resumed { color: #ffd166; }
+footer {
+  padding: 10px 22px 18px;
+  color: #8aa2bb;
+  font-size: 12px;
+}
+@media (max-width: 980px) {
+  main { grid-template-columns: 1fr; }
+}
