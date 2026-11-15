@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>药片灌装线 · Pill Filling Line</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 16px; background: #0e1116; color: #d7dde5;
+    font: 14px/1.5 system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+    display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+  }
+  canvas { background: #161b22; border: 1px solid #2b3442; border-radius: 10px; }
+  .panel { width: 280px; display: flex; flex-direction: column; gap: 12px; }
+  fieldset { border: 1px solid #2b3442; border-radius: 10px; padding: 10px 12px; margin: 0; }
+  legend { color: #8fb4ff; padding: 0 6px; font-weight: 600; }
+  button {
+    width: 100%; padding: 8px 10px; margin-top: 8px; border-radius: 8px;
+    border: 1px solid #3a4658; background: #1d2530; color: #d7dde5;
+    cursor: pointer; font-size: 14px;
+  }
+  button:hover { background: #26313f; }
+  button.on { background: #14402c; border-color: #2ea56a; }
+  button.warn { background: #3d2418; border-color: #c0672f; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  label.row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+  input[type=range] { width: 150px; }
+  .stat { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; font-variant-numeric: tabular-nums; }
+  .stat b { color: #fff; }
+  #banner {
+    min-height: 44px; padding: 8px 10px; border-radius: 8px;
+    background: #18222e; border: 1px solid #2b3442; font-size: 13px;
+  }
+  #banner.alert { background: #3a1d1d; border-color: #b04a4a; }
+  h1 { font-size: 18px; margin: 0 0 2px; }
+  .sub { color: #8b97a6; font-size: 12px; }
+</style>
+</head>
+<body>
+  <canvas id="stage" width="960" height="600"></canvas>
+  <div class="panel">
+    <div>
+      <h1>药片灌装线</h1>
+      <div class="sub">十二瓶合格、废瓶不超过两瓶即成功</div>
+    </div>
+    <div id="banner">准备开工。</div>
+    <fieldset>
+      <legend>料斗（可单独暂停）</legend>
+      <button id="hopper-small">小药片料斗：运行</button>
+      <button id="hopper-large">大药片料斗：运行</button>
+    </fieldset>
+    <fieldset>
+      <legend>振动频率</legend>
+      <label class="row"><span>频率 <b id="freq-val">2</b> 档</span>
+        <input id="freq" type="range" min="1" max="5" step="1" value="2"></label>
+      <div class="sub">频率越高出料越快，错料概率也越高</div>
+    </fieldset>
+    <fieldset>
+      <legend>剔除 / 换批</legend>
+      <button id="divert">剔除机构：关</button>
+      <button id="clear" class="warn">清空缓存（换批必做）</button>
+      <button id="reject">剔除当前不良瓶</button>
+    </fieldset>
+    <fieldset>
+      <legend>状态</legend>
+      <div class="stat">
+        <span>合格瓶</span><b id="st-good">0 / 12</b>
+        <span>废瓶</span><b id="st-waste">0 / 2</b>
+        <span>剔除药片</span><b id="st-div">0</b>
+        <span>清缓存</span><b id="st-clear">0</b>
+        <span>批次</span><b id="st-batch">1 / 4（小）</b>
+        <span>缓存</span><b id="st-buf">0 / 8</b>
+      </div>
+    </fieldset>
+    <button id="mute">声音：开</button>
+    <button id="restart">重开一局</button>
+  </div>
+  <script type="module" src="src/ui.js"></script>
+</body>
+</html>
