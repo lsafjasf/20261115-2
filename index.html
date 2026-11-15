@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>低多边形工具图标生成器</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; display: flex; gap: 20px; padding: 20px;
+    font: 14px/1.5 system-ui, sans-serif; background: #16181d; color: #d7dbe2;
+  }
+  canvas { border-radius: 10px; touch-action: none; cursor: grab; }
+  canvas:active { cursor: grabbing; }
+  .panel { width: 260px; display: flex; flex-direction: column; gap: 14px; }
+  h1 { font-size: 17px; margin: 0 0 4px; }
+  label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+  label span { display: flex; justify-content: space-between; color: #9aa3b2; }
+  input[type="range"] { width: 100%; accent-color: #5b9dff; }
+  input[type="color"] { width: 100%; height: 32px; border: none; background: none; padding: 0; }
+  .row { display: flex; gap: 10px; }
+  button {
+    flex: 1; padding: 9px 0; border: 0; border-radius: 8px; cursor: pointer;
+    background: #2b3342; color: #e6ebf5; font-size: 13px;
+  }
+  button:hover { background: #3a4256; }
+  .hint { font-size: 12px; color: #7c8595; }
+</style>
+</head>
+<body>
+  <canvas id="view" width="640" height="640"></canvas>
+  <div class="panel">
+    <h1>工具图标生成器</h1>
+    <label><span>挤出深度 <b id="depthVal"></b></span>
+      <input id="depth" type="range" min="0.1" max="1.2" step="0.01"></label>
+    <label><span>倒角半径 <b id="bevelVal"></b></span>
+      <input id="bevel" type="range" min="0" max="0.14" step="0.005"></label>
+    <label><span>材质颜色</span>
+      <input id="color" type="color"></label>
+    <label><span>光源方位角 <b id="azVal"></b></span>
+      <input id="azimuth" type="range" min="0" max="360" step="1"></label>
+    <label><span>光源高度角 <b id="elVal"></b></span>
+      <input id="elevation" type="range" min="-80" max="80" step="1"></label>
+    <div class="row">
+      <button id="exportObj">导出 OBJ</button>
+      <button id="exportPng">导出 PNG</button>
+    </div>
+    <p class="hint">拖动画布旋转观察。法线由三角形绕向直接导出，旋转一周不会出现黑面。</p>
+  </div>
+  <script type="module" src="js/viewer.mjs"></script>
+</body>
+</html>
