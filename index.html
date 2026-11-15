@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>月面基地四层货梯</title>
+  <style>
+    body {
+      margin: 0;
+      background: #05080f;
+      color: #d7e1f0;
+      font-family: "PingFang SC", "Microsoft YaHei", monospace;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 16px;
+    }
+    canvas {
+      background: #070b14;
+      border: 1px solid #2a3344;
+      border-radius: 8px;
+    }
+    .panel {
+      width: 340px;
+      background: #0e1420;
+      border: 1px solid #2a3344;
+      border-radius: 8px;
+      padding: 14px;
+    }
+    h1 { font-size: 18px; margin: 0 0 10px; color: #9fc0ee; }
+    h2 { font-size: 14px; margin: 14px 0 6px; color: #8fb4e6; }
+    .row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+    button {
+      background: #1b2740;
+      color: #d7e1f0;
+      border: 1px solid #33507e;
+      border-radius: 5px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    button:hover:not(:disabled) { background: #243757; }
+    button:disabled { opacity: 0.35; cursor: not-allowed; }
+    button.danger { border-color: #8a3b36; }
+    button.warn { border-color: #8a6a2f; }
+    select {
+      background: #1b2740;
+      color: #d7e1f0;
+      border: 1px solid #33507e;
+      border-radius: 4px;
+      padding: 4px;
+    }
+    .pressure-track {
+      height: 14px;
+      background: #11161f;
+      border: 1px solid #2a3344;
+      border-radius: 7px;
+      overflow: hidden;
+      margin: 4px 0;
+    }
+    #pressure-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #e0b34a, #46d17a);
+      transition: width 0.1s linear;
+    }
+    .feedback {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 5px;
+      font-size: 12px;
+      min-height: 16px;
+    }
+    .feedback.ok { background: #143520; color: #8fe0ad; }
+    .feedback.bad { background: #3a1714; color: #f0a09a; }
+    .hint { font-size: 11px; color: #7f8da3; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <canvas id="scene" width="920" height="640"></canvas>
+
+  <div class="panel">
+    <h1>月面基地四层货梯</h1>
+    <button id="start-audio">启用声音</button>
+
+    <h2>1. 选择缓冲装置（底层）</h2>
+    <div class="row">
+      <button id="buffer-spring">弹簧缓冲</button>
+      <button id="buffer-hydraulic">液压缓冲</button>
+      <button id="buffer-magnetic">电磁缓冲</button>
+    </div>
+
+    <h2>2. 分配停靠顺序</h2>
+    <div class="row">
+      <select id="plan-1"><option>1</option><option>2</option><option>3</option></select>
+      <select id="plan-2"><option>1</option><option selected>2</option><option>3</option></select>
+      <select id="plan-3"><option>1</option><option>2</option><option selected>3</option></select>
+      <button id="apply-plan">应用顺序</button>
+    </div>
+
+    <h2>3. 装载设备（底层）</h2>
+    <div class="row">
+      <button id="load-seismograph">月震仪 120kg → F1</button>
+      <button id="load-drill">钻探机 340kg → F2</button>
+      <button id="load-reactor">核电池 520kg → F3</button>
+    </div>
+
+    <h2>4. 运行与制动</h2>
+    <div class="row">
+      <button id="go-up">▲ 上升</button>
+      <button id="go-down">▼ 下降</button>
+      <button id="brake" class="warn">制动</button>
+      <button id="creep-up">回调上</button>
+      <button id="creep-down">回调下</button>
+    </div>
+
+    <h2>5. 气闸与门</h2>
+    <div class="row">
+      <button id="pressure">开始压力平衡</button>
+      <button id="open-door" class="danger">开门（提前开门会失败）</button>
+      <button id="close-door">关门</button>
+    </div>
+    <div class="pressure-track"><div id="pressure-bar"></div></div>
+    <div id="pressure-label" class="hint">B1 气压 100%</div>
+
+    <div id="feedback" class="feedback"></div>
+    <button id="reset" style="margin-top:8px">重置本局</button>
+
+    <p class="hint">
+      规则：重载下降制动距离更长，需提前制动；越过平台会碰撞并由缓冲器吸收冲击。
+      上层气闸须完成 4 秒压力平衡才能开门，提前开门将被锁定并记违规。
+      三种设备全部交付后返回 B1 底层即胜利。
+    </p>
+  </div>
+
+  <script src="src/engine.js"></script>
+  <script src="src/renderer.js"></script>
+  <script src="src/audio.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>

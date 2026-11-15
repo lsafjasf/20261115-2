@@ -1,0 +1,11 @@
+{
+  "name": "moon-base-cargo-lift",
+  "version": "1.0.0",
+  "description": "月面基地四层货梯：低重力运输、制动距离、缓冲装置与气闸压力平衡",
+  "private": true,
+  "scripts": {
+    "test": "node --test test/engine.test.js",
+    "simulate": "node test/simulation.js",
+    "serve": "node -e \"const http=require('http'),fs=require('fs'),p=require('path');const t={'.html':'text/html','.js':'text/javascript','.css':'text/css'};http.createServer((q,s)=>{const f=p.join(process.cwd(),q.url==='/'?'index.html':q.url);fs.readFile(f,(e,d)=>{if(e){s.statusCode=404;return s.end('404')}s.setHeader('Content-Type',t[p.extname(f)]||'text/plain');s.end(d)})}).listen(8080,()=>console.log('http://localhost:8080'))\""
+  }
+}
