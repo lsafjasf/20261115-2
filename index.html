@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10110f" />
+    <title>OFFBEAT — 20s Crop Room</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='5' fill='%2311130e'/><circle cx='16' cy='16' r='9' fill='%23d9ff53'/><circle cx='16' cy='16' r='4' fill='%23ff7556'/></svg>" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </span>
+          <div>
+            <strong>CUT/20</strong>
+            <small>VERTICAL STUDIO</small>
+          </div>
+        </div>
+        <div class="project-crumb">
+          <span>Projects</span>
+          <i>/</i>
+          <strong>OFFBEAT · 20s</strong>
+          <span class="source-pill">GENERATED SOURCE</span>
+        </div>
+        <div class="top-actions">
+          <span class="saved-state"><i></i> All changes saved</span>
+          <button class="icon-button" type="button" aria-label="Help">?</button>
+          <button class="export-button" id="openExportButton" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" />
+            </svg>
+            Export 3 clips
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="editor" aria-label="Crop editor">
+          <div class="stage-head">
+            <div class="stage-title">
+              <span class="status-dot"></span>
+              <strong>Source monitor</strong>
+              <span>1280 × 720 · 30 fps</span>
+            </div>
+            <div class="stage-tools">
+              <span class="smart-status"><i></i> Subject tracking on</span>
+              <button class="tool-chip is-active" id="safeGuideButton" type="button">Safe guides</button>
+              <button class="tool-chip" id="fullscreenButton" type="button" aria-label="Fullscreen">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 3H3v5m13-5h5v5M8 21H3v-5m13 5h5v-5" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="stage-wrap">
+            <div class="source-shell" id="sourceShell">
+              <canvas id="sourceCanvas" width="1280" height="720" aria-label="Generated source animation"></canvas>
+              <div class="source-label">
+                <span>SOURCE</span>
+                <strong id="sourceTimecode">00:00:00:00</strong>
+              </div>
+              <div class="crop-label" id="cropLabel">16:9 CROP</div>
+              <div class="safe-pill"><i></i> 90% SAFE</div>
+              <div class="output-pip" id="outputPip">
+                <div class="pip-head">
+                  <span><i></i> OUTPUT</span>
+                  <strong id="outputRatioLabel">16:9</strong>
+                </div>
+                <div class="pip-screen" id="pipScreen">
+                  <canvas id="outputCanvas" width="960" height="540" aria-label="Cropped output preview"></canvas>
+                </div>
+                <div class="pip-foot">
+                  <span id="outputResolutionLabel">1280 × 720</span>
+                  <span>WebM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="transport">
+            <div class="transport-left">
+              <button class="step-button" id="jumpStartButton" type="button" aria-label="Jump to clip in">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M18 6l-9 6 9 6V6z" /></svg>
+              </button>
+              <button class="step-button" id="stepBackButton" type="button" aria-label="Step back one frame">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-9 6 9 6V6z" /></svg>
+              </button>
+              <button class="play-button" id="playButton" type="button" aria-label="Play selected clip">
+                <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7V5z" /></svg>
+                <svg class="pause-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" /></svg>
+              </button>
+              <button class="step-button" id="stepForwardButton" type="button" aria-label="Step forward one frame">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l9 6-9 6V6z" /></svg>
+              </button>
+              <button class="step-button" id="jumpEndButton" type="button" aria-label="Jump to clip out">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5v14M6 6l9 6-9 6V6z" /></svg>
+              </button>
+              <span class="transport-time" id="transportTime">00:01.20 <em>/ 00:05.40</em></span>
+            </div>
+            <div class="beat-readout">
+              <span class="beat-bars" id="beatBars" aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i>
+              </span>
+              <span>WEB AUDIO · 120 BPM</span>
+            </div>
+            <button class="loop-button is-on" id="loopButton" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 7h-8a4 4 0 0 0 0 8h6a4 4 0 0 0 0-8M7 7l2-2m-2 2 2 2m8 8-2 2m2-2-2-2" /></svg>
+              LOOP CLIP
+            </button>
+          </div>
+
+          <section class="timeline-panel" aria-label="Timeline">
+            <div class="timeline-head">
+              <div>
+                <strong>Sequence 01</strong>
+                <span>Drag the lime handles to trim</span>
+              </div>
+              <div class="timeline-legend">
+                <span><i class="legend-in"></i> In</span>
+                <span><i class="legend-out"></i> Out</span>
+                <span class="timeline-duration" id="timelineDuration">3 clips · 16.1s</span>
+              </div>
+            </div>
+            <div class="timeline-canvas-wrap">
+              <canvas id="timelineCanvas" aria-label="Animated timeline and filmstrip"></canvas>
+            </div>
+            <div class="range-strip">
+              <div class="range-field">
+                <label for="inField">IN POINT</label>
+                <input id="inField" type="text" inputmode="decimal" value="00:01.20" />
+              </div>
+              <div class="range-arrow">→</div>
+              <div class="range-field">
+                <label for="outField">OUT POINT</label>
+                <input id="outField" type="text" inputmode="decimal" value="00:06.60" />
+              </div>
+              <div class="range-duration">
+                <span>DURATION</span>
+                <strong id="rangeDuration">05.40s</strong>
+                <small id="frameCount">162 frames</small>
+              </div>
+              <div class="range-tip"><kbd>←</kbd><kbd>→</kbd> nudge 1 frame</div>
+            </div>
+          </section>
+        </section>
+
+        <aside class="inspector" aria-label="Crop settings">
+          <div class="inspector-scroll">
+            <div class="inspector-heading">
+              <div>
+                <span class="eyebrow">CLIP <b id="clipNumber">01</b></span>
+                <h1 id="clipTitle">Opening</h1>
+              </div>
+              <button class="more-button" type="button" aria-label="More options">•••</button>
+            </div>
+
+            <section class="setting-section ratio-section">
+              <div class="setting-title">
+                <span>OUTPUT RATIO</span>
+                <small>Reframe without touching the edit</small>
+              </div>
+              <div class="ratio-grid" id="ratioGrid">
+                <button class="ratio-card" data-ratio="16:9" type="button">
+                  <span class="ratio-icon landscape"><i></i></span>
+                  <strong>Landscape</strong>
+                  <small>16:9 · 1280×720</small>
+                  <b class="ratio-check">✓</b>
+                </button>
+                <button class="ratio-card" data-ratio="1:1" type="button">
+                  <span class="ratio-icon square"><i></i></span>
+                  <strong>Square</strong>
+                  <small>1:1 · 900×900</small>
+                  <b class="ratio-check">✓</b>
+                </button>
+                <button class="ratio-card" data-ratio="9:16" type="button">
+                  <span class="ratio-icon portrait"><i></i></span>
+                  <strong>Portrait</strong>
+                  <small>9:16 · 608×1080</small>
+                  <b class="ratio-check">✓</b>
+                </button>
+              </div>
+            </section>
+
+            <section class="setting-section">
+              <div class="setting-title">
+                <span>SMART FRAMING</span>
+                <label class="switch">
+                  <input id="smartFrameToggle" type="checkbox" checked />
+                  <span></span>
+                </label>
+              </div>
+              <div class="smart-card">
+                <div class="smart-graphic">
+                  <span class="smart-subject"></span>
+                  <span class="smart-frame"></span>
+                  <i></i><i></i><i></i><i></i>
+                </div>
+                <div>
+                  <strong>Subject lock</strong>
+                  <p>The animated disc stays inside the 90% safe frame.</p>
+                </div>
+                <span class="live-badge">LIVE</span>
+              </div>
+              <div class="setting-row">
+                <div>
+                  <strong>Subtitles</strong>
+                  <small>Auto-wrap inside crop bounds</small>
+                </div>
+                <label class="switch">
+                  <input id="subtitleToggle" type="checkbox" checked />
+                  <span></span>
+                </label>
+              </div>
+              <div class="setting-row">
+                <div>
+                  <strong>Subject-aware pan</strong>
+                  <small>Ease with the beat</small>
+                </div>
+                <label class="switch">
+                  <input id="trackingToggle" type="checkbox" checked />
+                  <span></span>
+                </label>
+              </div>
+            </section>
+
+            <section class="setting-section">
+              <div class="setting-title">
+                <span>EXPORT PRESET</span>
+                <small>Three files queued</small>
+              </div>
+              <div class="preset-box">
+                <div class="preset-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 4v16M15 4v16M5 8h14M5 16h14" /></svg>
+                </div>
+                <div class="preset-copy">
+                  <strong>WebM · VP9</strong>
+                  <span>30 fps · stereo audio · high quality</span>
+                </div>
+                <span class="estimate">~12 MB</span>
+              </div>
+              <div class="output-summary">
+                <div><span>TOTAL RUNTIME</span><strong id="totalRuntime">16.10s</strong></div>
+                <div><span>CLIPS</span><strong>03</strong></div>
+                <div><span>AUDIO</span><strong>ON BEAT</strong></div>
+              </div>
+            </section>
+
+            <section class="setting-section clip-list-section">
+              <div class="setting-title">
+                <span>SEQUENCE CLIPS</span>
+                <small>Click to edit</small>
+              </div>
+              <div class="clip-list" id="clipList"></div>
+            </section>
+          </div>
+
+          <div class="inspector-footer">
+            <div class="ready-line"><span>READY TO RENDER</span><i></i></div>
+            <button class="render-button" id="renderAllButton" type="button">
+              <span>Render all clips</span>
+              <strong>3 × WebM</strong>
+            </button>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      <span class="toast-icon">✓</span>
+      <div><strong>Clip updated</strong><small>Smart framing kept the subject safe.</small></div>
+    </div>
+
+    <div class="modal-backdrop" id="exportModal" aria-hidden="true">
+      <section class="export-modal" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+        <div class="modal-head">
+          <div>
+            <span class="eyebrow">RENDER QUEUE</span>
+            <h2 id="exportTitle">Three crops. One beat.</h2>
+            <p>Each clip is trimmed, reframed, and recorded with the Web Audio mix.</p>
+          </div>
+          <button class="modal-close" id="closeExportButton" type="button" aria-label="Close">×</button>
+        </div>
+        <div class="export-list" id="exportList"></div>
+        <div class="export-proof">
+          <span><i></i> Subject check passed</span>
+          <span><i></i> Caption bounds clamped</span>
+          <span><i></i> Audio clock locked</span>
+        </div>
+        <div class="modal-actions">
+          <div class="render-note" id="renderNote">Render happens in real time. Keep this tab visible.</div>
+          <button class="render-button" id="confirmExportButton" type="button">
+            <span>Start render</span>
+            <strong id="exportButtonMeta">3 clips</strong>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <canvas id="sceneBuffer" width="1280" height="720" hidden></canvas>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

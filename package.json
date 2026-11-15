@@ -1,0 +1,15 @@
+{
+  "name": "cut20-crop-room",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Twenty-second Canvas animation cropped into landscape, square, and portrait WebM clips with smart subject framing and Web Audio.",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node tests/e2e.mjs",
+    "test:e2e": "node tests/e2e.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}
