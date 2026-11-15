@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>山谷救援空投 · Valley Rescue Airdrop</title>
+<link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+<main class="layout">
+  <section class="stage">
+    <canvas id="scene" width="1000" height="720"></canvas>
+    <div class="hud">
+      <span id="hudWind">风速 -- m/s</span>
+      <span id="hudAlt">高度 -- m</span>
+      <span id="hudStatus">待命</span>
+    </div>
+  </section>
+
+  <aside class="panel">
+    <h1>山谷救援空投</h1>
+    <p class="hint">四处救援物资：设定<b>投放时刻</b>与<b>开伞高度</b>。开伞过早被风飘远，过晚则落地损坏。每次投放后风向小幅变化。</p>
+
+    <div id="crateControls" class="crates"></div>
+
+    <div class="actions">
+      <button id="btnLaunch" class="primary">开始投放</button>
+      <button id="btnDemo">自动演示（成功+失败）</button>
+      <button id="btnReset">重置</button>
+      <button id="btnMute" aria-pressed="false">🔊 音效开</button>
+    </div>
+
+    <h2>救援点状态</h2>
+    <ul id="pointStatus" class="points"></ul>
+
+    <h2>事件日志</h2>
+    <ol id="log" class="log"></ol>
+  </aside>
+</main>
+
+<script src="src/physics.js"></script>
+<script src="src/audio.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>

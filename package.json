@@ -1,0 +1,29 @@
+{
+  "name": "uid354",
+  "version": "1.0.0",
+  "description": "山谷救援空投：Canvas + Web Audio 风力空投模拟小游戏",
+  "main": "index.html",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node test/demo-run.cjs && node test/dom-integration.cjs",
+    "test:physics": "node test/demo-run.cjs",
+    "test:dom": "node test/dom-integration.cjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsafjasf/20261115-2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lsafjasf/20261115-2/issues"
+  },
+  "homepage": "https://github.com/lsafjasf/20261115-2#readme",
+  "dependencies": {
+    "jsdom": "^31.0.1"
+  }
+}
