@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
+  <title>CUT/LOOP — Transition Player</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="CUT LOOP home">
+        <span class="brand-mark">C/L</span>
+        <span class="brand-name">CUT<span>/</span>LOOP</span>
+        <span class="brand-tag">TRANSITION PLAYER</span>
+      </a>
+      <div class="topbar-meta">
+        <span class="save-state" id="saveState"><i></i> 本地工程</span>
+        <span class="project-code">PROJECT 023 / A</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="button button-quiet" id="saveButton" type="button">
+          <span class="button-icon">↓</span> 保存工程
+        </button>
+        <button class="button button-accent" id="exportButton" type="button">
+          <span class="button-icon">↗</span> 导出 WebM
+        </button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="stage-column" aria-label="预览与播放控制">
+        <div class="stage-heading">
+          <div>
+            <p class="eyebrow">LIVE PREVIEW / 16:9</p>
+            <h1>Three movements,<br><em>one continuous cut.</em></h1>
+          </div>
+          <div class="stage-stats">
+            <span><b id="statScenes">03</b> SCENES</span>
+            <span><b id="statTransitions">02</b> TRANSITIONS</span>
+            <span><b id="statDuration">00:10</b> RUNTIME</span>
+          </div>
+        </div>
+
+        <div class="stage-frame">
+          <div class="stage-canvas-wrap">
+            <canvas id="previewCanvas" width="1280" height="720" aria-label="转场实时预览"></canvas>
+            <div class="stage-corner stage-corner-tl"></div>
+            <div class="stage-corner stage-corner-br"></div>
+            <div class="preview-status">
+              <span class="pulse-dot"></span>
+              <span id="previewStatus">PAUSED</span>
+            </div>
+            <div class="transition-cue" id="transitionCue">
+              <span id="cueIndex">TR 01</span>
+              <strong id="cueName">推移</strong>
+              <i id="cueProgress"></i>
+            </div>
+          </div>
+
+          <div class="transport">
+            <button class="play-button" id="playButton" type="button" aria-label="播放">
+              <span class="play-shape"></span>
+            </button>
+            <div class="transport-main">
+              <div class="time-row">
+                <span id="currentTime">00:00.00</span>
+                <span id="activeSceneLabel">SCENE 01 / FIRST LIGHT</span>
+                <span id="totalTime">00:10.25</span>
+              </div>
+              <div class="timeline-wrap">
+                <div class="timeline-segments" id="timelineSegments"></div>
+                <input id="timelineRange" type="range" min="0" max="10.25" value="0" step="0.001" aria-label="播放位置">
+              </div>
+              <div class="timeline-ticks" id="timelineTicks"></div>
+            </div>
+            <div class="transport-tools">
+              <button class="icon-button" id="restartButton" type="button" aria-label="回到开头" title="回到开头">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14M19 6.6 9.5 12l9.5 5.4z"/></svg>
+              </button>
+              <button class="icon-button" id="loopButton" type="button" aria-label="切换循环播放" title="循环播放" aria-pressed="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 7h-7a4 4 0 0 0 0 8h1M7 17h7a4 4 0 0 0 0-8h-1M17 4l3 3-3 3M7 14l-3 3 3 3"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="stage-footer">
+          <div class="legend">
+            <span><i class="legend-scene"></i> SCENE</span>
+            <span><i class="legend-transition"></i> TRANSITION OVERLAP</span>
+          </div>
+          <p>两段场景动画在转场区间内同步推进，场景时间不会提前归零。</p>
+        </div>
+      </section>
+
+      <aside class="sequence-panel" aria-label="转场编排">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">SEQUENCE BUILDER</p>
+            <h2>转场编排</h2>
+          </div>
+          <button class="reset-button" id="resetButton" type="button">恢复示例</button>
+        </div>
+        <div class="panel-hint">
+          <span>01</span>
+          <p>调整场景顺序、转场类型与覆盖时长。所有改动自动保存。</p>
+        </div>
+        <div class="sequence-list" id="sequenceList"></div>
+        <div class="panel-footer">
+          <p><span class="mono">SPACE</span> 播放 / 暂停　<span class="mono">← →</span> 逐帧检视</p>
+          <span class="panel-version">v1.0 / CANVAS ENGINE</span>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="export-overlay" id="exportOverlay" hidden>
+    <div class="export-card">
+      <div class="export-orbit"><span></span></div>
+      <p class="eyebrow">FRAME-SAFE EXPORT</p>
+      <h2>正在逐帧录制</h2>
+      <p id="exportStatus">准备画布与视频编码器…</p>
+      <div class="export-progress"><i id="exportProgress"></i></div>
+      <div class="export-meta">
+        <span id="exportFrame">FRAME 000 / 000</span>
+        <span>VP9 / 30 FPS</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

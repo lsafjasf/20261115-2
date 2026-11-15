@@ -1,0 +1,15 @@
+{
+  "name": "cutloop-transition-player",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node scripts/test-player.mjs",
+    "export:webm": "node scripts/export-webm.mjs",
+    "verify:webm": "node scripts/verify-webm.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "1.62.1"
+  }
+}
