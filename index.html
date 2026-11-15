@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="单通道货柜堆场调度游戏：按船期重新叠放六只货柜，确保重不压轻、高箱不入限高排。"
+    />
+    <title>单通道堆场 · BERTH 07</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 42 42" role="img">
+              <path d="M6 12h30v22H6zM12 6h18v6H12zM15 18h12v10H15z" />
+              <path d="M3 35h36" />
+            </svg>
+          </span>
+          <span class="brand-copy">
+            <span class="eyebrow">VANTERM / BERTH 07</span>
+            <strong>单通道堆场</strong>
+          </span>
+        </div>
+        <div class="shift-stamp">
+          <span class="signal-dot"></span>
+          <span>夜班 · 06</span>
+          <span class="shift-rule"></span>
+          <span>能见度 8.2 NM</span>
+        </div>
+        <nav class="toolbar" aria-label="游戏工具">
+          <button class="icon-button" id="soundButton" type="button" aria-pressed="true">
+            <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="button-label">声音开</span>
+          </button>
+          <button class="text-button" id="pauseButton" type="button">暂停</button>
+          <button class="text-button" id="helpButton" type="button">规则</button>
+          <button class="text-button accent" id="newGameButton" type="button">重新开局</button>
+        </nav>
+      </header>
+
+      <main class="game-layout">
+        <section class="yard-column" aria-labelledby="yardTitle">
+          <div class="yard-heading">
+            <div>
+              <span class="eyebrow">LIVE YARD VIEW / TOP DOWN</span>
+              <h1 id="yardTitle">把六只箱子，按时送上三条船。</h1>
+            </div>
+            <div class="headline-stats" aria-label="当前班次状态">
+              <div class="headline-stat">
+                <span>已装船</span>
+                <strong><b id="completedStat">0</b><small>/ 6</small></strong>
+              </div>
+              <div class="headline-stat">
+                <span>通道</span>
+                <strong class="clear-state" id="laneStat">畅通</strong>
+              </div>
+              <div class="headline-stat deadline-stat">
+                <span>末班离港</span>
+                <strong id="finalTimer">02:18</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="canvas-shell" id="canvasShell">
+            <canvas
+              id="gameCanvas"
+              width="1180"
+              height="760"
+              tabindex="0"
+              aria-label="俯视货柜堆场。点击垛顶货柜，再点击目标堆位或船舶。"
+            ></canvas>
+            <div class="canvas-topline">
+              <span id="clockReadout">待命 · 点击货柜开始计时</span>
+              <span class="live-badge"><i></i> LIVE YARD</span>
+            </div>
+            <div class="toast" id="toast" role="status" aria-live="polite"></div>
+            <div class="pause-veil" id="pauseVeil" hidden>
+              <span class="eyebrow">SHIFT PAUSED</span>
+              <strong>作业已暂停</strong>
+              <button class="primary-button" id="resumeButton" type="button">继续作业</button>
+            </div>
+            <div class="result-card" id="resultCard" hidden>
+              <span class="eyebrow" id="resultEyebrow">SHIFT COMPLETE</span>
+              <h2 id="resultTitle">按时通关</h2>
+              <p id="resultCopy"></p>
+              <div class="result-grid">
+                <div><span>装船</span><b id="resultCompleted">0 / 6</b></div>
+                <div><span>超时</span><b id="resultMissed">0</b></div>
+                <div><span>违规</span><b id="resultViolations">0</b></div>
+                <div><span>用时</span><b id="resultTime">00:00</b></div>
+              </div>
+              <button class="primary-button" id="resultRestart" type="button">再开一班</button>
+            </div>
+          </div>
+
+          <div class="control-strip">
+            <div class="selection-status" id="selectionStatus">
+              <span class="selection-icon" aria-hidden="true">＋</span>
+              <span><strong>先抓垛顶</strong>，再点目标堆位或对应船舶</span>
+            </div>
+            <div class="load-meter" aria-label="吊机负载">
+              <span>LOAD</span>
+              <div class="meter-track"><i id="loadFill"></i></div>
+              <b id="loadReadout">0.0 t</b>
+            </div>
+            <button class="cancel-button" id="cancelSelection" type="button" hidden>
+              取消选择
+            </button>
+          </div>
+
+          <div class="rule-ribbon" aria-label="核心规则">
+            <span><i class="rule-dot green"></i>只可抓取顶层</span>
+            <span><i class="rule-dot amber"></i>重箱不压轻箱</span>
+            <span><i class="rule-dot red"></i>高箱不入 A 排</span>
+            <span><i class="rule-dot cyan"></i>通道禁止落箱</span>
+          </div>
+        </section>
+
+        <aside class="schedule-column" aria-labelledby="scheduleTitle">
+          <div class="schedule-header">
+            <div>
+              <span class="eyebrow">SAILING BOARD / 03</span>
+              <h2 id="scheduleTitle">本班船期</h2>
+            </div>
+            <span class="weather-chip">NE 4 kn</span>
+          </div>
+          <div class="ship-list" id="shipList"></div>
+
+          <section class="brief-card" aria-labelledby="briefTitle">
+            <div class="brief-header">
+              <span class="eyebrow">SHIFT BRIEF</span>
+              <span id="shiftCode">#YARD-0718</span>
+            </div>
+            <h3 id="briefTitle">单通道 · 夜间叠箱</h3>
+            <p>
+              先移开挡路箱，再按船期装船。完成至少五只且通道无落箱即可通过；
+              每次违规落箱扣 <b>5 秒</b>。
+            </p>
+            <div class="legend-row">
+              <span><i class="height-mark"></i>箱侧标高</span>
+              <span><i class="weight-mark">t</i>箱重吨位</span>
+            </div>
+            <button class="brief-link" id="briefHelp" type="button">
+              查看完整装卸规则 <span>↗</span>
+            </button>
+          </section>
+
+          <section class="signal-card" aria-label="吊机音频状态">
+            <div class="signal-head">
+              <span class="eyebrow">CRANE AUDIO</span>
+              <span id="audioHz">待机</span>
+            </div>
+            <div class="waveform" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <p>吊机音高与音量随箱重变化。重载更低沉、更厚。</p>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="footer-note">
+        <span>YC-07 · 40t 双梁岸桥</span>
+        <span>操作：点击抓箱 → 点击落点</span>
+        <span>键盘：P 暂停 · R 重开 · Esc 取消</span>
+      </footer>
+    </div>
+
+    <dialog class="rules-dialog" id="rulesDialog">
+      <form method="dialog">
+        <div class="dialog-head">
+          <div>
+            <span class="eyebrow">OPERATIONS MANUAL</span>
+            <h2>装卸规则</h2>
+          </div>
+          <button class="close-button" value="close" aria-label="关闭规则">×</button>
+        </div>
+        <div class="rule-grid">
+          <article>
+            <span class="rule-number">01</span>
+            <h3>只抓顶层</h3>
+            <p>起重机一次只能抓取每垛最上方一只货柜。想取底箱，必须先把上面的箱子移走。</p>
+          </article>
+          <article>
+            <span class="rule-number">02</span>
+            <h3>重不压轻</h3>
+            <p>落箱时，目标垛顶的支撑箱必须不低于待落箱重量。违规会原地拒绝并扣 5 秒。</p>
+          </article>
+          <article>
+            <span class="rule-number">03</span>
+            <h3>高箱限行</h3>
+            <p>A 排顶部有限高梁，9'6 高箱不能放入。B、C、D 排可接收标准箱与高箱。</p>
+          </article>
+          <article>
+            <span class="rule-number">04</span>
+            <h3>按船期装船</h3>
+            <p>点击与货柜同色的船舶装载。船到截止时间会离港，未装货柜计入超时，完成数随之降低。</p>
+          </article>
+          <article>
+            <span class="rule-number">05</span>
+            <h3>通道零占用</h3>
+            <p>中央黄色装卸通道不能落箱。悬停通道会显示禁放标记，保持畅通才可结算通过。</p>
+          </article>
+          <article>
+            <span class="rule-number">06</span>
+            <h3>通过条件</h3>
+            <p>在末班船离港前完成至少 5 只货柜，并保持通道畅通。六只全装船可获得满分评级。</p>
+          </article>
+        </div>
+        <button class="primary-button" value="close">明白，继续作业</button>
+      </form>
+    </dialog>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

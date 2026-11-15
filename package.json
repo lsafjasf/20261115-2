@@ -1,0 +1,16 @@
+{
+  "name": "single-lane-container-yard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A canvas-based single-lane container yard scheduling game.",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "test": "node --test tests/game.test.mjs",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1"
+  }
+}
