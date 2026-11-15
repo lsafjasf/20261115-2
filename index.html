@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="沿内应力曲线完成玻璃精切、顺序分离与公差检验。"
+    />
+    <title>CLARITY / 曲线精切</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="ambient-grid" aria-hidden="true"></div>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="CLARITY 曲线精切">
+          <span class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <span class="brand-copy">
+            <strong>CLARITY</strong>
+            <small>OPTICAL GLASS LAB</small>
+          </span>
+        </a>
+
+        <div class="batch-line">
+          <span class="live-dot"></span>
+          <span>工单 <b>GL-0719</b></span>
+          <i></i>
+          <span>内应力浮法玻璃 · 6.0 mm</span>
+        </div>
+
+        <div class="top-actions">
+          <button class="icon-button" id="soundToggle" type="button" aria-label="切换声音" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 9v6h4l5 4V5L8 9H4Z" />
+              <path class="sound-wave" d="M16 9.2a4 4 0 0 1 0 5.6M18.7 6.5a7.8 7.8 0 0 1 0 11" />
+            </svg>
+          </button>
+          <span class="operator">
+            <span class="operator-avatar">林</span>
+            <span><small>操作员</small>LIN / 04</span>
+          </span>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="panel briefing" aria-labelledby="briefTitle">
+          <div class="eyebrow">
+            <span>精密装配件</span>
+            <span class="eyebrow-index">01 / 03</span>
+          </div>
+          <h1 id="briefTitle">曲线精切</h1>
+          <p class="lede">
+            沿两道引导曲线完成刻划，再依次轻敲分离。控制走刀速度与压力，避开内应力集中区。
+          </p>
+
+          <div class="spec-strip">
+            <div>
+              <span>目标裂片</span>
+              <strong>03</strong>
+            </div>
+            <div>
+              <span>轮廓公差</span>
+              <strong>±0.35<small>mm</small></strong>
+            </div>
+            <div>
+              <span>应力等级</span>
+              <strong class="amber">中高</strong>
+            </div>
+          </div>
+
+          <div class="control-block">
+            <div class="control-heading">
+              <label for="pressure">刀轮压力</label>
+              <output id="pressureOutput" for="pressure">2.52 <small>N</small></output>
+            </div>
+            <div class="range-wrap">
+              <div class="safe-band" aria-hidden="true"></div>
+              <input
+                id="pressure"
+                type="range"
+                min="1.6"
+                max="3.8"
+                value="2.52"
+                step="0.01"
+                aria-describedby="pressureHint"
+              />
+              <div class="range-labels">
+                <span>轻</span><span class="safe-label">安全区</span><span>重</span>
+              </div>
+            </div>
+            <p id="pressureHint" class="control-hint">
+              <span class="hint-dot"></span>
+              <span class="hint-text">推荐 2.05–2.85 N；超过 2.95 N 会崩边</span>
+            </p>
+          </div>
+
+          <div class="procedure">
+            <div class="procedure-item is-active" data-step="cut">
+              <span class="step-no">01</span>
+              <span><strong>沿曲线刻划</strong><small>拖动切割头，依次完成 A / B 线</small></span>
+            </div>
+            <div class="procedure-item" data-step="separate">
+              <span class="step-no">02</span>
+              <span><strong>顺序轻敲</strong><small>按 1 → 2 → 3 分离裂片</small></span>
+            </div>
+            <div class="procedure-item" data-step="measure">
+              <span class="step-no">03</span>
+              <span><strong>公差检验</strong><small>三片全部达标即装配成功</small></span>
+            </div>
+          </div>
+
+          <div class="sample-block">
+            <div class="sample-title">
+              <span>固定样例</span>
+              <small>确定性回放</small>
+            </div>
+            <button class="sample-button success-sample" id="successSample" type="button">
+              <span class="sample-icon">✓</span>
+              <span><strong>标准切割</strong><small>安全速度 · 三片合格</small></span>
+              <span class="sample-arrow">↗</span>
+            </button>
+            <button class="sample-button failure-sample" id="failureSample" type="button">
+              <span class="sample-icon">!</span>
+              <span><strong>过速废片</strong><small>走刀超限 · 断裂偏移</small></span>
+              <span class="sample-arrow">↗</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="stage-column" aria-label="玻璃切割工作台">
+          <div class="stage-header">
+            <div>
+              <span class="stage-kicker">WORKBENCH / 01</span>
+              <h2 id="stageTitle">待机 · 定位切割头</h2>
+            </div>
+            <div class="stage-status" id="stageStatus">
+              <span class="status-light"></span>
+              <span id="statusLabel">READY</span>
+            </div>
+          </div>
+
+          <div class="canvas-frame" id="canvasFrame">
+            <div class="ruler ruler-top" aria-hidden="true">
+              <span>0</span><span>100</span><span>200</span><span>300</span><span>400</span><span>500</span><span>600 mm</span>
+            </div>
+            <div class="ruler ruler-left" aria-hidden="true">
+              <span>0</span><span>100</span><span>200</span><span>300</span><span>400 mm</span>
+            </div>
+            <canvas id="glassCanvas" width="960" height="640"></canvas>
+            <div class="canvas-vignette" aria-hidden="true"></div>
+
+            <div class="head-tooltip" id="headTooltip" aria-hidden="true">
+              <span>切削头</span><strong id="tooltipSpeed">0 mm/s</strong>
+            </div>
+
+            <div class="stage-toast" id="stageToast" role="status" aria-live="polite">
+              <span class="toast-icon"></span>
+              <span class="toast-copy"><strong>准备就绪</strong><small>从 A 线顶部起点开始拖动</small></span>
+            </div>
+          </div>
+
+          <div class="telemetry">
+            <div class="telemetry-item">
+              <span class="telemetry-label">进给速度</span>
+              <strong id="speedReadout">000<small>mm/s</small></strong>
+              <span class="telemetry-bar"><i id="speedBar"></i></span>
+            </div>
+            <div class="telemetry-item">
+              <span class="telemetry-label">路径偏差</span>
+              <strong id="deviationReadout">0.00<small>mm</small></strong>
+              <span class="telemetry-bar"><i id="deviationBar"></i></span>
+            </div>
+            <div class="telemetry-item">
+              <span class="telemetry-label">边缘完整度</span>
+              <strong id="edgeReadout">100<small>%</small></strong>
+              <span class="telemetry-bar"><i id="edgeBar"></i></span>
+            </div>
+            <div class="telemetry-item">
+              <span class="telemetry-label">应力释放</span>
+              <strong id="stressReadout">62<small>%</small></strong>
+              <span class="telemetry-bar stress"><i id="stressBar"></i></span>
+            </div>
+          </div>
+
+          <div class="stage-footer">
+            <div class="active-cut">
+              <span>当前刻划</span>
+              <div class="cut-selector">
+                <span class="cut-chip is-active" data-cut="A">A 线</span>
+                <span class="cut-chip" data-cut="B">B 线</span>
+                <span class="cut-chip" data-cut="done">分离</span>
+              </div>
+            </div>
+            <div class="stage-actions">
+              <button class="text-button" id="resetButton" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4.9 4.9v5.2h5.2M5.3 10a7.2 7.2 0 1 1-.1 4.3" />
+                </svg>
+                重置工位
+              </button>
+              <button class="primary-button" id="startButton" type="button">
+                <span id="startButtonLabel">开始切割</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <aside class="panel parts-panel" aria-labelledby="partsTitle">
+          <div class="parts-heading">
+            <div>
+              <span class="eyebrow">ASSEMBLY SET</span>
+              <h2 id="partsTitle">三片装配件</h2>
+            </div>
+            <span class="part-count" id="partCount">0 / 3</span>
+          </div>
+
+          <div class="part-list">
+            <article class="part-card" data-part="1">
+              <div class="part-top">
+                <span class="part-number">01</span>
+                <span class="part-status">待分离</span>
+              </div>
+              <div class="part-shape shape-one" aria-hidden="true"><span></span></div>
+              <div class="part-meta">
+                <strong>左侧窗片</strong>
+                <span class="part-tolerance">—</span>
+              </div>
+              <div class="part-track"><i></i></div>
+            </article>
+
+            <article class="part-card" data-part="2">
+              <div class="part-top">
+                <span class="part-number">02</span>
+                <span class="part-status">待分离</span>
+              </div>
+              <div class="part-shape shape-two" aria-hidden="true"><span></span></div>
+              <div class="part-meta">
+                <strong>中央主窗片</strong>
+                <span class="part-tolerance">—</span>
+              </div>
+              <div class="part-track"><i></i></div>
+            </article>
+
+            <article class="part-card" data-part="3">
+              <div class="part-top">
+                <span class="part-number">03</span>
+                <span class="part-status">待分离</span>
+              </div>
+              <div class="part-shape shape-three" aria-hidden="true"><span></span></div>
+              <div class="part-meta">
+                <strong>右侧窗片</strong>
+                <span class="part-tolerance">—</span>
+              </div>
+              <div class="part-track"><i></i></div>
+            </article>
+          </div>
+
+          <div class="tolerance-key">
+            <div class="tol-scale">
+              <span>−0.35</span><span>目标</span><span>+0.35</span>
+            </div>
+            <div class="tol-line"><i></i><b></b></div>
+            <p>轻敲后测量切口边缘，偏差落在绿色容差带内即合格。</p>
+          </div>
+
+          <div class="part-order">
+            <span>分离顺序</span>
+            <div class="order-flow">
+              <b>1</b><i></i><b>2</b><i></i><b>3</b>
+            </div>
+          </div>
+
+          <div class="result-card" id="resultCard" hidden>
+            <span class="result-kicker" id="resultKicker">ASSEMBLY PASSED</span>
+            <strong id="resultTitle">装配成功</strong>
+            <p id="resultCopy">三片均落入 ±0.35 mm 公差带。</p>
+            <div class="result-metrics">
+              <span>最大偏差<strong id="maxDeviation">0.18 mm</strong></span>
+              <span>边缘评级<strong id="edgeGrade">A</strong></span>
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="./src/game.js"></script>
+  </body>
+</html>
