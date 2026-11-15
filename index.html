@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>火山监测站 · 喷发前兆判定</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>🌋 火山监测站</h1>
+  <div id="clock">T+00:00 / 06:00</div>
+  <div id="mission">任务:在 6 小时监测中识别真实喷发前兆,过滤设备故障与车辆噪声</div>
+</header>
+
+<main>
+  <section class="panel" id="wavePanel">
+    <h2>传感器波形</h2>
+    <canvas id="waveCanvas" width="860" height="300"></canvas>
+    <div class="legend">
+      <span class="lg vib">━ 地面振动</span>
+      <span class="lg gas">━ 气体浓度</span>
+      <span class="lg inf">━ 次声波</span>
+      <span class="lg risk">━ 加权风险</span>
+      <span class="lg thr">┄ 告警阈值</span>
+    </div>
+  </section>
+
+  <section class="panel" id="volcanoPanel">
+    <h2>火山剖面 · 风险带</h2>
+    <canvas id="volcanoCanvas" width="380" height="300"></canvas>
+    <div id="riskReadout">风险 <b id="riskVal">0</b> / 阈值 <b id="thrVal">55</b></div>
+  </section>
+
+  <section class="panel" id="ctrlPanel">
+    <h2>控制台</h2>
+    <div class="ctrl">
+      <label>振动权重 <span id="wVibVal">1.0</span></label>
+      <input type="range" id="wVib" min="0" max="2" step="0.1" value="1">
+    </div>
+    <div class="ctrl">
+      <label>气体权重 <span id="wGasVal">1.0</span></label>
+      <input type="range" id="wGas" min="0" max="2" step="0.1" value="1">
+    </div>
+    <div class="ctrl">
+      <label>次声权重 <span id="wInfVal">1.0</span></label>
+      <input type="range" id="wInf" min="0" max="2" step="0.1" value="1">
+    </div>
+    <div class="ctrl">
+      <label>告警阈值 <span id="thrVal2">55</span></label>
+      <input type="range" id="thr" min="10" max="95" step="1" value="55">
+    </div>
+    <div class="ctrl row">
+      <button id="btnStart">▶ 开始监测</button>
+      <button id="btnSpeed">速度 ×1</button>
+      <button id="btnSound">🔇 设备音</button>
+    </div>
+    <div id="alarmBanner" class="hidden">⚠ 预警已触发</div>
+    <div id="stats">
+      <span>误报 <b id="statFalse">0</b></span>
+      <span>错过喷发 <b id="statMiss">0</b></span>
+      <span>正确预警 <b id="statGood">0</b></span>
+    </div>
+    <div id="result" class="hidden"></div>
+  </section>
+
+  <section class="panel" id="logPanel">
+    <h2>观察记录</h2>
+    <div id="log"></div>
+  </section>
+</main>
+
+<script src="game.js"></script>
+</body>
+</html>
