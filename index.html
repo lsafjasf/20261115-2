@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="声纹诊断台：使用电子听诊器辨识三类机械故障。"
+    />
+    <title>声纹诊断台 · SonicDx</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true"></div>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="声纹诊断台首页">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48">
+              <path d="M4 25h5l3-11 5 22 4-16 4 9 3-4h12" />
+            </svg>
+          </span>
+          <span>
+            <strong>SONIC<span>DX</span></strong>
+            <small>机械声纹诊断台 / M-04</small>
+          </span>
+        </a>
+        <div class="topbar-center">
+          <span class="live-dot"></span>
+          <span>巡检通道 <b id="shiftId">SHIFT-B12</b></span>
+          <span class="topbar-divider"></span>
+          <span id="clock">--:--:--</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-button" id="muteButton" aria-label="静音" aria-pressed="false">
+            <svg viewBox="0 0 24 24" class="sound-on-icon">
+              <path d="M5 9v6h4l5 4V5L9 9H5Z" />
+              <path d="M16 8.5c1.4 1.4 1.4 5.6 0 7M18.5 6c3 3 3 9 0 12" />
+            </svg>
+            <svg viewBox="0 0 24 24" class="sound-off-icon">
+              <path d="M5 9v6h4l5 4V5L9 9H5Z" />
+              <path d="m16 9 5 5m0-5-5 5" />
+            </svg>
+          </button>
+          <button class="text-button" id="restartButton">重新巡检</button>
+        </div>
+      </header>
+
+      <main class="workbench">
+        <section class="machine-panel panel">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">INSPECTION BAY</span>
+              <h1 id="machineTitle">离心泵 / CP-04</h1>
+            </div>
+            <div class="bay-status">
+              <span class="status-led"></span>
+              <span>运行中</span>
+              <b id="machineSerial">SN 8841-CP</b>
+            </div>
+          </div>
+
+          <div class="machine-stage" id="machineStage">
+            <div class="stage-grid" aria-hidden="true"></div>
+            <div class="scan-sweep" aria-hidden="true"></div>
+            <div id="machineVisual" class="machine-visual" aria-label="当前机械设备"></div>
+            <div id="hotspotLayer" class="hotspot-layer"></div>
+            <div class="stage-corner stage-corner--tl"></div>
+            <div class="stage-corner stage-corner--tr"></div>
+            <div class="stage-corner stage-corner--bl"></div>
+            <div class="stage-corner stage-corner--br"></div>
+            <div class="stage-readout stage-readout--left">
+              <span>FRAME</span>
+              <b id="frameReadout">—</b>
+            </div>
+            <div class="stage-readout stage-readout--right">
+              <span>LOAD</span>
+              <b id="loadReadout">—</b>
+            </div>
+          </div>
+
+          <div class="sensor-instruction" id="sensorInstruction">
+            <span class="sensor-instruction-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="5" />
+                <path d="m15 15 5 5M11 7v8M7 11h8" />
+              </svg>
+            </span>
+            <p><b>选择测点。</b> 点击设备上的标记，将听诊器压紧在壳体表面。</p>
+            <span class="placement-state" id="placementState">未贴附</span>
+          </div>
+
+          <div class="machine-stats">
+            <div class="stat">
+              <span>运转转速</span>
+              <b id="rpmValue">—</b>
+              <small>RPM</small>
+            </div>
+            <div class="stat">
+              <span>壳体温度</span>
+              <b id="tempValue">—</b>
+              <small>°C</small>
+            </div>
+            <div class="stat">
+              <span>负载状态</span>
+              <b id="loadState">—</b>
+              <small>%</small>
+            </div>
+            <div class="stat stat--wide">
+              <span>设备档案</span>
+              <b id="machineSpec">—</b>
+            </div>
+          </div>
+
+          <div class="load-control">
+            <div class="control-label">
+              <span>工况负载模拟</span>
+              <b id="loadLabel">—</b>
+            </div>
+            <div class="slider-wrap">
+              <input
+                type="range"
+                id="loadSlider"
+                min="20"
+                max="100"
+                value="64"
+                aria-label="设备负载"
+              />
+              <div class="slider-ticks" aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+            </div>
+            <p>负载会改变背景设备声。建议稳定在标记区间再采集。</p>
+          </div>
+        </section>
+
+        <aside class="diagnostic-column">
+          <section class="panel monitor-panel">
+            <div class="panel-heading panel-heading--compact">
+              <div>
+                <span class="eyebrow">LIVE AUDIO CAPTURE</span>
+                <h2>声纹示波器</h2>
+              </div>
+              <div class="capture-badge" id="captureBadge">
+                <span></span>
+                <b>STANDBY</b>
+              </div>
+            </div>
+            <div class="scope-frame">
+              <canvas id="scopeCanvas" aria-label="实时声音波形图"></canvas>
+              <div class="scope-hud scope-hud--tl">
+                <span>CH-01 / SENSOR</span>
+                <b id="scopePoint">NO CONTACT</b>
+              </div>
+              <div class="scope-hud scope-hud--tr">
+                <span>TIMEBASE</span>
+                <b>12.5 ms/div</b>
+              </div>
+              <div class="scope-hud scope-hud--br">
+                <span>FILTER</span>
+                <b id="filterReadout">WIDE / 20 kHz</b>
+              </div>
+              <div class="sensor-fuzz" id="sensorFuzz">
+                <span>信号模糊</span>
+                <small>测点偏离主振源</small>
+              </div>
+            </div>
+            <div class="acquisition-strip">
+              <div class="pressure-block">
+                <div class="pressure-heading">
+                  <span>声压级 / SPL</span>
+                  <b><strong id="splValue">--</strong> dB</b>
+                </div>
+                <canvas id="pressureCanvas" aria-label="声压级历史曲线"></canvas>
+              </div>
+              <div class="quality-block">
+                <div class="quality-row">
+                  <span>信号清晰度</span>
+                  <b id="clarityValue">—</b>
+                </div>
+                <div class="meter-track">
+                  <span id="clarityMeter"></span>
+                </div>
+                <div class="quality-row quality-row--muted">
+                  <span>接触耦合</span>
+                  <b id="couplingValue">—</b>
+                </div>
+                <div class="meter-track meter-track--amber">
+                  <span id="couplingMeter"></span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel signal-panel">
+            <div class="gain-control">
+              <div class="gain-heading">
+                <div>
+                  <span class="eyebrow">INPUT GAIN</span>
+                  <h2>前置增益</h2>
+                </div>
+                <div class="gain-readout" id="gainReadout">34<small>%</small></div>
+              </div>
+              <div class="gain-dial-wrap">
+                <div class="gain-scale" aria-hidden="true">
+                  <span>0</span><span>24</span><span>48</span><span>72</span><span>100</span>
+                </div>
+                <input
+                  type="range"
+                  id="gainSlider"
+                  min="0"
+                  max="100"
+                  value="34"
+                  aria-label="听诊器前置增益"
+                />
+                <div class="gain-safe-zone" aria-hidden="true"></div>
+              </div>
+              <div class="gain-status">
+                <span class="gain-state" id="gainState"><i></i> SAFE RANGE</span>
+                <span class="clip-led" id="clipLed">CLIP</span>
+              </div>
+            </div>
+            <div class="load-noise">
+              <span class="load-noise-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 12h2l2-6 3 12 3-9 3 6 3-3" />
+                </svg>
+              </span>
+              <div>
+                <span>背景负载噪声</span>
+                <b id="noiseLevel">-18 dB</b>
+              </div>
+              <div class="mini-bars" aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel diagnosis-panel">
+            <div class="panel-heading panel-heading--compact">
+              <div>
+                <span class="eyebrow">FAULT IDENTIFICATION</span>
+                <h2>声纹判断</h2>
+              </div>
+              <span class="step-count">诊断 <b id="diagnosisIndex">01</b> / 03</span>
+            </div>
+            <div class="diagnosis-prompt">
+              <span id="promptCode">CP-04 · 待采信</span>
+              <p id="diagnosisPrompt">贴紧测点并试听，选择最符合的异常声纹。</p>
+            </div>
+            <div class="fault-options" role="radiogroup" aria-label="故障类型">
+              <label class="fault-option" data-type="continuous">
+                <input type="radio" name="faultType" value="continuous" />
+                <span class="fault-icon fault-icon--continuous" aria-hidden="true">
+                  <i></i><i></i><i></i>
+                </span>
+                <span class="fault-copy">
+                  <b>连续音</b>
+                  <small>稳态啸叫 / 气蚀</small>
+                </span>
+                <span class="radio-mark"></span>
+              </label>
+              <label class="fault-option" data-type="impact">
+                <input type="radio" name="faultType" value="impact" />
+                <span class="fault-icon fault-icon--impact" aria-hidden="true">
+                  <i></i><i></i><i></i>
+                </span>
+                <span class="fault-copy">
+                  <b>冲击音</b>
+                  <small>周期敲击 / 间隙</small>
+                </span>
+                <span class="radio-mark"></span>
+              </label>
+              <label class="fault-option" data-type="friction">
+                <input type="radio" name="faultType" value="friction" />
+                <span class="fault-icon fault-icon--friction" aria-hidden="true">
+                  <i></i><i></i><i></i>
+                </span>
+                <span class="fault-copy">
+                  <b>摩擦音</b>
+                  <small>宽频沙沙 / 干摩擦</small>
+                </span>
+                <span class="radio-mark"></span>
+              </label>
+            </div>
+            <button class="diagnose-button" id="diagnoseButton" disabled>
+              <span>提交声纹判断</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 7 7-7 7" /></svg>
+            </button>
+            <div class="diagnosis-foot">
+              <span><i class="dot dot--teal"></i>三次判断需全部正确</span>
+              <span><i class="dot dot--amber"></i>增益 ≤ 72%</span>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="statusbar">
+        <span><b>提示</b> 先贴准测点，再选择声纹类别。</span>
+        <span class="statusbar-center" id="statusMessage">系统待命</span>
+        <span class="statusbar-right">
+          <span>安全增益上限 <b>72%</b></span>
+          <span class="statusbar-sep"></span>
+          <span id="sessionScore">正确 0 / 3</span>
+        </span>
+      </footer>
+    </div>
+
+    <div class="start-overlay" id="startOverlay">
+      <div class="start-card">
+        <span class="start-kicker">FIELD UNIT / 2026</span>
+        <div class="start-wave" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span><i></i>
+        </div>
+        <h2>把耳朵贴到<br /><em>机器的脉搏</em>上。</h2>
+        <p>
+          三台设备，三种异常。贴准测点，根据<strong>连续音、冲击音与摩擦音</strong>做出诊断。
+          背景噪声会随负载波动，保持增益克制。
+        </p>
+        <div class="start-requirements">
+          <span><i>01</i> 三次判断全对</span>
+          <span><i>02</i> 增益不超过 72%</span>
+          <span><i>03</i> 建议佩戴耳机</span>
+        </div>
+        <button class="primary-button primary-button--large" id="startButton">
+          <span class="button-signal"></span>
+          <span id="startButtonLabel">开始声纹采集</span>
+          <small>需启用浏览器音频</small>
+        </button>
+        <span class="start-footnote">所有声音均通过 Web Audio 实时合成</span>
+      </div>
+    </div>
+
+    <div class="verdict-overlay is-hidden" id="verdictOverlay" aria-hidden="true">
+      <div class="verdict-dialog">
+        <canvas id="verdictCanvas" aria-label="声纹判断卡"></canvas>
+        <div class="verdict-actions">
+          <button class="secondary-button" id="verdictSecondary">返回调整</button>
+          <button class="primary-button" id="verdictPrimary">继续</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      <span class="toast-icon">!</span>
+      <p id="toastText"></p>
+    </div>
+
+    <div class="completion-overlay is-hidden" id="completionOverlay" aria-hidden="true">
+      <div class="completion-card">
+        <span class="completion-kicker">INSPECTION COMPLETE</span>
+        <div class="completion-seal" aria-hidden="true">
+          <svg viewBox="0 0 64 64"><path d="m17 33 10 10 21-24" /></svg>
+        </div>
+        <h2>巡检闭环。</h2>
+        <p>三类故障已确认，未发生过度增益。</p>
+        <div class="completion-stats">
+          <span><b>3/3</b> 判断正确</span>
+          <span><b id="finalGain">—</b> 峰值增益</span>
+          <span><b>0</b> 增益告警</span>
+        </div>
+        <button class="primary-button primary-button--large" id="replayButton">再次巡检</button>
+      </div>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
