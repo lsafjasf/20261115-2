@@ -1,0 +1,26 @@
+{
+  "name": "pulse-desk",
+  "version": "1.0.0",
+  "description": "Four-track synthetic loop mixer with project recall and WAV export",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "export": "node scripts/render-export.mjs",
+    "test": "node scripts/verify.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsafjasf/20261115-2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/lsafjasf/20261115-2/issues"
+  },
+  "homepage": "https://github.com/lsafjasf/20261115-2#readme",
+  "devDependencies": {
+    "node-web-audio-api": "^2.2.0"
+  }
+}

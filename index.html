@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="四轨合成循环混音台，支持工程保存、电平过载提示与 20 秒 WAV 导出。"
+    />
+    <title>Pulse Desk · 四轨合成混音台</title>
+    <link rel="stylesheet" href="./assets/fonts/noto-sans-sc.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <svg class="svg-sprite" aria-hidden="true">
+      <symbol id="icon-play" viewBox="0 0 24 24">
+        <path d="M8 5.8v12.4L18.4 12 8 5.8Z" fill="currentColor" />
+      </symbol>
+      <symbol id="icon-stop" viewBox="0 0 24 24">
+        <rect x="6.5" y="6.5" width="11" height="11" rx="1.4" fill="currentColor" />
+      </symbol>
+      <symbol id="icon-save" viewBox="0 0 24 24">
+        <path d="M5 4.5h11.2L19.5 8v11.5h-15V4.5Zm2 2v11h10.5V8.9l-2.4-2.4H7Zm1.5 0h6v4h-6v-4Zm0 6h7.5v4H8.5v-4Z" fill="currentColor" />
+      </symbol>
+      <symbol id="icon-upload" viewBox="0 0 24 24">
+        <path d="M11 16.5h2V9.7l2.2 2.2 1.4-1.4L12 5.9 7.4 10.5l1.4 1.4L11 9.7v6.8ZM5 18.5h14V21H5v-2.5Z" fill="currentColor" />
+      </symbol>
+      <symbol id="icon-download" viewBox="0 0 24 24">
+        <path d="M11 3h2v8.2l2.4-2.4 1.4 1.4-4.8 4.8-4.8-4.8 1.4-1.4L11 11.2V3ZM5 18.5h14V21H5v-2.5Z" fill="currentColor" />
+      </symbol>
+      <symbol id="icon-wave" viewBox="0 0 24 24">
+        <path d="M3 12h2V9h2v6h2V6h2v12h2V8h2v8h2V5h2v14h2v-3h1v4H3v-8Z" fill="currentColor" />
+      </symbol>
+    </svg>
+
+    <div class="ambient-glow ambient-glow-a"></div>
+    <div class="ambient-glow ambient-glow-b"></div>
+    <div class="grain"></div>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div>
+            <p class="brand-name">PULSE DESK</p>
+            <p class="brand-sub">SYNTHETIC LOOP MIXER</p>
+          </div>
+        </div>
+
+        <div class="project-heading">
+          <p class="eyebrow">CURRENT SESSION</p>
+          <div class="project-title-row">
+            <h1 id="projectTitle">NEON DRIFT</h1>
+            <span class="session-badge">20 SEC</span>
+          </div>
+          <p id="projectSubtitle" class="project-subtitle">
+            Twenty-second synthetic loop
+          </p>
+        </div>
+
+        <div class="top-actions">
+          <div class="save-status" id="saveStatus">
+            <span class="status-dot"></span>
+            <span>自动保存</span>
+          </div>
+          <button class="button button-ghost" id="saveButton" type="button">
+            <svg aria-hidden="true"><use href="#icon-save"></use></svg>
+            保存工程
+          </button>
+          <button class="button button-ghost" id="loadButton" type="button">
+            <svg aria-hidden="true"><use href="#icon-upload"></use></svg>
+            载入
+          </button>
+          <button class="button button-accent" id="exportButton" type="button">
+            <svg aria-hidden="true"><use href="#icon-download"></use></svg>
+            <span id="exportLabel">导出 WAV</span>
+          </button>
+          <input id="projectFile" type="file" accept=".json,application/json" hidden />
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="transport-panel" aria-label="播放控制">
+          <button class="play-button" id="playButton" type="button" aria-label="播放">
+            <svg class="play-icon" aria-hidden="true"><use href="#icon-play"></use></svg>
+            <svg class="stop-icon" aria-hidden="true"><use href="#icon-stop"></use></svg>
+          </button>
+          <div class="time-display" aria-live="off">
+            <span id="timeCurrent">00:00.000</span>
+            <span class="time-divider">/</span>
+            <span id="timeDuration">00:20.000</span>
+          </div>
+          <div class="transport-meta">
+            <span class="live-pill" id="enginePill">
+              <span class="engine-dot"></span>
+              <span id="engineLabel">准备就绪</span>
+            </span>
+            <span class="tempo">96 BPM</span>
+            <span class="time-signature">4 / 4</span>
+            <span class="loop-mode">LOOP · 8 BARS</span>
+          </div>
+          <div class="bus-glance">
+            <span>BUS GR</span>
+            <strong id="grReadout">0.0 dB</strong>
+            <div class="gr-bar"><i id="grBar"></i></div>
+          </div>
+        </section>
+
+        <section class="arrangement" aria-label="编曲时间线">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">ARRANGEMENT</p>
+              <h2>八小节循环</h2>
+            </div>
+            <div class="arrangement-legend">
+              <span><i class="legend-dot legend-dot-a"></i>合成素材</span>
+              <span><i class="legend-dot legend-dot-b"></i>总线处理</span>
+            </div>
+          </div>
+          <div class="timeline">
+            <div class="timeline-ruler" id="timelineRuler"></div>
+            <div class="timeline-lanes" id="timelineLanes"></div>
+            <div class="playhead" id="playhead">
+              <span class="playhead-cap"></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="mixer-section" aria-label="四轨混音通道">
+          <div class="section-heading mixer-heading">
+            <div>
+              <p class="eyebrow">CHANNEL MIXER</p>
+              <h2>四条合成音轨</h2>
+            </div>
+            <p class="mixer-hint">
+              拖动推子 · 调整声像与延迟 · 单独静音不会改变其他通道
+            </p>
+          </div>
+          <div class="track-grid" id="trackGrid"></div>
+        </section>
+
+        <section class="bus-panel" aria-label="总线压缩器">
+          <div class="bus-identity">
+            <div class="bus-icon" aria-hidden="true">
+              <svg><use href="#icon-wave"></use></svg>
+            </div>
+            <div>
+              <p class="eyebrow">MASTER BUS</p>
+              <h2>总线压缩</h2>
+              <p>柔和胶合 · 四轨汇总后处理</p>
+            </div>
+          </div>
+          <div class="bus-meter-block">
+            <div class="bus-meter-copy">
+              <span>GAIN REDUCTION</span>
+              <strong id="busGrValue">0.0 dB</strong>
+            </div>
+            <div class="gr-meter" id="busGrMeter">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+          </div>
+          <div class="bus-controls" id="busControls"></div>
+          <div class="master-block">
+            <div class="master-label">
+              <span>MASTER</span>
+              <strong id="masterGainValue">-1.0 dB</strong>
+            </div>
+            <div class="master-slider" id="masterSlider" role="slider"
+              aria-label="主输出增益" aria-valuemin="-36" aria-valuemax="6"
+              aria-valuenow="-1" tabindex="0">
+              <div class="master-track"><i id="masterFill"></i></div>
+              <div class="master-thumb" id="masterThumb"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>PULSE DESK / UID 397</span>
+        <span>24-BIT WAV · 48 KHZ · 20.000 SECONDS</span>
+        <span>过载阈值 −1.0 dBFS</span>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="loading-screen" id="loadingScreen">
+      <div class="loading-mark">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <p id="loadingLabel">正在合成四轨素材…</p>
+    </div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

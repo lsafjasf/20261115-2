@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "title": "NEON DRIFT",
+  "subtitle": "Twenty-second synthetic loop",
+  "bpm": 96,
+  "loopSeconds": 20,
+  "sampleRate": 48000,
+  "masterGainDb": -1,
+  "bus": {
+    "threshold": -18,
+    "ratio": 4,
+    "attack": 0.02,
+    "release": 0.24,
+    "knee": 12
+  },
+  "tracks": [
+    {
+      "id": "drums",
+      "gainDb": -7,
+      "pan": -0.08,
+      "delayMs": 0,
+      "muted": false
+    },
+    {
+      "id": "bass",
+      "gainDb": -8.5,
+      "pan": 0.04,
+      "delayMs": 88,
+      "muted": false
+    },
+    {
+      "id": "ambience",
+      "gainDb": -10,
+      "pan": 0.18,
+      "delayMs": 240,
+      "muted": false
+    },
+    {
+      "id": "cue",
+      "gainDb": -11,
+      "pan": -0.22,
+      "delayMs": 168,
+      "muted": false
+    }
+  ]
+}
