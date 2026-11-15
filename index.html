@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#071216" />
+    <title>微网频率守卫 · Microgrid Frequency Guard</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23081216'/><path d='M12 36h9l5-15 8 27 6-19 4 7h8' fill='none' stroke='%237fffc4' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient-grid" aria-hidden="true"></div>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div>
+            <div class="eyebrow">ISLAND MICROGRID / 07</div>
+            <h1>微网频率守卫</h1>
+          </div>
+        </div>
+        <div class="freq-hero" id="freqHero">
+          <span class="freq-label">系统频率</span>
+          <strong id="freqValue">50.00</strong>
+          <span class="freq-unit">Hz</span>
+          <span class="freq-state" id="freqState">稳定</span>
+        </div>
+        <div class="topbar-actions">
+          <div class="time-chip">
+            <span>演练时钟</span>
+            <strong id="clockValue">00:00</strong>
+            <small>/ 10:00</small>
+          </div>
+          <div class="sound-control">
+            <div class="sound-bars" id="soundBars" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <button class="icon-button" id="audioButton" type="button" aria-label="切换声音" title="切换声音">
+              <span id="audioIcon">◖</span>
+            </button>
+          </div>
+          <button class="ghost-button" id="pauseButton" type="button" disabled>暂停</button>
+          <button class="primary-button" id="startButton" type="button">启动演练</button>
+        </div>
+      </header>
+
+      <div class="mission-strip">
+        <span class="mission-tag"><i></i> 孤网保供任务</span>
+        <p id="missionText">光伏阵列遥测正常。点击「启动演练」，在十分钟内守住 49.50–50.50 Hz。</p>
+        <div class="speed-control" role="group" aria-label="时间倍率">
+          <span>时间倍率</span>
+          <button class="speed-button" data-speed="4" type="button">4×</button>
+          <button class="speed-button active" data-speed="1" type="button">1×</button>
+          <button class="speed-button" data-speed="10" type="button">10×</button>
+        </div>
+      </div>
+
+      <main class="dashboard">
+        <section class="panel control-panel" aria-labelledby="dispatchTitle">
+          <div class="panel-heading">
+            <div>
+              <span class="panel-kicker">DISPATCH CONSOLE</span>
+              <h2 id="dispatchTitle">调度台</h2>
+            </div>
+            <span class="status-pill" id="dispatchStatus">待命</span>
+          </div>
+
+          <div class="balance-card">
+            <div>
+              <span>功率缺口</span>
+              <strong id="balanceValue">0.0 <small>MW</small></strong>
+            </div>
+            <div class="balance-scale" aria-hidden="true">
+              <span id="balanceNeedle"></span>
+              <i></i>
+            </div>
+            <div class="balance-meta">
+              <span>出力 <b id="supplyValue">22.0</b></span>
+              <span>负荷 <b id="demandValue">22.0</b></span>
+            </div>
+          </div>
+
+          <div class="device-control" data-device="battery">
+            <div class="device-control-head">
+              <div class="device-icon battery-icon" aria-hidden="true">▣</div>
+              <div class="device-title">
+                <strong>储能放电</strong>
+                <span>磷酸铁锂 / 6 MW</span>
+              </div>
+              <div class="device-live">
+                <strong id="batteryActual">0.0</strong><small>MW</small>
+              </div>
+            </div>
+            <div class="ramp-track"><span id="batteryRampBar"></span></div>
+            <div class="stepper-row">
+              <button class="step-button" data-step="battery:-2" type="button" aria-label="降低储能目标 2 MW" title="调整 2 MW">−</button>
+              <div class="target-readout">目标 <b id="batteryTarget">0.0</b> MW</div>
+              <button class="step-button" data-step="battery:2" type="button" aria-label="提高储能目标 2 MW" title="调整 2 MW">+</button>
+            </div>
+            <div class="device-meta">
+              <span id="batteryRampState">待命</span>
+              <span>磨损 <b id="batteryWear">0%</b></span>
+            </div>
+          </div>
+
+          <div class="device-control" data-device="gas">
+            <div class="device-control-head">
+              <div class="device-icon gas-icon" aria-hidden="true">✦</div>
+              <div class="device-title">
+                <strong>燃气机组</strong>
+                <span>可调范围 3.5–10 MW</span>
+              </div>
+              <div class="device-live">
+                <strong id="gasActual">3.5</strong><small>MW</small>
+              </div>
+            </div>
+            <div class="ramp-track"><span id="gasRampBar"></span></div>
+            <div class="stepper-row">
+              <button class="step-button" data-step="gas:-2" type="button" aria-label="降低燃气目标 2 MW" title="调整 2 MW">−</button>
+              <div class="target-readout">目标 <b id="gasTarget">3.5</b> MW</div>
+              <button class="step-button" data-step="gas:2" type="button" aria-label="提高燃气目标 2 MW" title="调整 2 MW">+</button>
+            </div>
+            <div class="device-meta">
+              <span id="gasRampState">待命</span>
+              <span>磨损 <b id="gasWear">0%</b></span>
+            </div>
+          </div>
+
+          <div class="load-section">
+            <div class="section-label">
+              <span>可中断负荷</span>
+              <small>点击切换 · 存在爬坡时间</small>
+            </div>
+            <div class="load-controls" id="loadControls"></div>
+          </div>
+
+          <div class="critical-note">
+            <span class="lock-mark">⌁</span>
+            <p><strong>医院与通信站已锁定保供</strong><br />关键负荷不可中断，任何频率策略都不得触碰。</p>
+          </div>
+        </section>
+
+        <section class="panel energy-panel" aria-labelledby="energyTitle">
+          <div class="panel-heading">
+            <div>
+              <span class="panel-kicker">LIVE POWER FLOW</span>
+              <h2 id="energyTitle">能量流</h2>
+            </div>
+            <div class="live-indicator"><i></i> REAL-TIME</div>
+          </div>
+          <div class="energy-banner">
+            <span id="energyMode">并网稳定</span>
+            <strong id="energyFrequency">50.00 Hz</strong>
+            <small>AC BUS / 孤网</small>
+          </div>
+          <div class="canvas-wrap energy-wrap">
+            <canvas id="energyCanvas" aria-label="能源节点与负荷之间的实时能量流"></canvas>
+          </div>
+        </section>
+
+        <section class="panel telemetry-panel" aria-labelledby="telemetryTitle">
+          <div class="panel-heading">
+            <div>
+              <span class="panel-kicker">FREQUENCY TELEMETRY</span>
+              <h2 id="telemetryTitle">频率轨迹</h2>
+            </div>
+            <div class="limit-badge">安全带 <b>49.50–50.50</b></div>
+          </div>
+          <div class="canvas-wrap frequency-wrap">
+            <canvas id="frequencyCanvas" aria-label="十分钟频率曲线与安全区间"></canvas>
+          </div>
+          <div class="metric-grid">
+            <div class="metric"><span>最大偏差</span><strong id="maxDeviation">0.00 <small>Hz</small></strong></div>
+            <div class="metric"><span>越限累计</span><strong id="violationTime">0.00 <small>s</small></strong></div>
+            <div class="metric"><span>关键负荷</span><strong>100<small>%</small></strong></div>
+          </div>
+          <div class="event-head"><span>事件流</span><i></i></div>
+          <div class="event-log" id="eventLog" aria-live="polite"></div>
+        </section>
+
+        <section class="panel fleet-panel" aria-labelledby="fleetTitle">
+          <div class="panel-heading compact-heading">
+            <div>
+              <span class="panel-kicker">RAMP / WEAR MATRIX</span>
+              <h2 id="fleetTitle">设备状态</h2>
+            </div>
+            <div class="fleet-legend"><span class="legend-target">目标</span><span class="legend-ramp">爬坡余量</span><span class="legend-wear">磨损</span></div>
+          </div>
+          <div class="canvas-wrap fleet-wrap">
+            <canvas id="deviceCanvas" aria-label="各设备目标、实际输出、爬坡和磨损状态"></canvas>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="result-overlay" id="resultOverlay" hidden>
+      <div class="result-card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+        <span class="result-kicker" id="resultKicker">DRILL COMPLETE</span>
+        <div class="result-emblem" id="resultEmblem">✓</div>
+        <h2 id="resultTitle">孤网守住了</h2>
+        <p id="resultMessage"></p>
+        <div class="result-stats">
+          <div><span>最大偏差</span><strong id="resultDeviation">0.00 Hz</strong></div>
+          <div><span>越限累计</span><strong id="resultViolation">0.00 s</strong></div>
+          <div><span>最高磨损</span><strong id="resultWear">0%</strong></div>
+        </div>
+        <button class="primary-button wide-button" id="restartButton" type="button">重新演练</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
