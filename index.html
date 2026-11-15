@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#090d12" />
+    <title>午夜印厂 · Night Press</title>
+    <link rel="preload" href="./assets/noto-sans-sc-subset.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">◉</span>
+        <div>
+          <p class="eyebrow">NIGHT PRESS · 03:17</p>
+          <h1>午夜印厂</h1>
+        </div>
+      </div>
+      <div class="hud" aria-label="夜班进度">
+        <div class="hud-stat">
+          <span>废页额度</span>
+          <strong id="wasteValue">0 / 6</strong>
+          <div class="meter"><i id="wasteMeter"></i></div>
+        </div>
+        <div class="hud-stat">
+          <span>订单交付</span>
+          <strong id="completeValue">0 / 3</strong>
+        </div>
+        <div class="hud-stat roll-stat">
+          <span>在机纸卷</span>
+          <strong id="rollValue">主卷 · 7 张</strong>
+        </div>
+        <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false">
+          <span id="soundIcon" aria-hidden="true">◌</span>
+          <span id="soundLabel">开启机声</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="orders-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">JOB QUEUE</p>
+            <h2>急单调度</h2>
+          </div>
+          <span class="count-badge" id="queueCount">3 单</span>
+        </div>
+        <p class="panel-intro">一台双面机。先出正面，干透后翻面，再把反面送回滚筒。</p>
+        <div class="orders-list" id="ordersList"></div>
+        <div class="shift-note">
+          <span class="shift-note-icon" aria-hidden="true">↻</span>
+          <p><strong>排程提示</strong> 正面印完可先晾着，换下一单继续印；纸卷见底时机器会自动急停。</p>
+        </div>
+      </aside>
+
+      <section class="press-column" aria-label="印刷机">
+        <div class="canvas-frame">
+          <canvas id="pressCanvas" width="1000" height="620" aria-label="夜间印刷机运行状态画布"></canvas>
+          <div class="canvas-topline">
+            <span class="status-lamp" id="statusLamp"></span>
+            <span id="pressStatus">主电源待机</span>
+            <span class="speed-readout">ROLLER <b id="speedReadout">02</b></span>
+          </div>
+          <div class="paper-alert" id="paperAlert" hidden>
+            <div>
+              <p class="eyebrow">PAPER OUT · PRESS STOPPED</p>
+              <strong>纸卷耗尽，滚筒已急停</strong>
+              <span id="outageCopy">立即切换备用纸卷，别让纸路空转。</span>
+            </div>
+            <button id="switchPaperBtn" class="danger-btn" type="button">切换备用纸卷 <b>−1 废页</b></button>
+          </div>
+          <div class="canvas-hint" id="canvasHint">选择订单 → 核对版面与油墨 → 开印</div>
+        </div>
+
+        <div class="transport-deck">
+          <div class="deck-group speed-group">
+            <div class="deck-label">
+              <span>滚筒速度</span>
+              <b id="speedName">常速</b>
+            </div>
+            <div class="speed-buttons" id="speedButtons" role="group" aria-label="滚筒速度">
+              <button type="button" data-speed="1">慢车</button>
+              <button type="button" data-speed="2" class="active">常速</button>
+              <button type="button" data-speed="3">冲刺</button>
+            </div>
+          </div>
+
+          <div class="deck-group registration-group">
+            <div class="deck-label">
+              <span>套色对版</span>
+              <b id="registrationLabel">居中</b>
+            </div>
+            <div class="registration-controls">
+              <button id="regLeft" class="nudge-btn" type="button" aria-label="套色向左微调">←</button>
+              <div class="registration-track" aria-label="套色对齐刻度">
+                <span class="safe-zone"></span>
+                <span class="center-line"></span>
+                <i id="registrationNeedle"></i>
+              </div>
+              <button id="regRight" class="nudge-btn" type="button" aria-label="套色向右微调">→</button>
+            </div>
+          </div>
+
+          <button id="startBtn" class="start-btn" type="button">
+            <span class="start-icon" aria-hidden="true">▶</span>
+            <span>
+              <small id="startSide">装版待命</small>
+              <b id="startLabel">开印正面</b>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <aside class="setup-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">PLATE & INK</p>
+            <h2>上机准备</h2>
+          </div>
+          <span class="job-chip" id="activeJobCode">单 01</span>
+        </div>
+
+        <section class="setup-block">
+          <div class="setup-title"><span>01 · 版面</span><b id="layoutCheck">未选择</b></div>
+          <div class="layout-options" id="layoutOptions"></div>
+        </section>
+
+        <section class="setup-block">
+          <div class="setup-title"><span>02 · 油墨</span><b id="inkCheck">未选择</b></div>
+          <div class="ink-options" id="inkOptions"></div>
+        </section>
+
+        <section class="job-ticket" id="jobTicket">
+          <div class="ticket-teeth" aria-hidden="true"></div>
+          <div class="ticket-title">
+            <span>急件工单</span>
+            <b id="ticketCopies">4 份</b>
+          </div>
+          <h3 id="ticketTitle">午夜快讯</h3>
+          <p id="ticketClient">城市晚报 · 头版双面急送</p>
+          <dl>
+            <div><dt>指定版面</dt><dd id="ticketLayout">双栏</dd></div>
+            <div><dt>指定油墨</dt><dd id="ticketInk">午夜青</dd></div>
+            <div><dt>晾干时间</dt><dd id="ticketDry">5.0 秒</dd></div>
+            <div><dt>正反工序</dt><dd>A 面 → 等待 → B 面</dd></div>
+          </dl>
+        </section>
+
+        <div class="dry-status" id="dryStatus">
+          <span class="dry-icon" aria-hidden="true">◒</span>
+          <div><small>晾纸架</small><b id="dryLabel">空置</b></div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="ticker">
+      <span class="ticker-label">值班广播</span>
+      <p id="message">机器已预热。先核对版面与油墨，再装纸开印。</p>
+      <span class="key-hint"><kbd>←</kbd><kbd>→</kbd> 对版</span>
+    </footer>
+
+    <div class="modal-backdrop" id="modal">
+      <section class="intro-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <p class="eyebrow" id="modalKicker">SHIFT BRIEF · 03:17</p>
+        <h2 id="modalTitle">今晚，只有一台机器。</h2>
+        <p class="modal-lead" id="modalLead">
+          三份急单必须在天亮前交付。核对每张工单的版面与油墨，安排双面印刷、晾干和翻面。
+        </p>
+        <div class="brief-grid" id="modalStats">
+          <div><span>订单</span><b>3 份</b></div>
+          <div><span>废页上限</span><b>6 张</b></div>
+          <div><span>机器</span><b>单台双面</b></div>
+        </div>
+        <ul class="brief-list" id="modalList">
+          <li><b>先校版：</b>版面或油墨错配会整批报废。</li>
+          <li><b>别抢干：</b>正面必须干透、翻面后才能跑反面。</li>
+          <li><b>盯紧纸卷：</b>缺纸急停后，立刻切备用卷。</li>
+        </ul>
+        <button class="modal-action" id="modalAction" type="button">接班开印</button>
+      </section>
+    </div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
