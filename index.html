@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>地下主管抢修模拟</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #1a1d24; color: #e8e8e8;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 12px; gap: 10px; min-height: 100vh;
+  }
+  h1 { font-size: 20px; color: #ffd166; }
+  #wrap { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  canvas { background: #0d0f13; border-radius: 8px; border: 1px solid #333; }
+  #panel {
+    width: 300px; display: flex; flex-direction: column; gap: 8px;
+    background: #23262e; padding: 12px; border-radius: 8px; font-size: 13px;
+  }
+  .group { border: 1px solid #3a3e48; border-radius: 6px; padding: 8px; }
+  .group h3 { font-size: 13px; color: #8ecae6; margin-bottom: 6px; }
+  button {
+    background: #2f6fed; color: #fff; border: none; border-radius: 5px;
+    padding: 6px 10px; margin: 2px 2px; cursor: pointer; font-size: 13px;
+  }
+  button:hover { background: #4a86ff; }
+  button:disabled { background: #444; color: #888; cursor: not-allowed; }
+  button.warn { background: #d62828; }
+  button.warn:hover { background: #f04040; }
+  label { font-size: 12px; color: #aaa; display: block; margin: 4px 0 2px; }
+  input[type=range] { width: 100%; }
+  .row { display: flex; justify-content: space-between; align-items: center; }
+  #log {
+    height: 150px; overflow-y: auto; background: #14161b; border-radius: 5px;
+    padding: 6px; font-size: 12px; line-height: 1.5;
+  }
+  #log .ok { color: #7bd88f; } #log .warn { color: #ffd166; }
+  #log .danger { color: #ff6b6b; } #log .info { color: #bbb; }
+  #status { font-size: 14px; font-weight: bold; min-height: 20px; }
+  .hint { font-size: 11px; color: #777; }
+</style>
+</head>
+<body>
+  <h1>🔧 地下主管泄漏抢修</h1>
+  <div id="status">阶段：泄漏中 —— 请按规程关阀（先上游 A，再下游 B，务必慢关！）</div>
+  <div id="wrap">
+    <canvas id="cv" width="760" height="460"></canvas>
+    <div id="panel">
+      <div class="group">
+        <h3>阀门操作（关阀时间越短水锤越猛，临界 1.0s）</h3>
+        <label>操作用时：<span id="durLabel">6.0</span> s</label>
+        <input type="range" id="dur" min="0.2" max="10" step="0.2" value="6">
+        <div class="row">
+          <button id="btnCloseA">关阀 A（上游）</button>
+          <button id="btnCloseB">关阀 B（下游）</button>
+        </div>
+        <div class="row">
+          <button id="btnOpenB" disabled>开阀 B</button>
+          <button id="btnOpenA" disabled>开阀 A</button>
+        </div>
+      </div>
+      <div class="group">
+        <h3>土建与排水</h3>
+        <button id="btnDig">开挖沟槽</button>
+        <button id="btnShore" disabled>加支护 +25%</button>
+        <button id="btnDrain" disabled>开始排水</button>
+      </div>
+      <div class="group">
+        <h3>换管与恢复</h3>
+        <button id="btnInstall" disabled>安装新管段（按住）</button>
+        <button id="btnRestore" disabled>恢复供水 & 压力测试</button>
+      </div>
+      <div class="group">
+        <h3>演示</h3>
+        <button id="btnDemo" class="warn">⚠ 演示：0.2s 猛关阀 B</button>
+        <button id="btnReset">重置</button>
+        <div class="hint">Web Audio 随水压变化，点击任意按钮后启用声音。</div>
+      </div>
+      <div id="log"></div>
+    </div>
+  </div>
+  <script src="sim.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
