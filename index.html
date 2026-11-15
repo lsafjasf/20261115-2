@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>节点鼓机 · 16 步节奏</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>节点鼓机</h1>
+    <div class="transport">
+      <button id="playBtn" class="primary">▶ 播放</button>
+      <button id="stopBtn">■ 停止</button>
+      <span class="tempo">
+        BPM <input id="tempo" type="number" min="60" max="200" value="112" />
+      </span>
+      <span id="muteState" class="mute-ok">峰值保护：待命</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel graph-panel">
+      <div class="panel-head">
+        <h2>节点连线</h2>
+        <p class="hint">从输出端口拖到输入端口连线；点击连线删除。错误连接会被拒绝并提示。</p>
+      </div>
+      <canvas id="graphCanvas" width="920" height="420"></canvas>
+      <div id="graphMsg" class="graph-msg"></div>
+    </section>
+
+    <section class="panel step-panel">
+      <div class="panel-head">
+        <h2>十六步步进格</h2>
+        <p class="hint">点击格子切换触发，当前播放列会高亮，循环长度固定 16 步。</p>
+      </div>
+      <canvas id="stepCanvas" width="920" height="240"></canvas>
+    </section>
+
+    <section class="panel control-panel">
+      <div class="panel-head"><h2>节点参数</h2></div>
+      <div id="nodeControls" class="node-controls"></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

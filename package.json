@@ -1,0 +1,13 @@
+{
+  "name": "drum-machine",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Canvas + Web Audio 节点式鼓机：四声源、滤波/延迟旁路、峰值自动静音、十六步循环",
+  "scripts": {
+    "test": "node tests/run-tests.mjs && node tests/interaction-test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}
