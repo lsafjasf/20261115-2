@@ -1,0 +1,10 @@
+{
+  "name": "snowline-water-dispatch",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Canvas 山区蓄水池融雪供水调度模拟",
+  "scripts": {
+    "test": "node test/simulation.test.js && node test/browser-logic.test.js",
+    "start": "python3 -m http.server 8000"
+  }
+}

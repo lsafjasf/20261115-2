@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>雪线调度 · 山区蓄水池供水模拟</title>
+  <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <h1>雪线调度</h1>
+        <p>调节引水渠、蓄水池闸门与供水泵，保证三村高峰不断水</p>
+      </div>
+      <div class="status-pills">
+        <span id="timePill">第 0 / 48 小时</span>
+        <span id="tempPill">--℃</span>
+        <span id="pipePill" class="pill-ok">管道正常</span>
+        <span id="resultPill">调度进行中</span>
+      </div>
+    </header>
+
+    <section class="stage">
+      <canvas id="scene" width="1000" height="420"></canvas>
+      <canvas id="chart" width="1000" height="230"></canvas>
+    </section>
+
+    <section class="controls">
+      <div class="slider-card">
+        <h2>调度装置</h2>
+        <label>引水渠闸门 <b id="canalValue">50%</b>
+          <input id="canalGate" type="range" min="0" max="100" value="50">
+        </label>
+        <label>蓄水池出水闸门 <b id="outletValue">50%</b>
+          <input id="outletGate" type="range" min="0" max="100" value="50">
+        </label>
+        <label>供水泵转速 <b id="pumpValue">50%</b>
+          <input id="pumpSpeed" type="range" min="0" max="100" value="50">
+        </label>
+        <p class="hint">低温时保持较高泵流量可防止结冰；流量过低会让管道冰堵。</p>
+      </div>
+
+      <div class="metrics-card">
+        <h2>实时指标</h2>
+        <div class="metric-grid">
+          <div><span>蓄水池</span><b id="reservoirMetric">-- m³</b></div>
+          <div><span>来水流量</span><b id="inflowMetric">-- m³/h</b></div>
+          <div><span>泵流量</span><b id="pumpMetric">-- m³/h</b></div>
+          <div><span>高峰断水</span><b id="failureMetric">0 次</b></div>
+          <div><span>积雪储水</span><b id="snowMetric">-- m³</b></div>
+          <div><span>累计缺水</span><b id="shortageMetric">-- m³</b></div>
+        </div>
+        <div id="villageList" class="village-list"></div>
+      </div>
+
+      <div class="actions-card">
+        <h2>操作与测试</h2>
+        <button id="playBtn">▶ 开始</button>
+        <button id="pauseBtn">⏸ 暂停</button>
+        <button id="stepBtn">单步 1h</button>
+        <button id="autoBtn">自动演示</button>
+        <button id="resetBtn">重置</button>
+        <button id="blockTestBtn" class="warning">冷却堵塞测试</button>
+        <label class="sound-toggle"><input id="soundToggle" type="checkbox" checked> 流量声音</label>
+      </div>
+
+      <div class="log-card">
+        <h2>事件日志</h2>
+        <ul id="eventLog"></ul>
+      </div>
+    </section>
+  </main>
+  <script src="src/simulation.js"></script>
+  <script src="src/audio.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
