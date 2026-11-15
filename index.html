@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>峡谷索桥货缆车</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>峡谷索桥 · 货缆车调度</h1>
+      <p class="sub">单缆单车道，安排三次双向运输把 A6 / B5 / C9 送到指定平台；过载或强阵风会拉断桥面。</p>
+    </header>
+
+    <div class="stage">
+      <canvas id="scene"></canvas>
+      <div id="overlay" class="overlay hidden">
+        <h2 id="overlayTitle"></h2>
+        <p id="overlayText"></p>
+        <button id="btnAgain">重新开始</button>
+      </div>
+    </div>
+
+    <section class="hud">
+      <div class="stat"><span>总质量</span><b id="hudMass">2</b></div>
+      <div class="stat"><span>载货</span><b id="hudCargo">0/12</b></div>
+      <div class="stat"><span>应力</span><b id="hudStress">0%</b></div>
+      <div class="stat"><span>风速</span><b id="hudWind">1.2</b></div>
+      <div class="stat"><span>摆角</span><b id="hudSwing">0°</b></div>
+      <div class="stat"><span>班次</span><b id="hudTrips">0</b></div>
+      <div class="stat"><span>位置</span><b id="hudStation">左平台</b></div>
+      <div class="stat"><span>重车恢复</span><b id="hudRecover">—</b></div>
+    </div>
+
+    <div class="stress-wrap">
+      <div class="stress-bar"><div id="stressBar"></div></div>
+      <small>桥面应力（接近满格即危险，超过极限断裂）</small>
+    </div>
+
+    <section class="controls">
+      <div class="group">
+        <label>移动（方向键 / A·D，按住行驶）</label>
+        <div class="row">
+          <button id="btnLeft">◀ 向左</button>
+          <button id="btnRight">向右 ▶</button>
+        </div>
+      </div>
+      <div class="group">
+        <label>货物批次（停靠站点时装车）</label>
+        <div class="row batch">
+          <label><input type="radio" name="batch" value="A" checked> A 红→右</label>
+          <label><input type="radio" name="batch" value="B"> B 蓝→左</label>
+          <label><input type="radio" name="batch" value="C"> C 绿→右</label>
+        </div>
+      </div>
+      <div class="group">
+        <label>装卸（L 装 / U 卸，仅停靠时有效）</label>
+        <div class="row">
+          <button id="btnLoad">装 1 件</button>
+          <button id="btnUnload">卸 1 件</button>
+        </div>
+      </div>
+      <div class="group">
+        <label>调度</label>
+        <div class="row">
+          <button id="btnDemo" class="primary">▶ 自动演示一局</button>
+          <button id="btnReset">重置</button>
+          <button id="btnMute">🔊 声音</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="progress">
+      交付进度：<b id="hudDeliver">A 0/6  B 0/5  C 0/9</b>
+      <p class="tips">提示：中途站可临时卸货（计入后续班次负担）；重车停车后桥面需数秒恢复；
+        安全载货 10 件，第 11 件起进入过载区。</p>
+    </section>
+  </div>
+
+  <script src="js/engine.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/main.js"></script>
+  <script>document.getElementById('btnAgain').addEventListener('click', function () {
+    document.getElementById('btnReset').click();
+  });</script>
+</body>
+</html>
