@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>混凝土养护模拟</title>
+<style>
+  body { font-family: sans-serif; background: #2b2f36; color: #eee; margin: 0; padding: 16px; }
+  h1 { font-size: 20px; margin: 0 0 12px; }
+  .wrap { display: flex; gap: 16px; flex-wrap: wrap; }
+  .boardBox { position: relative; }
+  canvas { background: #999; border-radius: 6px; display: block; }
+  #banner {
+    display: none; position: absolute; top: 40%; left: 50%; transform: translate(-50%,-50%);
+    padding: 14px 28px; font-size: 22px; border-radius: 8px; cursor: pointer;
+  }
+  #banner.win { background: #2e7d32; }
+  #banner.lose { background: #b71c1c; }
+  .panel { width: 300px; }
+  .row { margin: 8px 0; }
+  .row label { display: inline-block; width: 76px; font-size: 13px; }
+  .barBox { display: inline-block; width: 130px; height: 14px; background: #444; border-radius: 4px; vertical-align: middle; overflow: hidden; }
+  .barBox div { height: 100%; font-size: 10px; line-height: 14px; color: #111; text-align: right; transition: width .2s; }
+  #barMoist { background: #64b5f6; }
+  #barTemp { background: #ffb74d; }
+  #barStrength { background: #81c784; }
+  #barCrack { background: #e57373; }
+  .val { font-size: 12px; margin-left: 6px; }
+  button {
+    margin: 4px 4px 4px 0; padding: 8px 12px; border: 0; border-radius: 6px;
+    background: #4a6fa5; color: #fff; cursor: pointer; font-size: 14px;
+  }
+  button:hover { background: #5a82bd; }
+  #log {
+    height: 110px; overflow-y: auto; background: #1e2126; border-radius: 6px;
+    padding: 6px 8px; font-size: 12px; line-height: 1.6;
+  }
+  .hint { font-size: 12px; color: #aaa; margin-top: 8px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<h1>🧱 混凝土板养护模拟(7 天)</h1>
+<div class="wrap">
+  <div class="boardBox">
+    <canvas id="board" width="560" height="360"></canvas>
+    <div id="banner"></div>
+  </div>
+  <div class="panel">
+    <div class="row"><label>表面湿度</label>
+      <span class="barBox"><div id="barMoist"></div></span><span class="val" id="valMoist"></span></div>
+    <div class="row"><label>板温</label>
+      <span class="barBox"><div id="barTemp"></div></span><span class="val" id="valTemp"></span></div>
+    <div class="row"><label>强度</label>
+      <span class="barBox"><div id="barStrength"></div></span><span class="val" id="valStrength"></span></div>
+    <div class="row"><label>裂缝面积</label>
+      <span class="barBox"><div id="barCrack"></div></span><span class="val" id="valCrack"></span></div>
+    <div class="row">
+      <button id="btnSpray">💧 喷淋(3h)</button>
+      <button id="btnCover">加盖覆盖层</button>
+      <button id="btnVent">开通风</button>
+    </div>
+    <div class="row">
+      <button id="btnSpeed">速度 x1</button>
+      <button id="btnRestart">重新开始</button>
+    </div>
+    <div id="log"></div>
+    <div class="hint">
+      目标:7 天内强度 ≥ 25 MPa 且裂缝面积 &lt; 8%。<br>
+      表面蒸发过快会开裂——干燥、大风、热浪时注意喷淋和覆盖;<br>
+      温度骤降会损失强度——寒潮时盖覆盖层保温,避免通风。
+    </div>
+  </div>
+</div>
+<script src="sim.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
