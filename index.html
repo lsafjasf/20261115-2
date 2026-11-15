@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="雨巷夜递：在雨夜街区完成四单包裹，避开积水与碰撞。"
+    />
+    <title>雨巷夜递 · Rain Alley Dispatch</title>
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main id="app">
+      <canvas id="game" aria-label="雨巷夜递游戏画面"></canvas>
+
+      <section id="start-screen" class="screen">
+        <div class="start-card">
+          <p class="eyebrow">NIGHT SHIFT · 23:47</p>
+          <h1>雨巷<span>夜递</span></h1>
+          <p class="lede">
+            四个包裹，四条短签收窗。<br />
+            积水会吃掉抓地力，急刹时别猛拐。
+          </p>
+
+          <div class="briefing">
+            <div>
+              <kbd>W</kbd><kbd>↑</kbd>
+              <span>蹬车</span>
+            </div>
+            <div>
+              <kbd>S</kbd><kbd>↓</kbd>
+              <span>刹车</span>
+            </div>
+            <div>
+              <kbd>A</kbd><kbd>D</kbd>
+              <span>转向</span>
+            </div>
+            <div>
+              <kbd>F</kbd>
+              <span>车灯</span>
+            </div>
+          </div>
+
+          <p class="tip">
+            在亮起的门牌边减速停车，等待客户签收。<br />
+            车损达到 <strong>70</strong> 即结束班次。
+          </p>
+          <button id="start-button" type="button">开始夜班</button>
+          <p class="fineprint">建议开启声音 · 支持键盘与触控</p>
+        </div>
+      </section>
+
+      <section id="result-screen" class="screen hidden" aria-live="polite">
+        <div class="result-card">
+          <p id="result-eyebrow" class="eyebrow"></p>
+          <h2 id="result-title"></h2>
+          <p id="result-copy" class="lede"></p>
+          <div id="result-stats" class="stats"></div>
+          <button id="restart-button" type="button">再跑一班</button>
+        </div>
+      </section>
+
+      <div id="touch-controls" class="touch-controls" aria-hidden="true">
+        <button data-control="left" aria-label="向左">←</button>
+        <button data-control="throttle" aria-label="蹬车">↑</button>
+        <button data-control="right" aria-label="向右">→</button>
+        <button data-control="brake" aria-label="刹车">↓</button>
+      </div>
+    </main>
+    <script type="module" src="./src/game.js"></script>
+  </body>
+</html>
