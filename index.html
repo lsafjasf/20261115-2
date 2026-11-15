@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="林下八秒：用六个合成采样器节点编排一段雨林循环。"
+    />
+    <title>林下八秒 · Canopy Loop</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="forest-glow" aria-hidden="true"></div>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Canopy Loop 首页">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 40 40">
+              <path d="M7 30c4-12 10-19 26-23-4 13-12 20-26 23Z" />
+              <path d="M5 34c9-4 17-6 28-6" />
+              <path d="M16 24c3 1 7 2 11 2" />
+            </svg>
+          </span>
+          <span>
+            <strong>林下声场</strong>
+            <small>CANOPY / LOOP STUDY 02</small>
+          </span>
+        </a>
+        <div class="top-meta" aria-label="音频状态">
+          <span class="meta-item"><i class="status-dot"></i> WEB AUDIO</span>
+          <span class="meta-item">48 kHz</span>
+          <span class="meta-item">8.00 s LOOP</span>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="rack-panel">
+          <div class="rack-heading">
+            <p class="eyebrow">FIELD COMPOSER / NO. 02</p>
+            <h1>林下<br /><em>八秒</em></h1>
+            <p class="intro">
+              六枚采样节点，悬停在雨林的呼吸之间。拖到时间线上，
+              让虫鸣、水滴与鸟声长成一段循环。
+            </p>
+          </div>
+
+          <div class="rack-caption">
+            <span>SAMPLERS</span>
+            <span>06 CH</span>
+          </div>
+          <div class="sampler-rack" id="samplerRack"></div>
+
+          <div class="rack-tip">
+            <span class="tip-mark">↔</span>
+            <p>拖动节点调整发声时刻<br />轻点右侧开关可单独静音</p>
+          </div>
+        </aside>
+
+        <section class="composer-panel" aria-label="八秒循环编辑器">
+          <div class="composer-head">
+            <div>
+              <p class="eyebrow">LOOP SEQUENCER</p>
+              <h2>声场时间线</h2>
+            </div>
+            <div class="preset-switcher" role="group" aria-label="节奏预置">
+              <button class="preset-button active" data-preset="dawn" type="button" aria-pressed="true">
+                <span class="preset-code">A</span>
+                <span><strong>晨雾</strong><small>疏朗 · 6 nodes</small></span>
+              </button>
+              <button class="preset-button" data-preset="squall" type="button" aria-pressed="false">
+                <span class="preset-code">B</span>
+                <span><strong>骤雨</strong><small>密集 · 2 clusters</small></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="timeline-shell">
+            <div class="timeline-left">
+              <div class="ruler-spacer">TRACK</div>
+              <div class="wave-label">
+                <span>合成波形</span>
+                <small>COMPOSITE</small>
+              </div>
+              <div class="lane-labels" id="laneLabels"></div>
+            </div>
+
+            <div class="timeline-right" id="timelineRight">
+              <div class="ruler" id="ruler" aria-hidden="true"></div>
+              <div class="wave-frame">
+                <canvas id="waveCanvas" aria-label="八秒合成波形"></canvas>
+                <div class="wave-grid-overlay" aria-hidden="true"></div>
+                <span class="wave-readout">0</span>
+                <span class="wave-readout wave-readout-end">8.00 s</span>
+              </div>
+              <div class="plot" id="plot">
+                <canvas id="gridCanvas" aria-label="节拍网格"></canvas>
+                <div class="mask-layer" id="maskLayer"></div>
+                <div class="nodes-layer" id="nodesLayer"></div>
+              </div>
+              <div class="playhead" id="playhead" aria-hidden="true">
+                <span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mix-status">
+            <div class="status-copy" id="statusCopy">
+              <span class="status-icon" aria-hidden="true">✓</span>
+              <div>
+                <strong>声部清晰</strong>
+                <p>六个节点间隔舒展，没有明显掩蔽。</p>
+              </div>
+            </div>
+            <div class="density-meter" aria-label="节奏密度">
+              <span>DENSITY</span>
+              <div class="density-bars" id="densityBars" aria-hidden="true"></div>
+            </div>
+          </div>
+
+          <div class="transport">
+            <button class="play-button" id="playButton" type="button" aria-label="播放八秒循环">
+              <span class="play-icon" aria-hidden="true"></span>
+              <span class="pause-icon" aria-hidden="true"><i></i><i></i></span>
+              <span class="play-ripple"></span>
+            </button>
+            <div class="transport-copy">
+              <span id="playState">准备循环</span>
+              <strong id="timeReadout">00.00 <i>/ 08.00</i></strong>
+            </div>
+            <div class="transport-divider" aria-hidden="true"></div>
+            <div class="seam-monitor" id="seamMonitor">
+              <span class="seam-label">LOOP SEAM</span>
+              <div class="seam-result" id="seamResult">
+                <span class="seam-pulse"></span>
+                <span>正在检查两段接缝…</span>
+              </div>
+            </div>
+            <button class="seam-button" id="seamButton" type="button">
+              重新检测
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>ALL SOUNDS SYNTHESIZED IN BROWSER</span>
+        <span>拖拽节点 · 0.25 秒吸附 · 独立静音</span>
+        <span>CANOPY FIELD LAB / 2026</span>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
