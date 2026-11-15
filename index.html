@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="深渊潮汐调度中枢：在十五分钟内平衡深海基地的发电、储能与关键负载。"
+    />
+    <title>ABYSS-7 · 潮汐调度中枢</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='16' fill='%2305161b'/%3E%3Cpath d='M5 18c4-5 8-5 11 0s7 5 11 0M5 23c4-5 8-5 11 0s7 5 11 0' fill='none' stroke='%2366ead4' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ocean-glow" aria-hidden="true"></div>
+    <div class="scanlines" aria-hidden="true"></div>
+
+    <main class="console">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <span class="brand-ring"></span>
+            <span class="brand-wave"></span>
+          </span>
+          <span class="brand-copy">
+            <strong>ABYSS<span>—</span>7</strong>
+            <small>深海基地 · 潮汐调度中枢</small>
+          </span>
+        </div>
+
+        <div class="mission-state">
+          <span class="signal-dot" id="signalDot"></span>
+          <span class="mission-label">MISSION 06–T</span>
+          <strong id="stateLabel">系统稳定</strong>
+        </div>
+
+        <div class="clock-block">
+          <div class="clock-heading">
+            <span>值守剩余</span>
+            <span id="timeScaleLabel">×12 时流</span>
+          </div>
+          <div class="clock-row">
+            <strong id="missionTime">15:00</strong>
+            <div class="clock-progress"><span id="missionProgress"></span></div>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button class="icon-button" id="audioButton" type="button" aria-label="开启环境音频" title="开启环境音频">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 9v6h4l5 4V5L8 9H4Z" />
+              <path class="sound-wave" d="M16 8.6a5 5 0 0 1 0 6.8M18.8 6a8.6 8.6 0 0 1 0 12" />
+              <path class="sound-off" d="m16 9 5 6m0-6-5 6" />
+            </svg>
+          </button>
+          <button class="icon-button" id="pauseButton" type="button" aria-label="暂停模拟" title="暂停 / 继续">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path class="pause-icon" d="M8 5v14M16 5v14" />
+              <path class="play-icon" d="m8 5 11 7-11 7V5Z" />
+            </svg>
+          </button>
+          <button class="speed-button" id="speedButton" type="button" title="切换模拟速度">×12</button>
+          <button class="restart-button" id="restartButton" type="button" title="重新开始">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <section class="workspace">
+        <div class="viewport-panel">
+          <div class="viewport-heading">
+            <div>
+              <span class="eyebrow">SECTOR 04 · 北海槽</span>
+              <h1>基地态势</h1>
+            </div>
+            <div class="view-tools">
+              <span class="live-indicator"><i></i> LIVE</span>
+              <span class="depth-readout">−2,840 m</span>
+            </div>
+          </div>
+
+          <div class="canvas-shell">
+            <canvas id="baseCanvas" aria-label="深海基地能量流与电池温度可视化"></canvas>
+            <div class="canvas-vignette" aria-hidden="true"></div>
+            <div class="canvas-corners" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+            <div class="site-label">
+              <span>HABITAT RING</span>
+              <strong>A-17 深渊前哨</strong>
+            </div>
+            <div class="flow-legend">
+              <span><i class="legend-dot tidal"></i>潮汐</span>
+              <span><i class="legend-dot fuel"></i>燃料电池</span>
+              <span><i class="legend-dot battery"></i>电池</span>
+            </div>
+            <div class="canvas-alert" id="canvasAlert" role="status">
+              <span class="alert-icon">!</span>
+              <span id="canvasAlertText">检测到供电缺口</span>
+            </div>
+            <div class="temp-float">
+              <span>电池组温度</span>
+              <strong id="canvasTemp">36.0<small>°C</small></strong>
+              <div class="temp-track"><i id="canvasTempBar"></i></div>
+            </div>
+            <div class="event-toast" id="eventToast" role="status">
+              <span class="toast-kicker" id="toastKicker">系统</span>
+              <strong id="toastText">负荷总线已就绪</strong>
+            </div>
+          </div>
+
+          <div class="telemetry-strip">
+            <article class="metric">
+              <span class="metric-icon meter"></span>
+              <div><small>总负载</small><strong id="loadMetric">—</strong></div>
+              <em id="loadTrend">—</em>
+            </article>
+            <article class="metric">
+              <span class="metric-icon wave"></span>
+              <div><small>潮汐出力</small><strong id="tidalMetric">—</strong></div>
+              <em id="flowMetric">—</em>
+            </article>
+            <article class="metric">
+              <span class="metric-icon bolt"></span>
+              <div><small>电池净流</small><strong id="netMetric">—</strong></div>
+              <em id="netTrend">—</em>
+            </article>
+            <article class="metric">
+              <span class="metric-icon shield"></span>
+              <div><small>基地稳定性</small><strong id="stabilityMetric">—</strong></div>
+              <em id="stabilityTrend">—</em>
+            </article>
+          </div>
+        </div>
+
+        <aside class="control-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">POWER MANAGEMENT</span>
+              <h2>能源分配</h2>
+            </div>
+            <span class="shift-tag">值班席 A</span>
+          </div>
+
+          <section class="source-section" aria-label="能源来源">
+            <article class="source-card tidal-card">
+              <div class="source-card-head">
+                <span class="source-symbol tidal-symbol" aria-hidden="true">
+                  <svg viewBox="0 0 32 32"><path d="M4 17c4-5 8-5 12 0s8 5 12 0M4 22c4-5 8-5 12 0s8 5 12 0M9 10l4-4m2 4 4-4" /></svg>
+                </span>
+                <div><small>潮汐发电机</small><strong id="tidalSourceValue">—</strong></div>
+                <span class="source-status">低流速</span>
+              </div>
+              <div class="source-foot">
+                <span>流速 <b id="flowValue">—</b></span>
+                <span>容量 <b>22.0 kW</b></span>
+              </div>
+            </article>
+
+            <article class="source-card battery-card">
+              <div class="source-card-head">
+                <span class="source-symbol battery-symbol" aria-hidden="true">
+                  <svg viewBox="0 0 32 32"><rect x="5" y="9" width="20" height="14" rx="3" /><path d="M28 13v6M9 13h5v6H9Z" /></svg>
+                </span>
+                <div><small>主电池组 · 18.0 kWh</small><strong id="batterySourceValue">—</strong></div>
+                <span class="battery-charge" id="batteryCharge">—</span>
+              </div>
+              <div class="battery-bar"><span id="batteryFill"></span><i class="reserve-line"></i></div>
+              <div class="allocation-row">
+                <label for="batteryLimit">放电上限</label>
+                <input id="batteryLimit" type="range" min="18" max="42" value="38" step="1" />
+                <output id="batteryLimitValue" for="batteryLimit">38 kW</output>
+              </div>
+              <div class="source-foot heat-foot">
+                <span>温度 <b id="batteryTempValue">—</b></span>
+                <span id="heatStatus">散热正常</span>
+              </div>
+            </article>
+
+            <article class="source-card fuel-card">
+              <div class="source-card-head">
+                <span class="source-symbol fuel-symbol" aria-hidden="true">
+                  <svg viewBox="0 0 32 32"><path d="M8 26V8h11v18M5 26h17M11 12h5M22 13h4v8a3 3 0 0 1-3 3M22 17h4" /></svg>
+                </span>
+                <div><small>备用燃料电池</small><strong id="fuelSourceValue">—</strong></div>
+                <button class="mini-switch" id="fuelToggle" type="button" role="switch" aria-checked="false" aria-label="切换备用燃料电池">
+                  <i></i><span>关闭</span>
+                </button>
+              </div>
+              <div class="fuel-leds" id="fuelLeds" aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+              <div class="source-foot">
+                <span>最大输出 <b>24.0 kW</b></span>
+                <span>氢气 <b id="fuelRemaining">100%</b></span>
+              </div>
+            </article>
+          </section>
+
+          <section class="load-section" aria-label="负载管理">
+            <div class="section-title">
+              <div><span class="eyebrow">LOAD BUS</span><h3>负荷总线</h3></div>
+              <div class="bus-total"><span id="busTotal">—</span><small>kW / 78</small></div>
+            </div>
+            <div class="bus-capacity"><span id="busCapacityFill"></span><i class="bus-capacity-line"></i></div>
+            <div class="load-list" id="loadList"></div>
+          </section>
+
+          <section class="log-section">
+            <div class="section-title compact">
+              <div><span class="eyebrow">OPERATIONS</span><h3>操作记录</h3></div>
+              <span class="log-count" id="logCount">00</span>
+            </div>
+            <div class="event-log" id="eventLog" aria-live="polite"></div>
+          </section>
+        </aside>
+      </section>
+
+      <footer class="footer">
+        <span><i class="footer-dot"></i> 控制链路正常</span>
+        <span>目标：15 分钟值守 · 电池 ≥ 20% · 稳定性 ≥ 60%</span>
+        <span id="footerTime">SOL 018 · 04:17:00</span>
+      </footer>
+    </main>
+
+    <div class="modal-backdrop" id="resultModal" hidden>
+      <section class="result-card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+        <span class="result-kicker" id="resultKicker">MISSION COMPLETE</span>
+        <h2 id="resultTitle">基地守住了</h2>
+        <p id="resultMessage">十五分钟值守完成，核心系统保持在线。</p>
+        <div class="result-stats">
+          <div><small>剩余电量</small><strong id="resultBattery">—</strong></div>
+          <div><small>基地稳定性</small><strong id="resultStability">—</strong></div>
+          <div><small>执行操作</small><strong id="resultOps">—</strong></div>
+        </div>
+        <button id="resultRestart" class="primary-button" type="button">再次值守</button>
+      </section>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
