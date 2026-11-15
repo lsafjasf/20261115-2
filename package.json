@@ -1,0 +1,14 @@
+{
+  "name": "valley-balloon-escape",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "simulate": "node tools/simulate.js",
+    "verify": "node tools/verify.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0"
+  }
+}

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#12161a" />
+    <meta
+      name="description"
+      content="控制热气球燃烧器与压舱物，带三名乘客越过火线逼近的山谷。"
+    />
+    <title>逆风越岭 · 山谷热气球逃生</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <canvas id="game" aria-label="热气球越过两道山脊的山谷逃生场景"></canvas>
+      <div class="grain" aria-hidden="true"></div>
+
+      <header class="topbar">
+        <div class="brand">
+          <span class="eyebrow">VALLEY EVACUATION · 05:42</span>
+          <h1>逆风越岭</h1>
+        </div>
+        <div class="mission" aria-label="逃生目标">
+          <div class="mission-row">
+            <span class="objective" id="objective1"><i></i>第一道山脊</span>
+            <span class="objective" id="objective2"><i></i>第二道山脊</span>
+            <span class="objective" id="objective3"><i></i>安全落地</span>
+          </div>
+          <div class="progress"><span id="progressFill"></span></div>
+        </div>
+        <div class="top-actions">
+          <button class="icon-button" id="audioButton" type="button" aria-pressed="true">
+            <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span id="audioLabel">声音开</span>
+          </button>
+          <button class="round-button" id="helpButton" type="button" aria-label="查看操作说明">?</button>
+        </div>
+      </header>
+
+      <aside class="wind-panel" aria-label="风向与风速">
+        <div class="panel-label">山谷风</div>
+        <div class="wind-compass">
+          <span id="windArrow" class="wind-arrow">→</span>
+          <span id="windSpeed">28</span>
+          <small>km/h</small>
+        </div>
+        <div class="wind-note" id="windNote">向东南吹 · 顺风出发</div>
+      </aside>
+
+      <aside class="flight-panel" aria-label="气球状态">
+        <div class="gauge-head">
+          <span class="panel-label">球囊温度</span>
+          <strong id="tempValue">62°</strong>
+        </div>
+        <div class="heat-track">
+          <span class="heat-safe" aria-hidden="true"></span>
+          <span class="heat-fill" id="heatFill"></span>
+          <span class="heat-marker" id="heatMarker"></span>
+        </div>
+        <div class="gauge-foot">
+          <span id="climbState">缓升</span>
+          <span id="verticalSpeed">+0.0 m/s</span>
+        </div>
+        <div class="ballast-row">
+          <span class="panel-label">压舱物</span>
+          <div class="ballast-bags" id="ballastBags"></div>
+          <span class="ballast-count" id="ballastCount">3 袋</span>
+        </div>
+      </aside>
+
+      <div class="altitude-callout" id="altitudeCallout" aria-live="polite"></div>
+
+      <footer class="control-rail">
+        <div class="key-group">
+          <span class="key">W</span><span class="key">↑</span>
+          <span>点火</span>
+        </div>
+        <div class="key-group">
+          <span class="key">S</span><span class="key">↓</span>
+          <span>放气下降</span>
+        </div>
+        <div class="key-group">
+          <span class="key wide">B</span>
+          <span>投压舱物</span>
+        </div>
+        <div class="touch-controls" aria-label="触屏控制">
+          <button type="button" data-control="burn">点火</button>
+          <button type="button" data-control="vent">放气</button>
+          <button type="button" data-control="ballast">投压舱</button>
+        </div>
+        <div class="rail-spacer"></div>
+        <button class="text-button" id="restartButton" type="button">重新起飞</button>
+      </footer>
+
+      <section class="overlay is-visible" id="startOverlay">
+        <div class="start-card">
+          <div class="card-topline">
+            <span>紧急撤离令 / 03</span>
+            <span class="live-dot">火线推进中</span>
+          </div>
+          <h2>山谷已经留不住<br /><em>三个人</em>了。</h2>
+          <p>
+            林火正从西侧封住谷底。你只有一只热气球、三袋压舱物和两次越过山脊的机会。
+            保持温度、借风前进，在火焰合拢前落到东侧高地。
+          </p>
+          <div class="brief-grid">
+            <div><span>载员</span><strong>03 人</strong></div>
+            <div><span>压舱</span><strong>03 袋</strong></div>
+            <div><span>航程</span><strong>≈ 1.4 km</strong></div>
+          </div>
+          <div class="start-actions">
+            <button class="primary-button" id="startButton" type="button">
+              <span>开始逃生</span><i>→</i>
+            </button>
+            <button class="secondary-button" id="demoButton" type="button">自动演示</button>
+          </div>
+          <p class="microcopy">点火会升温；冷却与放气会降低升力。压舱物只能投一次，投早了就很难压住高度。</p>
+        </div>
+      </section>
+
+      <section class="overlay result-overlay" id="resultOverlay">
+        <div class="result-card">
+          <span class="result-kicker" id="resultKicker">撤离完成</span>
+          <h2 id="resultTitle">三个人，<br />都到了。</h2>
+          <p id="resultCopy">东侧高地已经接应。山谷里的火光被甩在身后。</p>
+          <div class="result-stats">
+            <div><span>用时</span><strong id="resultTime">00:00</strong></div>
+            <div><span>剩余压舱</span><strong id="resultBallast">2 袋</strong></div>
+            <div><span>落地速度</span><strong id="resultSpeed">3.1</strong></div>
+          </div>
+          <div class="result-actions">
+            <button class="primary-button" id="againButton" type="button"><span>再飞一次</span><i>↻</i></button>
+            <button class="secondary-button" id="watchAgainButton" type="button">观看自动逃生</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="overlay help-overlay" id="helpOverlay">
+        <div class="help-card">
+          <button class="round-button close-help" id="closeHelpButton" type="button" aria-label="关闭说明">×</button>
+          <span class="result-kicker">飞行手册</span>
+          <h2>让气球<br />听话一点。</h2>
+          <div class="help-list">
+            <div><b>01</b><p><strong>按住 W / ↑ 点火。</strong>球囊升温产生升力，松手后会持续冷却。</p></div>
+            <div><b>02</b><p><strong>按住 S / ↓ 放气。</strong>快速降低升力，接近落地时用它减速。</p></div>
+            <div><b>03</b><p><strong>按 B 投压舱物。</strong>立刻获得升力，但三袋用完就没有下一次补救。</p></div>
+            <div><b>04</b><p><strong>看风向和山脊。</strong>高处的风更快；篮底低于山脊就会撞山。</p></div>
+          </div>
+          <button class="primary-button" id="resumeButton" type="button"><span>继续</span><i>→</i></button>
+        </div>
+      </section>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <div class="demo-banner" id="demoBanner">自动逃生演示 · 可随时接管</div>
+    </main>
+    <script type="module" src="./src/game.js"></script>
+  </body>
+</html>
