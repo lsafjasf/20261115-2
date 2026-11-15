@@ -1,0 +1,10 @@
+{
+  "name": "inland-tug-barge",
+  "version": "1.0.0",
+  "description": "内河拖船带三节驳船过桥过弯的 Canvas 物理小游戏",
+  "private": true,
+  "scripts": {
+    "test": "node test/run-tests.js && node test/browser-smoke.js && node test/input-flow.js",
+    "start": "node test/server.js"
+  }
+}

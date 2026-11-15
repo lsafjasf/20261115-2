@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>内河拖船 · 三驳过弯</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #1d2b1f;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #f2efe6;
+    }
+    #game {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+    #hud {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(12, 20, 16, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 12px 16px;
+      min-width: 230px;
+      font-size: 13px;
+      line-height: 1.7;
+      pointer-events: none;
+    }
+    #hud h1 {
+      font-size: 16px;
+      margin: 0 0 6px;
+      letter-spacing: 1px;
+    }
+    .bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 2px 0 6px;
+    }
+    .bar > span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #6fcf7a, #e6c14c);
+    }
+    #help {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      background: rgba(12, 20, 16, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      line-height: 1.8;
+      max-width: 280px;
+    }
+    #banner {
+      position: absolute;
+      top: 38%;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 40px;
+      font-weight: 700;
+      text-shadow: 0 3px 18px rgba(0, 0, 0, 0.7);
+      display: none;
+    }
+    #banner small {
+      display: block;
+      font-size: 16px;
+      font-weight: 400;
+      margin-top: 10px;
+    }
+    .btn {
+      pointer-events: auto;
+      margin-top: 8px;
+      background: #2e6f8f;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .btn:hover { background: #3a86ab; }
+  </style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="hud">
+    <h1>内河拖船 · 三驳过弯</h1>
+    <div>航速 <span id="speed">0</span> px/s · 用时 <span id="clock">0</span>s</div>
+    <div>水位 <span id="water">0.00</span> m
+      <span id="bridges"></span>
+    </div>
+    <div>系缆长度 <span id="cable">0</span>
+      <div class="bar"><span id="cableBar" style="width:0%"></span></div>
+    </div>
+    <div>缆绳张力 <span id="tension">0</span>
+      <div class="bar"><span id="tensionBar" style="width:0%"></span></div>
+    </div>
+    <div>船体损伤 <span id="damage">0</span> / <span id="dmgLimit"></span>
+      <div class="bar"><span id="damageBar" style="width:0%"></span></div>
+    </div>
+    <div>最大折叠角 <span id="fold">0</span>°</div>
+    <div>油门 <span id="throttle">0</span> · 舵 <span id="rudder">0</span></div>
+    <button class="btn" id="autoBtn">开启自动驾驶 (T)</button>
+    <button class="btn" id="restartBtn">重新开始 (R)</button>
+  </div>
+  <div id="help">
+    <b>操作</b><br />
+    W / S：前进 / 倒车油门　A / D：左右舵<br />
+    Q / E：收短 / 放出三根系缆<br />
+    T：切换自动驾驶演示　R：重新开始<br />
+    红色桥表示当前水位无法穿桥，需等待涨落潮。
+  </div>
+  <div id="banner"></div>
+  <script src="js/sim.js"></script>
+  <script src="js/autopilot.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
