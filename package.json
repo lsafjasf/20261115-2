@@ -1,0 +1,13 @@
+{
+  "name": "lunar-potato-greenhouse",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Canvas lunar greenhouse simulation with a three-batch potato loop.",
+  "scripts": {
+    "start": "python3 -m http.server 4199 --bind 127.0.0.1",
+    "test": "playwright test tests/greenhouse.spec.js --workers=1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1"
+  }
+}

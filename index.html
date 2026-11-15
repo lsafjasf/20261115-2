@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07110f" />
+    <title>月壤温室 · 土豆三季</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="space-noise" aria-hidden="true"></div>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">M</span>
+          <div>
+            <p class="eyebrow">LUNAR HABITAT / SECTOR 07</p>
+            <h1>月壤温室 <span>土豆三季</span></h1>
+          </div>
+        </div>
+        <div class="mission-progress" aria-label="土豆批次进度">
+          <div class="round-node active" data-round="1"><b>01</b><small>培育中</small></div>
+          <i></i>
+          <div class="round-node" data-round="2"><b>02</b><small>待留种</small></div>
+          <i></i>
+          <div class="round-node" data-round="3"><b>03</b><small>待留种</small></div>
+        </div>
+        <button class="icon-button audio-toggle" id="audioToggle" aria-pressed="true">
+          <span class="audio-wave">▥</span>
+          <span class="audio-label">环境声开启</span>
+        </button>
+      </header>
+
+      <main class="workspace">
+        <section class="viewport-panel">
+          <div class="canvas-frame">
+            <canvas id="greenhouseCanvas" width="1200" height="720">
+              你的浏览器需要支持 Canvas。
+            </canvas>
+            <div class="canvas-hud">
+              <span class="sol-badge"><i></i><b id="cycleLabel">昼 14:00</b></span>
+              <span class="telemetry"><i></i>生态闭环在线</span>
+              <button class="scan-toggle" id="heatToggle" aria-pressed="false">热成像</button>
+            </div>
+            <div class="phase-banner" id="phaseBanner">
+              <p class="phase-kicker">任务 01 / 03</p>
+              <h2 id="phaseTitle">等待播种</h2>
+              <p id="phaseDetail">初始种薯已装载，先校准四项环境参数。</p>
+            </div>
+            <div class="canvas-caption">
+              <span id="captionHint">低重力散热效率仅为地表的 38%</span>
+              <span>气闸闭合 · 舱压正常</span>
+            </div>
+          </div>
+
+          <div class="telemetry-strip">
+            <article class="metric oxygen">
+              <span class="metric-icon">O₂</span>
+              <div><small>舱内氧气</small><strong id="oxygenValue">20.9%</strong></div>
+              <em id="oxygenTrend">循环待机</em>
+            </article>
+            <article class="metric water">
+              <span class="metric-icon">H₂O</span>
+              <div><small>水培储水</small><strong id="waterValue">28.0 L</strong></div>
+              <em id="waterTrend">冷凝回收 68%</em>
+            </article>
+            <article class="metric heat">
+              <span class="metric-icon">°C</span>
+              <div><small>舱内温度</small><strong id="tempValue">20.5°</strong></div>
+              <em id="heatTrend">散热偏慢</em>
+            </article>
+            <article class="metric co2">
+              <span class="metric-icon">CO₂</span>
+              <div><small>二氧化碳</small><strong id="co2Value">620 ppm</strong></div>
+              <em id="co2Trend">光合作用待机</em>
+            </article>
+            <article class="metric pantry">
+              <span class="metric-icon">◒</span>
+              <div><small>食用库存</small><strong id="pantryValue">0.0 kg</strong></div>
+              <em id="seedValue">种薯库存 1 枚</em>
+            </article>
+          </div>
+        </section>
+
+        <aside class="control-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">LIFE SUPPORT CONSOLE</p>
+              <h2>培育控制台</h2>
+            </div>
+            <span class="online-dot">LIVE</span>
+          </div>
+
+          <div class="crop-card">
+            <div class="crop-heading">
+              <span class="crop-glyph">◉</span>
+              <div>
+                <small id="batchLabel">批次 01 · 种薯待激活</small>
+                <strong>SOLANUM TUBEROSUM</strong>
+              </div>
+              <b id="growthValue">0%</b>
+            </div>
+            <div class="growth-track"><i id="growthBar"></i><span></span><span></span><span></span></div>
+            <div class="crop-meta">
+              <span>长势 <b id="vigorValue">--</b></span>
+              <span>预计产量 <b id="yieldValue">--</b></span>
+              <span>热应激 <b id="stressValue">0%</b></span>
+            </div>
+          </div>
+
+          <div class="controls" id="controls">
+            <label class="control-row" for="lightControl">
+              <div class="control-copy"><span>光照周期</span><b id="lightValue">14 h</b></div>
+              <input id="lightControl" type="range" min="6" max="21" step="1" value="14" />
+              <div class="range-labels"><span>暗 6h</span><span>理想 16h</span><span>亮 21h</span></div>
+            </label>
+            <label class="control-row" for="nutrientControl">
+              <div class="control-copy"><span>水培营养</span><b id="nutrientValue">1.80 EC</b></div>
+              <input id="nutrientControl" type="range" min="0.6" max="3.2" step="0.1" value="1.8" />
+              <div class="range-labels"><span>稀释</span><span>理想 1.9</span><span>浓缩</span></div>
+            </label>
+            <label class="control-row" for="tempControl">
+              <div class="control-copy"><span>温控目标</span><b id="tempControlValue">21°C</b></div>
+              <input id="tempControl" type="range" min="14" max="36" step="1" value="21" />
+              <div class="range-labels"><span>冷 14°</span><span>理想 21°</span><span>热 36°</span></div>
+            </label>
+            <label class="control-row" for="co2Control">
+              <div class="control-copy"><span>CO₂ 补充</span><b id="co2ControlValue">850 ppm</b></div>
+              <input id="co2Control" type="range" min="350" max="1200" step="25" value="850" />
+              <div class="range-labels"><span>低 350</span><span>理想 850</span><span>高 1200</span></div>
+            </label>
+          </div>
+
+          <div class="pump-card">
+            <div class="pump-icon"><i></i></div>
+            <div class="pump-copy">
+              <small>低重力循环泵</small>
+              <strong id="pumpState">运行中</strong>
+              <span id="pumpHint">冷却效率 +58% · 耗水 0.01 L/s</span>
+            </div>
+            <button id="pumpBtn" aria-pressed="true"><span>泵机</span><b>ON</b></button>
+          </div>
+
+          <div class="sim-actions">
+            <button class="primary-action" id="primaryBtn">
+              <span id="primaryLabel">播种第 1 批</span>
+              <small id="primaryMeta">消耗种薯 1 枚 · 水 1.2 L</small>
+            </button>
+            <div class="speed-control" aria-label="模拟速度">
+              <button data-speed="1" class="active">1×</button>
+              <button data-speed="2">2×</button>
+              <button data-speed="4">4×</button>
+            </div>
+          </div>
+
+          <div class="system-note" id="systemNote">
+            <span>!</span>
+            <p>月面辐射散热慢于地表。热成像用于定位泵机与灯阵的热区。</p>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <div class="completion-overlay" id="completionOverlay">
+      <div class="completion-card">
+        <p class="eyebrow">MISSION COMPLETE / CLOSED LOOP</p>
+        <h2>三季土豆，完成闭环。</h2>
+        <p>三批作物均已收获，最后一批仍预留种薯库存。氧气、水与食用储备足以支撑下一次月面播种。</p>
+        <div class="completion-stats" id="completionStats"></div>
+        <button id="restartBtn">再次运行温室模拟</button>
+      </div>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
