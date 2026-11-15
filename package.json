@@ -1,0 +1,16 @@
+{
+  "name": "bumblebee-greenhouse",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Canvas 温室熊蜂授粉调度游戏",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/engine.test.js",
+    "test:browser": "node tests/browser.e2e.mjs",
+    "test:e2e": "node tests/run-browser.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0"
+  }
+}

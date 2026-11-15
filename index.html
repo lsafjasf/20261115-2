@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f2efe5" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23264b37'/%3E%3Cellipse cx='32' cy='34' rx='15' ry='19' fill='%23e6a72e'/%3E%3Cpath d='M20 27h24M19 35h26M22 43h20' stroke='%23262b20' stroke-width='3'/%3E%3Cellipse cx='23' cy='16' rx='7' ry='4' fill='%23fff' opacity='.55' transform='rotate(-30 23 16)'/%3E%3Cellipse cx='40' cy='14' rx='7' ry='4' fill='%23fff' opacity='.42' transform='rotate(30 40 14)'/%3E%3C/svg%3E" />
+    <title>暖房蜂事 · 熊蜂授粉调度</title>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <div>
+            <p class="eyebrow">GREENHOUSE 02 / 授粉周期</p>
+            <h1>暖房蜂事</h1>
+          </div>
+        </div>
+        <div class="cycle-head">
+          <div class="cycle-copy">
+            <span id="cycleStatus">准备放蜂</span>
+            <strong id="clock">06:00</strong>
+          </div>
+          <div class="timeline" aria-hidden="true">
+            <span id="timelineFill"></span>
+            <i class="sun-mark"></i>
+          </div>
+        </div>
+        <button id="audioBtn" class="icon-btn" aria-label="切换声音" title="切换声音">
+          <span id="audioIcon">◖))</span>
+          <span class="sound-label">环境声</span>
+        </button>
+      </header>
+
+      <main class="workspace">
+        <section class="stage-panel">
+          <div class="metric-strip" aria-label="温室实时指标">
+            <article class="metric">
+              <span class="metric-icon warm">☀</span>
+              <div><small>温室温度</small><strong id="tempMetric">22.0°C</strong></div>
+              <em id="tempTag">舒适</em>
+            </article>
+            <article class="metric">
+              <span class="metric-icon blue">▥</span>
+              <div><small>蜂群活跃度</small><strong id="activityMetric">84%</strong></div>
+              <em id="activityTag">稳定</em>
+            </article>
+            <article class="metric">
+              <span class="metric-icon amber">●</span>
+              <div><small>蜂群数量</small><strong id="colonyMetric">56</strong></div>
+              <em id="colonyTag">下限 40</em>
+            </article>
+            <article class="metric">
+              <span class="metric-icon green">✦</span>
+              <div><small>已坐果</small><strong id="fruitMetric">0 / 3</strong></div>
+              <em id="fruitTag">本周期</em>
+            </article>
+          </div>
+
+          <div class="canvas-wrap">
+            <canvas id="scene" aria-label="温室、蜂群轨迹、作物与热区可视化"></canvas>
+            <div class="canvas-vignette" aria-hidden="true"></div>
+            <div class="scene-legend" aria-hidden="true">
+              <span><i class="dot bee-dot"></i>蜂群轨迹</span>
+              <span><i class="dot heat-dot"></i>热应激区</span>
+              <span><i class="dot residue-dot"></i>农残区</span>
+            </div>
+            <div id="toast" class="toast" role="status"></div>
+
+            <div id="resultCard" class="result-card hidden">
+              <div class="result-seal" id="resultSeal">✓</div>
+              <p class="eyebrow" id="resultEyebrow">CYCLE COMPLETE</p>
+              <h2 id="resultTitle">授粉周期完成</h2>
+              <p id="resultBody"></p>
+              <div id="resultStats" class="result-stats"></div>
+              <div class="result-actions">
+                <button id="againBtn" class="primary">再放一箱蜂</button>
+                <button id="closeResultBtn" class="ghost">查看温室</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="transport">
+            <div class="transport-left">
+              <button id="startBtn" class="primary play-btn"><span>▶</span><b>开始授粉</b></button>
+              <button id="pauseBtn" class="icon-btn" disabled aria-label="暂停">Ⅱ</button>
+              <button id="speedBtn" class="speed-btn" aria-label="切换速度">1×</button>
+              <button id="resetBtn" class="icon-btn" aria-label="重置">↺</button>
+            </div>
+            <div class="phase-track">
+              <span class="phase now" id="phaseMorning">晨间</span>
+              <span class="phase" id="phaseNoon">正午热峰</span>
+              <span class="phase" id="phaseAfter">坐果</span>
+              <span class="phase" id="phaseFinish">收工</span>
+            </div>
+            <button id="heatScenarioBtn" class="scenario-btn">
+              <span>实验场景</span> 通风不足
+            </button>
+          </div>
+        </section>
+
+        <aside class="control-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">CLIMATE CONTROL</p>
+              <h2>环境调控</h2>
+            </div>
+            <span id="autoBadge" class="status-pill">手动</span>
+          </div>
+
+          <section class="control-block">
+            <div class="control-label">
+              <label for="ventilation">顶部通风</label>
+              <output id="ventilationOut">30%</output>
+            </div>
+            <input id="ventilation" type="range" min="0" max="100" value="30" />
+            <div class="range-foot"><span>闷闭</span><span>强排风</span></div>
+          </section>
+
+          <section class="control-block">
+            <div class="control-label">
+              <label for="shade">遮阳幕</label>
+              <output id="shadeOut">35%</output>
+            </div>
+            <input id="shade" type="range" min="0" max="100" value="35" />
+            <div class="range-foot"><span>全透光</span><span>全遮阴</span></div>
+          </section>
+
+          <section class="control-block">
+            <div class="control-label">
+              <span>放蜂区</span>
+              <output id="releaseOut">中央</output>
+            </div>
+            <div class="release-grid" id="releaseGrid">
+              <button data-zone="west"><i>西</i><span>番茄近</span></button>
+              <button data-zone="center" class="active"><i>中</i><span>均衡</span></button>
+              <button data-zone="east"><i>东</i><span>蓝莓近</span></button>
+            </div>
+          </section>
+
+          <section class="conditions">
+            <div class="section-title">
+              <h3>田间状况</h3>
+              <span id="residueSummary">农残 0.12</span>
+            </div>
+            <div id="cropList" class="crop-list"></div>
+          </section>
+
+          <section class="colony-card">
+            <div class="section-title">
+              <h3>蜂群健康</h3>
+              <span id="colonyDelta">-</span>
+            </div>
+            <div class="colony-main">
+              <strong id="colonyBig">56</strong>
+              <span>只工蜂</span>
+              <div class="colony-bar"><i id="colonyBar"></i><b></b></div>
+            </div>
+            <p id="colonyAdvice">温度与农残处于可控范围，可开始放蜂。</p>
+          </section>
+
+          <section class="event-section">
+            <div class="section-title"><h3>温室记录</h3><span id="eventClock">T+00:00</span></div>
+            <div id="eventLog" class="event-log"></div>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
