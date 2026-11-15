@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>夜间隧道巡检 · 十分钟检修窗口</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #05070d;
+    color: #cfd8e3;
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    height: 100%;
+    overflow: hidden;
+  }
+  #wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 10px;
+  }
+  canvas {
+    background: #0a0e18;
+    border: 1px solid #1e2a3d;
+    border-radius: 8px;
+    box-shadow: 0 0 40px rgba(30, 80, 160, 0.15);
+    max-width: 96vw;
+  }
+  #help {
+    font-size: 13px;
+    color: #7c8aa0;
+    letter-spacing: 0.5px;
+  }
+  #help b { color: #ffd166; font-weight: 600; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game" width="1100" height="560"></canvas>
+  <div id="help">
+    <b>→ / D</b> 前进（不可倒车） · <b>空格</b> 制动 · 停进检测区后按 <b>E</b> 检查 · 发现故障按 <b>T</b> 使用工具（耗时更长） · 三处合格后驶出隧道
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
