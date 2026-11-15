@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>沙尘暴温室防护模拟</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>沙尘暴温室防护模拟</h1>
+      <p class="sub">
+        操作三台移动风机偏转沙尘流。十分钟内让两座温室进风效率都保持在 70% 以上即成功。
+      </p>
+    </header>
+
+    <main>
+      <section class="stage">
+        <canvas id="field" width="1000" height="600"></canvas>
+        <div class="hud">
+          <span>剩余时间 <b id="timer">10:00</b></span>
+          <span>风暴强度 <b id="storm">0%</b></span>
+          <span>温室A效率 <b id="houseA">100%</b></span>
+          <span>温室B效率 <b id="houseB">100%</b></span>
+          <span id="status" class="">已暂停</span>
+          <span id="overdrive" class="ok">送风状态正常</span>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2>风机控制</h2>
+        <p class="hint">点击风机选中；拖动机身移动，拖动喷嘴改方向。</p>
+        <label>
+          方向角
+          <input id="fanAngle" type="range" min="-80" max="80" step="1" value="0" />
+          <span id="angleVal">0°</span>
+        </label>
+        <label>
+          功率
+          <input id="fanPower" type="range" min="0" max="100" step="1" value="100" />
+          <span id="powerVal">100%</span>
+        </label>
+
+        <h2>模拟</h2>
+        <div class="buttons">
+          <button id="start">开始 / 继续</button>
+          <button id="pause">暂停</button>
+          <button id="reset">重置</button>
+        </div>
+        <label>
+          时间倍率
+          <select id="speed">
+            <option value="1">1×（实时十分钟）</option>
+            <option value="10" selected>10×</option>
+            <option value="60">60×（一分钟跑完）</option>
+          </select>
+        </label>
+
+        <h2>部署预设</h2>
+        <div class="buttons">
+          <button id="presetGood" class="good-btn">正确防护</button>
+          <button id="presetBad" class="bad-btn">方向错误</button>
+          <button id="presetOver" class="warn-btn">过度送风</button>
+        </div>
+        <p class="hint">
+          「过度送风」把顶部风机对准温室 B，演示沙子被横向推进另一座温室。
+        </p>
+      </aside>
+    </main>
+
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>

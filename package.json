@@ -1,0 +1,10 @@
+{
+  "name": "sandstorm-greenhouse-defense",
+  "version": "1.0.0",
+  "description": "Canvas + Web Audio sandstorm defense simulation with three mobile fans",
+  "type": "module",
+  "scripts": {
+    "test": "node test/sim.test.js",
+    "drill": "node test/drill.mjs"
+  }
+}

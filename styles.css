@@ -1,0 +1,122 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #14171b;
+  color: #e6ebef;
+}
+header {
+  padding: 18px 24px 8px;
+}
+h1 {
+  margin: 0;
+  font-size: 22px;
+}
+.sub {
+  color: #9fb0bd;
+  margin: 6px 0 0;
+}
+main {
+  display: flex;
+  gap: 20px;
+  padding: 16px 24px 28px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.stage {
+  flex: 1 1 640px;
+  min-width: 320px;
+}
+#field {
+  width: 100%;
+  height: auto;
+  background: #22262b;
+  border: 1px solid #35404a;
+  border-radius: 10px;
+  touch-action: none;
+}
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #c6d2dc;
+}
+.hud b {
+  color: #fff;
+}
+.panel {
+  flex: 0 0 280px;
+  background: #1c2127;
+  border: 1px solid #303a43;
+  border-radius: 10px;
+  padding: 16px;
+}
+.panel h2 {
+  font-size: 15px;
+  margin: 16px 0 8px;
+  color: #8fc4ef;
+}
+.panel h2:first-child {
+  margin-top: 0;
+}
+label {
+  display: block;
+  margin: 10px 0;
+  font-size: 13px;
+  color: #c6d2dc;
+}
+input[type="range"] {
+  width: 100%;
+  margin: 6px 0 2px;
+}
+select {
+  width: 100%;
+  margin-top: 6px;
+  background: #242b32;
+  color: #e6ebef;
+  border: 1px solid #3a4650;
+  border-radius: 6px;
+  padding: 6px;
+}
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+button {
+  flex: 1 1 auto;
+  background: #2c3945;
+  color: #e6ebef;
+  border: 1px solid #3d4c59;
+  border-radius: 7px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 13px;
+}
+button:hover {
+  background: #364756;
+}
+.good-btn {
+  border-color: #2f7d5b;
+}
+.bad-btn {
+  border-color: #a14a3c;
+}
+.warn-btn {
+  border-color: #b58b3a;
+}
+.hint {
+  font-size: 12px;
+  color: #8ea0ad;
+  line-height: 1.5;
+}
+.ok {
+  color: #74d9a2;
+}
+.bad {
+  color: #ef826d;
+}
