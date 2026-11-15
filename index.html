@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>街角建筑立面生成器</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <aside class="panel">
+      <h1>街角建筑立面</h1>
+      <label>
+        Seed
+        <div class="row">
+          <input id="seed" type="number" min="1" value="7" />
+          <button id="reroll" type="button">换一个</button>
+        </div>
+      </label>
+      <label>楼层数 <span id="floorsValue">4</span>
+        <input id="floors" type="range" min="2" max="8" value="4" />
+      </label>
+      <label>开间数 <span id="baysValue">6</span>
+        <input id="bays" type="range" min="3" max="9" value="6" />
+      </label>
+      <label>窗格比例（宽/高） <span id="paneValue">1.5</span>
+        <input id="paneRatio" type="range" min="0.8" max="2.4" step="0.1" value="1.5" />
+      </label>
+      <label>遮阳板
+        <select id="sunshades">
+          <option value="none">无</option>
+          <option value="some" selected>部分</option>
+          <option value="all">全部</option>
+        </select>
+      </label>
+      <label>遮阳板挑出长度 <span id="depthValue">18</span>
+        <input id="sunshadeDepth" type="range" min="8" max="34" value="18" />
+      </label>
+      <label>招牌位置
+        <select id="sign">
+          <option value="none">无招牌</option>
+          <option value="parapet" selected>女儿墙</option>
+          <option value="above-door">门楣</option>
+          <option value="side-wall">侧墙</option>
+        </select>
+      </label>
+      <label class="check">
+        <input id="constructionLines" type="checkbox" checked />
+        显示构造线
+      </label>
+      <div class="actions">
+        <button id="exportSvg" type="button">导出 SVG</button>
+        <button id="exportPng" type="button">导出 PNG</button>
+      </div>
+      <pre id="report" class="report"></pre>
+    </aside>
+    <section class="stage">
+      <canvas id="canvas" width="800" height="600"></canvas>
+    </section>
+  </main>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
