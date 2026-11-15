@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>六色刺绣纹样编辑器 · 四边无缝</title>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="board">
+        <h1>六色刺绣纹样</h1>
+        <p class="sub">环面网格 · 针脚长度与换色实时校验 · 四边可无缝平铺</p>
+        <div class="canvas-wrap">
+          <canvas id="canvas" width="640" height="640"></canvas>
+          <div id="tooltip" class="tooltip" hidden></div>
+        </div>
+        <div class="hint">
+          点击两个网格点落针；移动鼠标悬停查看针脚长度与当前线色。按住 <code>Shift</code> 连针（连续针列）。
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2>线色（六色）</h2>
+        <div id="palette" class="palette"></div>
+
+        <h2>工具</h2>
+        <div class="tools">
+          <button id="btn-pen" class="active">布针</button>
+          <button id="btn-eraser">擦除</button>
+          <button id="btn-undo">撤销</button>
+          <button id="btn-clear">清空</button>
+        </div>
+        <label class="check"><input type="checkbox" id="toggle-grid" checked /> 显示网格</label>
+        <label class="check"><input type="checkbox" id="toggle-preview" checked /> 针迹预览</label>
+
+        <h2>校验</h2>
+        <ul id="issue-list" class="issues"><li class="ok">暂无问题</li></ul>
+        <div id="stats" class="stats"></div>
+
+        <h2>导出与平铺</h2>
+        <div class="tools">
+          <button id="btn-svg">导出 SVG</button>
+          <button id="btn-png">导出 PNG</button>
+          <button id="btn-demo">载入示例纹样</button>
+        </div>
+        <label class="check">平铺预览：
+          <select id="tile-count">
+            <option value="1">1 × 1</option>
+            <option value="2">2 × 2</option>
+            <option value="3" selected>3 × 3</option>
+            <option value="4">4 × 4</option>
+          </select>
+        </label>
+        <canvas id="tile-canvas" width="300" height="300" class="tile-preview"></canvas>
+      </aside>
+    </main>
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>
