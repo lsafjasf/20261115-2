@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>地热井压力调控模拟</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d1117; color: #d7e0ea;
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh; padding: 12px;
+  }
+  h1 { font-size: 20px; margin-bottom: 8px; color: #7fd4ff; }
+  #wrap { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  canvas { background: #10161f; border: 1px solid #2a3546; border-radius: 8px; }
+  #panel {
+    width: 260px; display: flex; flex-direction: column; gap: 12px;
+    background: #131a25; border: 1px solid #2a3546; border-radius: 8px; padding: 14px;
+  }
+  .ctl label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+  .ctl output { color: #7fd4ff; font-variant-numeric: tabular-nums; }
+  input[type=range] { width: 100%; accent-color: #3fa9f5; }
+  .row { display: flex; gap: 8px; }
+  button {
+    flex: 1; padding: 8px 0; border: none; border-radius: 6px; cursor: pointer;
+    background: #2563eb; color: #fff; font-size: 14px;
+  }
+  button:hover { background: #3b82f6; }
+  button.ghost { background: #2a3546; }
+  select { background: #1c2534; color: #d7e0ea; border: 1px solid #2a3546; border-radius: 6px; padding: 6px; flex: 1; }
+  #stats { font-size: 13px; line-height: 1.9; font-variant-numeric: tabular-nums; }
+  #stats .warn { color: #ffb454; }
+  #stats .danger { color: #ff5f5f; }
+  #msg { font-size: 14px; min-height: 22px; text-align: center; font-weight: 600; }
+  #msg.ok { color: #4ade80; } #msg.bad { color: #ff5f5f; } #msg.info { color: #7fd4ff; }
+  .hint { font-size: 12px; color: #8b98ab; line-height: 1.6; }
+</style>
+</head>
+<body>
+  <h1>🌋 地热井压力调控模拟</h1>
+  <div id="wrap">
+    <canvas id="cv" width="640" height="560"></canvas>
+    <div id="panel">
+      <div class="ctl">
+        <label>🌀 涡轮负荷 <output id="oLoad">80%</output></label>
+        <input type="range" id="rLoad" min="0" max="100" value="80">
+      </div>
+      <div class="ctl">
+        <label>💨 泄压阀开度 <output id="oRelief">0%</output></label>
+        <input type="range" id="rRelief" min="0" max="100" value="0">
+      </div>
+      <div class="ctl">
+        <label>💧 注水率 <output id="oInj">0%</output></label>
+        <input type="range" id="rInj" min="0" max="100" value="0">
+      </div>
+      <div class="row">
+        <button id="btnStart">▶ 开始</button>
+        <button id="btnReset" class="ghost">↺ 重置</button>
+        <select id="speed">
+          <option value="1">1×</option>
+          <option value="4" selected>4×</option>
+          <option value="10">10×</option>
+        </select>
+      </div>
+      <div id="stats"></div>
+      <div id="msg" class="info">调节三个阀门，撑过 10 分钟</div>
+      <div class="hint">
+        目标：保持发电（平均功率 ≥ 6 MW）且井口压力始终低于 12 MPa。<br>
+        · 热储会不断增压并出现蒸汽涌浪<br>
+        · 泄压可降压但损失输出<br>
+        · 注水过快会暂时降低蒸汽量<br>
+        · 压力/温度响应有延迟，提前调节<br>
+        · 超压 5 秒将触发紧急停机！
+      </div>
+    </div>
+  </div>
+  <script src="sim.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
