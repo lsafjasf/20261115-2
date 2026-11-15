@@ -1,0 +1,190 @@
+:root {
+  --ink: #1c1f26;
+  --muted: #5c6470;
+  --panel: #ffffff;
+  --page: #eef1f5;
+  --accent: #2f6fdb;
+  --danger: #c62828;
+  --ok: #1b7f3b;
+  --border: #d8dee7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  background: var(--page);
+  color: var(--ink);
+}
+
+.topbar {
+  padding: 20px 28px 12px;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 16px;
+  padding: 12px 28px 32px;
+  align-items: start;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+}
+
+.panel h2 {
+  font-size: 15px;
+  margin: 18px 0 10px;
+}
+
+.panel h2:first-child {
+  margin-top: 0;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.field label {
+  width: 56px;
+  font-size: 14px;
+}
+
+.field input[type="color"] {
+  width: 44px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.field code {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.view-switch {
+  display: flex;
+  gap: 8px;
+}
+
+.view-btn {
+  flex: 1;
+  padding: 8px 4px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f6f8fb;
+  cursor: pointer;
+}
+
+.view-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.export-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 8px;
+  background: var(--ink);
+  color: #fff;
+  cursor: pointer;
+}
+
+.export-btn:hover {
+  opacity: 0.88;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 8px 0 0;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  max-width: 640px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.scores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 14px 0 4px;
+}
+
+.score-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 14px;
+}
+
+.score-card h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.score-card p {
+  margin: 4px 0;
+}
+
+.verdict {
+  font-weight: 700;
+}
+
+.score-card.safe {
+  border-color: var(--ok);
+}
+
+.score-card.safe .verdict {
+  color: var(--ok);
+}
+
+.score-card.unsafe {
+  border-color: var(--danger);
+  background: #fdecec;
+}
+
+.score-card.unsafe .verdict,
+.score-card.unsafe strong {
+  color: var(--danger);
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

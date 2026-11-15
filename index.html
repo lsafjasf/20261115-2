@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>配色检查器 · 色弱视图对比</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>配色检查器</h1>
+    <p class="subtitle">普通 / 红绿色弱 / 蓝黄色弱 三视图对比度与可辨识度检查</p>
+  </header>
+
+  <main class="layout">
+    <section class="panel controls" aria-label="配色设置">
+      <h2>1. 选择颜色</h2>
+      <div class="field">
+        <label for="bgColor">背景色</label>
+        <input type="color" id="bgColor" value="#f5f2ea" />
+        <code id="bgHex">#f5f2ea</code>
+      </div>
+      <div class="field">
+        <label for="titleColor">标题色</label>
+        <input type="color" id="titleColor" value="#1a1a2e" />
+        <code id="titleHex">#1a1a2e</code>
+      </div>
+      <div class="field">
+        <label for="buttonColor">按钮色</label>
+        <input type="color" id="buttonColor" value="#2f6fdb" />
+        <code id="buttonHex">#2f6fdb</code>
+      </div>
+
+      <h2>2. 切换视图</h2>
+      <div class="view-switch" role="tablist" aria-label="视图切换">
+        <button class="view-btn active" data-view="normal" role="tab" aria-selected="true">普通视图</button>
+        <button class="view-btn" data-view="deuteranopia" role="tab" aria-selected="false">红绿色弱</button>
+        <button class="view-btn" data-view="tritanopia" role="tab" aria-selected="false">蓝黄色弱</button>
+      </div>
+
+      <h2>3. 导出</h2>
+      <button id="exportBtn" class="export-btn">导出优化建议(.txt)</button>
+      <p class="hint">仅生成建议文本供您手动采纳,不会自动替换您的任何颜色。</p>
+    </section>
+
+    <section class="panel preview" aria-label="预览与评分">
+      <h2>预览(<span id="viewLabel">普通视图</span>)</h2>
+      <canvas id="previewCanvas" width="640" height="320" aria-label="配色模拟预览"></canvas>
+
+      <div class="scores">
+        <div class="score-card" id="titleCard">
+          <h3>标题 / 背景</h3>
+          <p>对比度:<strong id="titleContrast">-</strong>:1(要求 ≥ 4.5)</p>
+          <p>可辨识度:<strong id="titleScore">-</strong>/100(要求 ≥ 50)</p>
+          <p class="verdict" id="titleVerdict">-</p>
+        </div>
+        <div class="score-card" id="buttonCard">
+          <h3>按钮 / 背景</h3>
+          <p>对比度:<strong id="buttonContrast">-</strong>:1(要求 ≥ 3.0)</p>
+          <p>可辨识度:<strong id="buttonScore">-</strong>/100(要求 ≥ 50)</p>
+          <p class="verdict" id="buttonVerdict">-</p>
+        </div>
+      </div>
+
+      <h2>色块对比(Canvas)</h2>
+      <canvas id="swatchCanvas" width="640" height="200" aria-label="原始与模拟色块对比"></canvas>
+    </section>
+  </main>
+
+  <script src="color.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
