@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#06151d" />
+    <title>ICEBREAKER / 冰下基地舱门检修</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="app">
+      <canvas
+        id="game"
+        width="1600"
+        height="900"
+        aria-label="冰下基地舱门维修模拟游戏"
+      ></canvas>
+      <div class="vignette" aria-hidden="true"></div>
+      <div class="scanlines" aria-hidden="true"></div>
+
+      <section id="briefing" class="briefing" aria-labelledby="briefing-title">
+        <div class="briefing-inner">
+          <p class="eyebrow"><span class="live-dot"></span> 极地深潜站 · 外部检修通道 A-07</p>
+          <h1 id="briefing-title">舱门<span>冻结</span></h1>
+          <p class="briefing-copy">
+            三道锁点被负温冰层封死。驾驶 K-7 维修车抵达锁点，用热水逐点解冻；
+            舱门开启后驶入气闸撤离。氧气有限，谨慎驾驶。
+          </p>
+          <div class="controls" aria-label="操作说明">
+            <div><kbd>WASD</kbd><span>驾驶</span></div>
+            <div><kbd>鼠标</kbd><span>瞄准</span></div>
+            <div><kbd>左键 / Space</kbd><span>预热 &amp; 喷射</span></div>
+            <div><kbd>F</kbd><span>锁定最近锁点</span></div>
+          </div>
+          <div class="briefing-actions">
+            <button id="start-button" class="start-button" type="button">
+              <span>点火出勤</span>
+              <i aria-hidden="true">↗</i>
+            </button>
+            <p class="briefing-foot"><span>O₂ 150s</span><span>K-7 外部维修单元</span></p>
+          </div>
+        </div>
+      </section>
+
+      <section id="result" class="result" hidden aria-live="polite">
+        <div class="result-card">
+          <p id="result-kicker" class="eyebrow">AIRLOCK CONTROL</p>
+          <h2 id="result-title">气闸已开启</h2>
+          <p id="result-copy"></p>
+          <div id="result-stats" class="result-stats"></div>
+          <button id="restart-button" class="start-button" type="button">
+            <span>再次出勤</span><i aria-hidden="true">↻</i>
+          </button>
+        </div>
+      </section>
+
+      <div id="audio-hint" class="audio-hint" hidden>
+        点击画面以启用泵机与水流声
+      </div>
+    </main>
+    <script src="./game.js"></script>
+  </body>
+</html>
