@@ -1,0 +1,10 @@
+{
+  "name": "paper-slitter-sim",
+  "version": "1.0.0",
+  "description": "宽幅纸卷分切仿真：对刀、卷速、张力 Canvas + Web Audio 游戏",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/engine.test.js",
+    "start": "node server.js"
+  }
+}
