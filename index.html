@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>城市声景工作台 · Web Audio</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>城市声景 <span class="sub">三分钟 · 早高峰 → 夜间 · 纯 Web Audio 合成</span></h1>
+  <div class="transport">
+    <button id="btnPlay" class="primary">▶ 播放</button>
+    <button id="btnPause">⏸ 暂停</button>
+    <button id="btnStop">⏹ 回到起点</button>
+    <label class="loop"><input type="checkbox" id="chkLoop" checked> 循环</label>
+    <span class="clock"><b id="clockNow">0:00.0</b> / 3:00.0</span>
+    <button id="btnCheck">🔬 暂停/离线一致性检查</button>
+    <button id="btnExport" class="primary">⬇ 导出 WAV</button>
+  </div>
+</header>
+
+<main>
+  <section class="panels">
+    <div class="panel">
+      <h2>声源位置（俯视）</h2>
+      <canvas id="mapCanvas" width="560" height="300"></canvas>
+    </div>
+    <div class="panel">
+      <h2>主输出波形</h2>
+      <canvas id="waveCanvas" width="560" height="150"></canvas>
+      <h2 class="mt">事件带（确定性事件调度）</h2>
+      <canvas id="eventCanvas" width="560" height="120"></canvas>
+    </div>
+  </section>
+
+  <section class="panel timeline-panel">
+    <div class="timeline-head">
+      <h2>参数关键帧时间线</h2>
+      <div class="hint">空白处点击添加关键帧 · 拖动圆点改时间/数值 · 双击圆点删除 · 数值范围 0–1</div>
+    </div>
+    <div id="ruler" class="ruler"></div>
+    <div id="lanes"></div>
+  </section>
+
+  <section class="panel log-panel">
+    <h2>检查报告</h2>
+    <pre id="report">尚未运行检查。点击「暂停/离线一致性检查」或导出 WAV 时会自动执行。</pre>
+  </section>
+</main>
+
+<script src="js/dsp.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/render.js"></script>
+<script src="js/live.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
