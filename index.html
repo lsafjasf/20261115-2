@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BLACKWATER // 声呐定位</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">⌁</span>
+        <div>
+          <p class="eyebrow">DEEP SURVEY DIVISION · 07</p>
+          <h1>BLACK<span>WATER</span></h1>
+        </div>
+      </div>
+      <div class="mission-id">
+        <span>OPERATION</span>
+        <strong>ABYSS-09</strong>
+      </div>
+      <div class="live-status">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">AWAITING DIVE</span>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <aside class="side-panel mission-panel">
+        <div class="panel-heading">
+          <span>01 / MISSION</span>
+          <span class="tiny-code">BWR-384</span>
+        </div>
+        <h2>Find what the dark<br>is hiding.</h2>
+        <p class="brief">
+          Three hard contacts and one active beacon lie inside the survey field.
+          The seabed map is offline. Listen for returns, resolve each position,
+          then commit an acoustic trace.
+        </p>
+        <div class="contact-tally">
+          <div class="tally-row" data-contact="obstacle">
+            <span class="contact-icon obstacle-icon"></span>
+            <span>OBSTACLES</span>
+            <strong><b id="obstacleCount">0</b>/3</strong>
+          </div>
+          <div class="tally-row" data-contact="beacon">
+            <span class="contact-icon beacon-icon"></span>
+            <span>BEACON</span>
+            <strong><b id="beaconCount">0</b>/1</strong>
+          </div>
+        </div>
+        <div class="mission-note">
+          <span>PLOT PROTOCOL</span>
+          Choose a signature, then click the scope where the return resolves.
+          <em>No contact appears until traced.</em>
+        </div>
+      </aside>
+
+      <section class="scope-column">
+        <div class="scope-header">
+          <div>
+            <p class="eyebrow">REAL-TIME ACOUSTIC SCOPE</p>
+            <h2>Listening field</h2>
+          </div>
+          <div class="bearing-readout">
+            <span>EMISSION AXIS</span>
+            <strong><b id="angleReadout">015</b>°</strong>
+          </div>
+        </div>
+
+        <div class="scope-stage">
+          <canvas id="scopeCanvas" aria-label="声呐扫描表：点击可标记回波位置"></canvas>
+          <div class="scope-corner top-left">GAIN <b id="gainValue">+08</b></div>
+          <div class="scope-corner top-right">RANGE <b>48 m</b></div>
+          <div class="scope-corner bottom-left">NO MAP FEED</div>
+          <div class="scope-corner bottom-right" id="hoverReadout">R — · BRG —</div>
+          <div class="overheat-flash" id="overheatFlash"></div>
+        </div>
+
+        <div class="scope-controls">
+          <div class="angle-control">
+            <button class="square-btn" id="angleDown" aria-label="向左旋转发射角">−</button>
+            <label class="angle-slider">
+              <span>ROTATE EMITTER</span>
+              <input id="angleSlider" type="range" min="0" max="359" value="15">
+            </label>
+            <button class="square-btn" id="angleUp" aria-label="向右旋转发射角">+</button>
+          </div>
+          <button class="transmit-btn" id="pingButton">
+            <span class="transmit-icon" aria-hidden="true"></span>
+            <div><strong>TRANSMIT</strong><small>HOLD TO SWEEP · SPACE</small></div>
+          </button>
+          <button class="undo-btn" id="undoButton" disabled>
+            <span>↶</span> ERASE TRACE
+          </button>
+        </div>
+      </section>
+
+      <aside class="side-panel instruments">
+        <div class="panel-heading">
+          <span>02 / RETURNS</span>
+          <span class="tiny-code">CH-01</span>
+        </div>
+        <div class="wave-card">
+          <div class="wave-title">
+            <span>HYDROPHONE WAVEFORM</span>
+            <span class="recording"><i></i> LIVE</span>
+          </div>
+          <canvas id="waveCanvas" aria-label="声呐回波波形"></canvas>
+          <div class="wave-scale"><span>0s</span><span>1</span><span>2</span><span>3</span><span>4s</span></div>
+          <div class="range-formula">RANGE ≈ (ΔT − 0.12) × 34 m/s</div>
+        </div>
+        <div class="stereo-card">
+          <div class="metric-label"><span>STEREO RETURN</span><span>L / R</span></div>
+          <div class="stereo-meters">
+            <div class="meter-track"><i id="leftMeter"></i></div>
+            <div class="meter-track"><i id="rightMeter"></i></div>
+          </div>
+          <div class="stereo-values"><span>PORT</span><span>STARBOARD</span></div>
+        </div>
+        <div class="plot-card">
+          <div class="metric-label"><span>PLOT SIGNATURE</span><span>MANUAL</span></div>
+          <div class="signature-buttons">
+            <button class="signature-btn active" data-signature="obstacle">
+              <span class="contact-icon obstacle-icon"></span>
+              <div><strong>OBSTACLE</strong><small>LOW · DAMPED</small></div>
+            </button>
+            <button class="signature-btn" data-signature="beacon">
+              <span class="contact-icon beacon-icon"></span>
+              <div><strong>BEACON</strong><small>HIGH · PURE</small></div>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="lower-deck">
+      <div class="power-card">
+        <div class="metric-label"><span>TRANSMISSIONS</span><b id="pingsLeft">24</b></div>
+        <div class="power-pips" id="powerPips"></div>
+      </div>
+      <div class="heat-card">
+        <div class="metric-label"><span>TRANSDUCER HEAT</span><b id="heatValue">08%</b></div>
+        <div class="heat-track"><i id="heatFill"></i><span></span></div>
+        <small id="heatHint">THERMAL MARGIN NOMINAL</small>
+      </div>
+      <div class="drive-card">
+        <div class="drive-pad">
+          <button data-move="up" aria-label="向北移动">↑</button>
+          <button data-move="left" aria-label="向西移动">←</button>
+          <button data-move="right" aria-label="向东移动">→</button>
+          <button data-move="down" aria-label="向南移动">↓</button>
+        </div>
+        <div>
+          <div class="metric-label"><span>LISTENER DRIVE</span><span>WASD</span></div>
+          <div class="coord-readout">X <b id="coordX">+00.0</b> &nbsp; Y <b id="coordY">+00.0</b></div>
+        </div>
+      </div>
+      <div class="log-card">
+        <div class="metric-label"><span>ACOUSTIC LOG</span><span id="logClock">00:00:00</span></div>
+        <p id="logLine">Transducer idle. Awaiting operator.</p>
+      </div>
+    </section>
+
+    <footer class="footer-line">
+      <span>BLACKWATER ACOUSTICS © 2038</span>
+      <span>AUDIO ENABLED AFTER DIVE · ECHO LINES ARE OPERATOR-GENERATED</span>
+      <span id="audioBadge">AUDIO OFFLINE</span>
+    </footer>
+  </main>
+
+  <div class="entry-screen" id="entryScreen">
+    <div class="entry-grid">
+      <div class="entry-copy">
+        <p class="eyebrow">DEEP SURVEY DIVISION · TRAINING BASIN 9</p>
+        <h2>Nothing here can<br>be seen.</h2>
+        <p>Your transducer is the only eye. Rotate the beam, drive the listener,
+          and read the delay and stereo weight of each return.</p>
+        <div class="brief-grid">
+          <div><span>01</span><p><b>Listen</b><br>Low damped returns are obstacles. A high, pure tone is the beacon.</p></div>
+          <div><span>02</span><p><b>Resolve</b><br>Delay sets range. The stronger channel sets the side of the beam.</p></div>
+          <div><span>03</span><p><b>Commit</b><br>Plot all four positions. Erase any bad trace. No map will assist you.</p></div>
+        </div>
+        <button class="dive-btn" id="diveButton"><span>ENTER THE WATER</span><i>→</i></button>
+        <p class="audio-warning">Headphones recommended · Web Audio will initialize on entry</p>
+      </div>
+      <div class="entry-diagram" aria-hidden="true">
+        <div class="orbit orbit-a"></div>
+        <div class="orbit orbit-b"></div>
+        <div class="diagram-core">⌁</div>
+        <span class="diagram-label label-a">RETURN / 01</span>
+        <span class="diagram-label label-b">UNKNOWN</span>
+        <span class="diagram-label label-c">DEPTH 148 m</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-screen" id="successScreen" hidden>
+    <div class="success-card">
+      <p class="eyebrow">SURVEY COMPLETE · ALL RETURNS RESOLVED</p>
+      <h2>Seabed<br>resolved.</h2>
+      <div class="success-rule"></div>
+      <div class="success-stats">
+        <div><span>OBSTACLES</span><b>3 / 3</b></div>
+        <div><span>BEACON</span><b>1 / 1</b></div>
+        <div><span>TRANSMISSIONS</span><b id="successPings">04</b></div>
+      </div>
+      <p class="success-copy">The four operator traces match the acoustic field.
+        Survey ABYSS-09 is now safe to enter.</p>
+      <button class="dive-btn" id="againButton"><span>RUN NEW SURVEY</span><i>↻</i></button>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
